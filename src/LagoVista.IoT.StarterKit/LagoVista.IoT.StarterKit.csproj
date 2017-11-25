@@ -1,20 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
     <NetStandardImplicitPackageVersion>2.0.1</NetStandardImplicitPackageVersion>
   </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="LagoVista.Core" Version="1.2.192-alpha0715" />
-    <PackageReference Include="LagoVista.UserAdmin" Version="1.2.192-alpha0715" />
-    <PackageReference Include="LagoVista.IoT.DeviceAdmin" Version="1.2.192-alpha0715" />
-    <PackageReference Include="LagoVista.IoT.DeviceManagement.Core" Version="1.2.192-alpha0715" />
-    <PackageReference Include="LagoVista.IoT.DeviceMessaging.Admin" Version="1.2.192-alpha0715" />
-    <PackageReference Include="LagoVista.IoT.Logging" Version="1.2.192-alpha0715" />
-    <PackageReference Include="LagoVista.IoT.Pipeline.Admin" Version="1.2.192-alpha0715" />
-    <PackageReference Include="LagoVista.IoT.Deployment.Admin" Version="1.2.192-alpha0715" />
-    <PackageReference Include="LagoVista.IoT.Simulator.Admin" Version="1.2.192-alpha0715" />
+    <PackageReference Include="LagoVista.Core" Version="1.2.192-alpha1258" />
+    <PackageReference Include="LagoVista.UserAdmin" Version="1.2.192-alpha1258" />
+    <PackageReference Include="LagoVista.IoT.DeviceAdmin" Version="1.2.192-alpha1258" />
+    <PackageReference Include="LagoVista.IoT.DeviceManagement.Core" Version="1.2.192-alpha1258" />
+    <PackageReference Include="LagoVista.IoT.DeviceMessaging.Admin" Version="1.2.192-alpha1258" />
+    <PackageReference Include="LagoVista.IoT.Logging" Version="1.2.192-alpha1258" />
+    <PackageReference Include="LagoVista.IoT.Pipeline.Admin" Version="1.2.192-alpha1258" />
+    <PackageReference Include="LagoVista.IoT.Deployment.Admin" Version="1.2.192-alpha1258" />
+    <PackageReference Include="LagoVista.IoT.Simulator.Admin" Version="1.2.192-alpha1258" />
   </ItemGroup>
-
 </Project>
