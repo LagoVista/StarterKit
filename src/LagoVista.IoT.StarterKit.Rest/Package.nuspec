@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>LagoVista.IoT.StarterKit.Rest</id>
+    <version>1.2.192-alpha0715</version>
+    <authors>Software Logistics, LLC</authors>
+    <owners>Software Logistics, LLC</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <projectUrl>https://github.com/LagoVista/IoTEngine</projectUrl>
+    <iconUrl>http://bytemaster.blob.core.windows.net/icons/LagoVistaIcon.png</iconUrl>
+    <description>Provides REST Services for Adminstering Simulators for the LagoVista Devices, IoT and Home Automation Frameworks</description>
+    <releaseNotes>Initial and Unstable Release</releaseNotes>
+    <copyright>Copyright 2017</copyright>
+    <tags>HomeAutomation IoT Cloud LagoVista</tags>
+    <dependencies>
+      <dependency id="Newtonsoft.Json" version="10.0.1" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="ReadMe.html" target="" />
+    <file src="bin\release\netstandard2.0\LagoVista.IoT.StarterKit.Rest.xml" target="contentFiles\wwwroot\xmldocs" />
+    <file src="bin\release\netstandard2.0\*.dll" target="lib\netstandard2.0" />
+  </files>
+</package>
