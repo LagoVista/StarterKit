@@ -10,4 +10,14 @@
     <DocumentationFile>bin\Release\netstandard2.0\LagoVista.IoT.StarterKit.Rest.xml</DocumentationFile>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="LagoVista.Core" Version="1.2.196-alpha0642" />
+    <PackageReference Include="LagoVista.IoT.Pipeline.Admin" Version="1.2.196-alpha0642" />
+    <PackageReference Include="LagoVista.IoT.Logging" Version="1.2.196-alpha0642" />
+    <PackageReference Include="LagoVista.IoT.Runtime.Core" Version="1.2.196-alpha0642" />
+    <PackageReference Include="LagoVista.IoT.Web.Common" Version="1.2.196-alpha0642" />
+    <PackageReference Include="LagoVista.UserAdmin" Version="1.2.196-alpha0642" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.1" />
+  </ItemGroup>
 </Project>

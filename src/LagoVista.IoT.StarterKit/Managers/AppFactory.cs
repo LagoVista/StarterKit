@@ -19,6 +19,7 @@ using LagoVista.UserAdmin.Models.Orgs;
 using LagoVista.IoT.DeviceManagement.Core.Managers;
 using LagoVista.IoT.Billing;
 using LagoVista.IoT.Verifiers.Managers;
+using LagoVista.IoT.Runtime.Core.Models.Verifiers;
 
 namespace LagoVista.IoT.StarterKit.Managers
 {
@@ -75,10 +76,8 @@ namespace LagoVista.IoT.StarterKit.Managers
             entity.Id = Guid.NewGuid().ToId();
         }
 
-        public async Task<InvokeResult<Solution>> CreateSimpleSolutionAsync(EntityHeader org, EntityHeader user)
+        public Subscription CreateFreeSubscription(EntityHeader org, EntityHeader user, DateTime createTimeStamp)
         {
-            var createTimeStamp = DateTime.UtcNow;
-
             var subscription = new Subscription()
             {
                 Id = Guid.NewGuid(),
@@ -92,8 +91,29 @@ namespace LagoVista.IoT.StarterKit.Managers
                 LastUpdatedDate = createTimeStamp,
             };
 
-            await _subscriptionMgr.AddSubscriptionAsync(subscription, org, user);
+            return subscription;
+        }
 
+        public DeviceRepository CreateDevice(Subscription subscription, EntityHeader org, EntityHeader user, DateTime createTimeStamp)
+        {
+            /* Create Device Configurations */
+            var deviceRepository = new DeviceRepository()
+            {
+                Name = "Sample Device Repo",
+                Key = "sampledevicerepo",
+                RepositoryType = EntityHeader<RepositoryTypes>.Create(RepositoryTypes.NuvIoT),
+                Subscription = new EntityHeader() { Id = subscription.Id.ToString(), Text = subscription.Name }
+            };
+            AddId(deviceRepository);
+            AddOwnedProperties(deviceRepository, org);
+            AddAuditProperties(deviceRepository, createTimeStamp, org, user);
+
+            return deviceRepository;
+        }
+
+
+        public async Task<InvokeResult<Solution>> CreateSimpleSolutionAsync(EntityHeader org, EntityHeader user, DateTime createTimeStamp)
+        {
             /* Create unit/state sets */
             var stateSet = new StateSet()
             {
@@ -125,6 +145,23 @@ namespace LagoVista.IoT.StarterKit.Managers
             AddAuditProperties(unitSet, createTimeStamp, org, user);
             await _deviceAdminMgr.AddUnitSetAsync(unitSet, org, user);
 
+            /* Create Pipeline Modules */
+            var restListener = new ListenerConfiguration()
+            {
+                Name = "Sample Rest",
+                Key = "samplereset",
+                ListenerType = EntityHeader<ListenerTypes>.Create(ListenerTypes.Rest),
+                RestServerType = EntityHeader<RESTServerTypes>.Create(RESTServerTypes.HTTP),
+                ListenOnPort = 80,
+                ContentType = EntityHeader<DeviceMessaging.Admin.Models.MessageContentTypes>.Create(DeviceMessaging.Admin.Models.MessageContentTypes.JSON),
+                UserName = "clientuser",
+                Password = "Test1234"
+            };
+            AddId(restListener);
+            AddOwnedProperties(restListener, org);
+            AddAuditProperties(restListener, createTimeStamp, org, user);
+            await _pipelineMgr.AddListenerConfigurationAsync(restListener, org, user);
+
             var msgTempDefinition = new DeviceMessaging.Admin.Models.DeviceMessageDefinition()
             {
                 Name = "Sample Temperature Message",
@@ -136,7 +173,12 @@ namespace LagoVista.IoT.StarterKit.Managers
                         Id = Guid.NewGuid().ToId(),
                         Name = "Example Temperature Message",
                         Key="exmpl001",
-                        Payload="98.5,38"
+                        Payload="98.5,38",
+                        Headers = new System.Collections.ObjectModel.ObservableCollection<DeviceMessaging.Admin.Models.Header>()
+                        {
+                            new DeviceMessaging.Admin.Models.Header() { Name="x-deviceid", Value="device001"},
+                            new DeviceMessaging.Admin.Models.Header() { Name = "x-messageid", Value="tmpmsg001"}
+                        }
                     }
                 },
                 MessageId = "smpltmp001",
@@ -178,7 +220,8 @@ namespace LagoVista.IoT.StarterKit.Managers
                         Id = Guid.NewGuid().ToId(),
                         Name = "Example Motion Message",
                         Key="exmpl001",
-                        Payload="{'motion':'on','level':80}"
+                        Payload="{'motion':'on','level':80}",
+                        PathAndQueryString = "/motion/device001"
                     }
                 },
                 MessageId = "smplmot001",
@@ -210,66 +253,167 @@ namespace LagoVista.IoT.StarterKit.Managers
             await _deviceMsgMgr.AddDeviceMessageDefinitionAsync(motionMsgDefinition, org, user);
 
 
-            /* Create Pipeline Modules */
-            var restListener = new ListenerConfiguration()
+            var deviceIdParser1 = new DeviceMessaging.Admin.Models.DeviceMessageDefinitionField()
             {
-                Name = "Sample Rest",
-                Key = "samplereset",
-                ListenerType = EntityHeader<ListenerTypes>.Create(ListenerTypes.Rest),
-                RestServerType = EntityHeader<RESTServerTypes>.Create(RESTServerTypes.HTTP),
-                ListenOnPort = 80,
-                ContentType = EntityHeader<DeviceMessaging.Admin.Models.MessageContentTypes>.Create(DeviceMessaging.Admin.Models.MessageContentTypes.JSON),
-                UserName = "clientuser",
-                Password = "Test1234"
+                SearchLocation = EntityHeader<DeviceMessaging.Admin.Models.SearchLocations>.Create(DeviceMessaging.Admin.Models.SearchLocations.Header),
+                HeaderName = "x-deviceid",
+                Name = "Device Id in Header",
+                Key = "xdeviceid"
             };
-            AddId(restListener);
-            AddOwnedProperties(restListener, org);
-            AddAuditProperties(restListener, createTimeStamp, org, user);
-            await _pipelineMgr.AddListenerConfigurationAsync(restListener, org, user);
+
+            var deviceIdParser2 = new DeviceMessaging.Admin.Models.DeviceMessageDefinitionField()
+            {
+                SearchLocation = EntityHeader<DeviceMessaging.Admin.Models.SearchLocations>.Create(DeviceMessaging.Admin.Models.SearchLocations.Path),
+                PathLocator = "/*/{deviceid}",
+                Name = "Device Id in Path",
+                Key = "pathdeviceid"
+            };
+
+            var messageIdParser1 = new DeviceMessaging.Admin.Models.DeviceMessageDefinitionField()
+            {
+                SearchLocation = EntityHeader<DeviceMessaging.Admin.Models.SearchLocations>.Create(DeviceMessaging.Admin.Models.SearchLocations.Header),
+                HeaderName = "x-messageid",
+                Name = "Message Id in Header",
+                Key = "xmessageid",
+            };
+            var messageIdParser2 = new DeviceMessaging.Admin.Models.DeviceMessageDefinitionField()
+            {
+                SearchLocation = EntityHeader<DeviceMessaging.Admin.Models.SearchLocations>.Create(DeviceMessaging.Admin.Models.SearchLocations.Path),
+                PathLocator = "/{messageid}/*",
+                Name = "Message Id in Path",
+                Key = "pathmessageid"
+            };
+
+            var verifier = new Verifier()
+            {
+                Component = new EntityHeader()
+                {
+                    Id = motionMsgDefinition.Id,
+                    Text = motionMsgDefinition.Name
+                },
+                ExpectedOutputs = new System.Collections.ObjectModel.ObservableCollection<ExpectedValue>()
+                {
+                    new ExpectedValue() { Key = "motion", Value="on"},
+                    new ExpectedValue() {Key = "level", Value="80"}
+                },
+                InputType = EntityHeader<InputTypes>.Create(InputTypes.Text),
+                Name = "Simple Message Verifier",
+                Key = "smplmsgver",
+                Description = "Validates that a Sample Motion Message has the proper field parsers",
+                Input = "{'motion':'on','level':80}",
+                PathAndQueryString = "/smplmot001/device001",
+                ShouldSucceed = true,
+                VerifierType = EntityHeader<VerifierTypes>.Create(VerifierTypes.MessageParser)
+            };
+            AddId(verifier);
+            AddOwnedProperties(verifier, org);
+            AddAuditProperties(verifier, createTimeStamp, org, user);
+            await _verifierMgr.AddVerifierAsync(verifier, org, user);
+
+            var deviceIdParserVerifier1 = new Verifier()
+            {
+                Component = new EntityHeader()
+                {
+                    Id = deviceIdParser1.Id,
+                    Text = deviceIdParser1.Name
+                },
+                ExpectedOutput = "device001",
+                InputType = EntityHeader<InputTypes>.Create(InputTypes.Text),
+                Name = "Find Device Id in Header",
+                Key = "msgidheader",
+                Description = "Validates that the Device Id can be extracted from the header",
+                Headers = new System.Collections.ObjectModel.ObservableCollection<DeviceMessaging.Admin.Models.Header>()
+                {
+                     new DeviceMessaging.Admin.Models.Header() { Name = "x-messageid", Value="device001"}
+                },
+                ShouldSucceed = true,
+                VerifierType = EntityHeader<VerifierTypes>.Create(VerifierTypes.MessageFieldParser)
+            };
+            AddId(deviceIdParserVerifier1);
+            AddOwnedProperties(deviceIdParserVerifier1, org);
+            AddAuditProperties(deviceIdParserVerifier1, createTimeStamp, org, user);
+            await _verifierMgr.AddVerifierAsync(deviceIdParserVerifier1, org, user);
+
+            var deviceIdParserVerifier2 = new Verifier()
+            {
+                Component = new EntityHeader()
+                {
+                    Id = deviceIdParser2.Id,
+                    Text = deviceIdParser2.Name
+                },
+                ExpectedOutput = "device002",
+                InputType = EntityHeader<InputTypes>.Create(InputTypes.Text),
+                Name = "Finds Device Id in Path",
+                Key = "msgidpath",
+                Description = "Validats the the device id can be extracted from thepath",
+                PathAndQueryString = "/smplmot001/device002",
+                ShouldSucceed = true,
+                VerifierType = EntityHeader<VerifierTypes>.Create(VerifierTypes.MessageFieldParser)
+            };
+            AddId(deviceIdParserVerifier2);
+            AddOwnedProperties(deviceIdParserVerifier2, org);
+            AddAuditProperties(deviceIdParserVerifier2, createTimeStamp, org, user);
+            await _verifierMgr.AddVerifierAsync(deviceIdParserVerifier2, org, user);
+
+            var messageIdParserVerifier1 = new Verifier()
+            {
+                Component = new EntityHeader()
+                {
+                    Id = messageIdParser1.Id,
+                    Text = messageIdParser1.Name
+                },
+                ExpectedOutput = "smplmsg001",
+                InputType = EntityHeader<InputTypes>.Create(InputTypes.Text),
+                Name = "Finds Message id in Header",
+                Key = "msgidheader",
+                Description = "Validates that the message id can be extracted from the header",
+                Headers = new System.Collections.ObjectModel.ObservableCollection<DeviceMessaging.Admin.Models.Header>()
+                {
+                     new DeviceMessaging.Admin.Models.Header() { Name = "x-messageid", Value="smplmsg001"}
+                },
+                ShouldSucceed = true,
+                VerifierType = EntityHeader<VerifierTypes>.Create(VerifierTypes.MessageFieldParser)
+            };
+            AddId(messageIdParserVerifier1);
+            AddOwnedProperties(messageIdParserVerifier1, org);
+            AddAuditProperties(messageIdParserVerifier1, createTimeStamp, org, user);
+            await _verifierMgr.AddVerifierAsync(messageIdParserVerifier1, org, user);
+
+            var messageIdParserVerifier2 = new Verifier()
+            {
+                Component = new EntityHeader()
+                {
+                    Id = messageIdParser2.Id,
+                    Text = messageIdParser2.Name
+                },
+                ExpectedOutput = "smplmot002",
+                InputType = EntityHeader<InputTypes>.Create(InputTypes.Text),
+                Name = "Finds Message id in Path",
+                Key = "msgidpath",
+                Description = "Validates that the message id can be extracted from path.",
+                PathAndQueryString = "/smplmot002/device001",
+                ShouldSucceed = true,
+                VerifierType = EntityHeader<VerifierTypes>.Create(VerifierTypes.MessageFieldParser)
+            };
+            AddId(messageIdParserVerifier2);
+            AddOwnedProperties(messageIdParserVerifier2, org);
+            AddAuditProperties(messageIdParserVerifier2, createTimeStamp, org, user);
+            await _verifierMgr.AddVerifierAsync(messageIdParserVerifier2, org, user);
 
             var planner = new PlannerConfiguration()
             {
                 Name = "Sample Planner",
                 Key = "sampleplanner",
                 MessageTypeIdParsers = new List<DeviceMessaging.Admin.Models.DeviceMessageDefinitionField>()
-                {
-                    new DeviceMessaging.Admin.Models.DeviceMessageDefinitionField()
-                    {
-                        SearchLocation = EntityHeader<DeviceMessaging.Admin.Models.SearchLocations>.Create(DeviceMessaging.Admin.Models.SearchLocations.Header),
-                        HeaderName= "x-messageid",
-                        Name = "Message Id in Header",
-                        Key = "xmessageid",
-                     },
-                    new DeviceMessaging.Admin.Models.DeviceMessageDefinitionField()
-                    {
-                        SearchLocation = EntityHeader<DeviceMessaging.Admin.Models.SearchLocations>.Create(DeviceMessaging.Admin.Models.SearchLocations.Path),
-                        PathLocator ="/{messageid}/*",
-                        Name = "Message Id in Path",
-                        Key = "pathmessageid"
-                    }
-                },
+                {messageIdParser1, messageIdParser2},
                 DeviceIdParsers = new List<DeviceMessaging.Admin.Models.DeviceMessageDefinitionField>()
-                {
-                    new DeviceMessaging.Admin.Models.DeviceMessageDefinitionField()
-                    {
-                        SearchLocation = EntityHeader<DeviceMessaging.Admin.Models.SearchLocations>.Create(DeviceMessaging.Admin.Models.SearchLocations.Header),
-                        HeaderName= "x-deviceid",
-                        Name = "Device Id in Header",
-                        Key = "xdeviceid"
-                    },
-                    new DeviceMessaging.Admin.Models.DeviceMessageDefinitionField()
-                    {
-                        SearchLocation = EntityHeader<DeviceMessaging.Admin.Models.SearchLocations>.Create(DeviceMessaging.Admin.Models.SearchLocations.Path),
-                        PathLocator ="/*/{deviceid}",
-                        Name = "Device Id in Path",
-                        Key = "pathdeviceid"
-                    }
-                }
+                {deviceIdParser1, deviceIdParser2}
             };
             AddId(planner);
             AddOwnedProperties(planner, org);
             AddAuditProperties(planner, createTimeStamp, org, user);
             await _pipelineMgr.AddPlannerConfigurationAsync(planner, org, user);
+
 
             /* Create Pipeline Modules */
             var sentinelConfiguration = new SentinelConfiguration()
@@ -343,7 +487,7 @@ namespace LagoVista.IoT.StarterKit.Managers
                 PrimaryOutput = new RouteConnection() { Id = tmpWf.Id, Name = wf.Name, Mappings = new List<KeyValuePair<string, object>>() },
                 ModuleType = EntityHeader<PipelineModuleType>.Create(PipelineModuleType.InputTranslator)
             };
-            var tmpSent=new RouteModuleConfig()
+            var tmpSent = new RouteModuleConfig()
             {
                 Id = Guid.NewGuid().ToId(),
                 Name = sentinelConfiguration.Name,
@@ -351,7 +495,7 @@ namespace LagoVista.IoT.StarterKit.Managers
                 PrimaryOutput = new RouteConnection() { Id = tmpInputTrn.Id, Name = inputTranslator.Name, Mappings = new List<KeyValuePair<string, object>>() },
                 ModuleType = EntityHeader<PipelineModuleType>.Create(PipelineModuleType.Sentinel)
             };
-           
+
 
             /* Create Route */
             var temperatureRoute = new Route()
@@ -360,9 +504,6 @@ namespace LagoVista.IoT.StarterKit.Managers
                 Key = "sampletemproute",
                 MessageDefinition = new EntityHeader<DeviceMessaging.Admin.Models.DeviceMessageDefinition>() { Id = msgTempDefinition.Id, Text = msgTempDefinition.Name, Value = msgTempDefinition },
                 PipelineModules = new List<RouteModuleConfig>()
-                {
-
-                }
             };
 
             var motOutTran = new RouteModuleConfig()
@@ -410,19 +551,6 @@ namespace LagoVista.IoT.StarterKit.Managers
                  }
             };
 
-            /* Create Device Configurations */
-            var deviceRep = new DeviceRepository()
-            {
-                Name = "Sample Device Repo",
-                Key = "sampledevicerepo",
-                RepositoryType = EntityHeader<RepositoryTypes>.Create(RepositoryTypes.NuvIoT),
-                Subscription = new EntityHeader() { Id = subscription.Id.ToString(), Text = subscription.Name }
-            };
-            AddId(deviceRep);
-            AddOwnedProperties(deviceRep, org);
-            AddAuditProperties(deviceRep, createTimeStamp, org, user);
-            await _deviceRepoMgr.AddDeviceRepositoryAsync(deviceRep, org, user);
-
             var deviceConfig = new DeviceConfiguration()
             {
                 ConfigurationVersion = 1.0,
@@ -469,8 +597,8 @@ namespace LagoVista.IoT.StarterKit.Managers
             /* Create Solution */
             var solution = new Solution()
             {
-                Id = "Sample Solution",
-                Name = "samplesolution",
+                Id = "Sample App",
+                Name = "sampleapp",
                 Listeners = new List<EntityHeader<ListenerConfiguration>>() { new EntityHeader<ListenerConfiguration>() { Id = restListener.Id, Text = restListener.Name, Value = restListener } },
                 Planner = new EntityHeader<PlannerConfiguration>() { Id = planner.Id, Text = planner.Name, Value = planner },
                 DeviceConfigurations = new List<EntityHeader<DeviceConfiguration>>() { new EntityHeader<DeviceConfiguration>() { Id = deviceConfig.Id, Text = deviceConfig.Name, Value = deviceConfig } },
@@ -478,13 +606,123 @@ namespace LagoVista.IoT.StarterKit.Managers
             AddId(solution);
             AddOwnedProperties(solution, org);
             AddAuditProperties(solution, createTimeStamp, org, user);
-            await _solutionMgr.AddSolutionsAsync(solution, org, user);
-
-
-
 
             return InvokeResult<Solution>.Create(solution);
         }
 
+        public Simulator.Admin.Models.Simulator CreateSimulator(DeploymentInstance instance, EntityHeader org, EntityHeader user, DateTime creationTimeStamp)
+        {
+            var simulator = new Simulator.Admin.Models.Simulator()
+            {
+                Id = "Simulator for Sample App",
+                Key = "sampleappsimulator",
+                DefaultEndPoint = instance.DnsHostName,
+                TLSSSL = false,
+                DefaultTransport = EntityHeader<Simulator.Admin.Models.TransportTypes>.Create(Simulator.Admin.Models.TransportTypes.RestHttp),
+                MessageTemplates = new List<Simulator.Admin.Models.MessageTemplate>()
+                {
+                   new Simulator.Admin.Models.MessageTemplate()
+                   {
+                       Name = "Motion Message",
+                       Key="motionmsg",
+                       Id = Guid.NewGuid().ToId(),
+                       TextPayload = "{'motion':'~motionvalue~','level':~motionlevel~}",
+                       PathAndQueryString="/smplmot001/~deviceid~",
+                       DynamicAttributes = new List<Simulator.Admin.Models.MessageDynamicAttribute>()
+                       {
+                           new Simulator.Admin.Models.MessageDynamicAttribute()
+                           {
+                               Id = Guid.NewGuid().ToId(),
+                                Key = "motionvalue",
+                                DefaultValue = "on",
+                                Name = "Motion On/Off",
+                                ParameterType = EntityHeader<ParameterTypes>.Create(ParameterTypes.String),
+                                Description = "Provide a value of 'on' or 'off' to simulate motion detected"
+                           },
+                           new Simulator.Admin.Models.MessageDynamicAttribute()
+                           {
+                                Id = Guid.NewGuid().ToId(),
+                                Key = "motionlevel",
+                                DefaultValue = "100",
+                                Name = "Motion Level",
+                                ParameterType = EntityHeader<ParameterTypes>.Create(ParameterTypes.Integer),
+                                Description = "Provide a value between 0 and 100 as to the level of motion detected"
+                           }
+                       }
+                   },
+                   new Simulator.Admin.Models.MessageTemplate()
+                   {
+                       Name = "Temperature Message",
+                       Key = "tempmsg",
+                       Id = Guid.NewGuid().ToId(),
+                       TextPayload = "~temperaturevalue~,~humidityvalue~",
+                       PayloadType =  EntityHeader<Simulator.Admin.Models.PaylodTypes>.Create(Simulator.Admin.Models.PaylodTypes.String),
+                       ContentType = "text/csv",
+                       HttpVerb = "POST",
+                       MessageHeaders = new List<Simulator.Admin.Models.MessageHeader>()
+                       {
+                           new Simulator.Admin.Models.MessageHeader() { HeaderName = "x-messageid", Value = "smpltmp001", Id = Guid.NewGuid().ToId(), Key = "xmessageid", Name="x-messageid"},
+                           new Simulator.Admin.Models.MessageHeader() { HeaderName = "x-deviceid", Value = "~deviceid~", Id = Guid.NewGuid().ToId(), Key = "xdeviceid", Name="x-deviceid"},
+                       },
+                       DynamicAttributes = new List<Simulator.Admin.Models.MessageDynamicAttribute>()
+                       {
+                           new Simulator.Admin.Models.MessageDynamicAttribute()
+                           {
+                               Id = Guid.NewGuid().ToId(),
+                                Key = "temperaturevalue",
+                                DefaultValue = "98.6",
+                                Name = "Temperature",
+                                ParameterType = EntityHeader<ParameterTypes>.Create(ParameterTypes.Decimal),
+                                Description = "Provide a value of 'on' or 'off' to simulate motion detected"
+                           },
+                           new Simulator.Admin.Models.MessageDynamicAttribute()
+                           {
+                                Id = Guid.NewGuid().ToId(),
+                                Key = "humidityvalue",
+                                DefaultValue = "65",
+                                Name = "Humidity",
+                                ParameterType = EntityHeader<ParameterTypes>.Create(ParameterTypes.Decimal),
+                                Description = "Provide a value between 0 and 100 as to the level of motion detected"
+                           }
+                       }},
+                }
+            };
+
+            AddId(simulator);
+            AddOwnedProperties(simulator, org);
+            AddAuditProperties(simulator, creationTimeStamp, org, user);
+
+            return simulator;
+        }
+
+        public DeploymentInstance CreateInstance(Solution solution, DeviceRepository deviceRepo, EntityHeader org, EntityHeader user, DateTime creationTimeStamp)
+        {
+            var instance = new DeploymentInstance()
+            {
+                Name = "Sample Deployment",
+                Key = "sample",
+                DeviceRepository = new EntityHeader<DeviceRepository>() { Id = deviceRepo.Id, Text = deviceRepo.Name },
+                Solution = new EntityHeader<Solution>() { Id = solution.Id, Text = solution.Name },
+            };
+
+            AddId(instance);
+            AddOwnedProperties(instance, org);
+            AddAuditProperties(instance, creationTimeStamp, org, user);
+            return instance;
+        }
+
+        public async Task<InvokeResult> CreateDeployableApp(EntityHeader org, EntityHeader user)
+        {
+            var creationDate = DateTime.UtcNow;
+
+            var subscription = CreateFreeSubscription(org, user, creationDate);
+            var createSolutionResult = await CreateSimpleSolutionAsync(org, user, creationDate);
+            var deviceRepo = CreateDevice(subscription, org, user, creationDate);
+
+            await _solutionMgr.AddSolutionsAsync(createSolutionResult.Result, org, user);
+
+
+            return InvokeResult.Success;
+        }
     }
 }
