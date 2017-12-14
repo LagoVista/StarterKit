@@ -17,5 +17,6 @@
     <PackageReference Include="LagoVista.IoT.Pipeline.Admin" Version="1.2.202-alpha0849" />
     <PackageReference Include="LagoVista.IoT.Deployment.Admin" Version="1.2.202-alpha0849" />
     <PackageReference Include="LagoVista.IoT.Simulator.Admin" Version="1.2.202-alpha0849" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.1-beta1" />
   </ItemGroup>
 </Project>
