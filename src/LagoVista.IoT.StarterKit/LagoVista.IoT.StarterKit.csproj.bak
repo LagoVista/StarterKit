@@ -1,0 +1,13 @@
+LagoVista.Core=1.2.285-alpha1447
+LagoVista.Core.Networking=1.2.285-alpha1447
+LagoVista.UserAdmin=1.2.285-alpha1447
+LagoVista.IoT.Billing.Managers=1.2.285-alpha1447
+LagoVista.IoT.DeviceAdmin=1.2.285-alpha1447
+LagoVista.IoT.DeviceManagement.Core=1.2.285-alpha1447
+LagoVista.IoT.DeviceMessaging.Admin=1.2.285-alpha1447
+LagoVista.IoT.Logging=1.2.285-alpha1447
+LagoVista.IoT.Verifiers=1.2.285-alpha1447
+LagoVista.IoT.Runtime.Core=1.2.285-alpha1447
+LagoVista.IoT.Pipeline.Admin=1.2.285-alpha1447
+LagoVista.IoT.Deployment.Admin=1.2.285-alpha1447
+LagoVista.IoT.Simulator.Admin=1.2.285-alpha1447
