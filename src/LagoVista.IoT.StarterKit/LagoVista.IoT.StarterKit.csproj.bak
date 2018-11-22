@@ -1,0 +1,13 @@
+LagoVista.Core=
+LagoVista.Core.Networking=
+LagoVista.UserAdmin=
+LagoVista.IoT.Billing.Managers=
+LagoVista.IoT.DeviceAdmin=
+LagoVista.IoT.DeviceManagement.Core=
+LagoVista.IoT.DeviceMessaging.Admin=
+LagoVista.IoT.Logging=
+LagoVista.IoT.Verifiers=
+LagoVista.IoT.Runtime.Core=
+LagoVista.IoT.Pipeline.Admin=
+LagoVista.IoT.Deployment.Admin=
+LagoVista.IoT.Simulator.Admin=
