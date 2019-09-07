@@ -58,6 +58,8 @@ namespace LagoVista.IoT.StarterKit.Managers
             await this.AddTrialSubscriptionAsync(org, user, creationTimeStamp);
             await this.AddInputTranslatorAsync(org, user, creationTimeStamp);
             await this.AddOutputTranslatorsAsync(org, user, creationTimeStamp);
+            await this.AddAnonymousSentinelAsync(org, user, creationTimeStamp);
+            await this.AddPort80Listener(org, user, creationTimeStamp);
         }
 
         public async Task<Subscription> AddTrialSubscriptionAsync(EntityHeader org, EntityHeader user, DateTime createTimeStamp)
