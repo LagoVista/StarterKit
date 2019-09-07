@@ -80,11 +80,31 @@ namespace LagoVista.IoT.StarterKit.Managers
             return subscription;
         }
 
+        public async Task AddPort80Listener(EntityHeader org, EntityHeader user, DateTime createTimestamp)
+        {
+            var port80Listener = new ListenerConfiguration();
+            port80Listener.Name = "Port 80 REST Listener";
+            port80Listener.Key = "port80rest";
+            port80Listener.Description = "A simple listener that will listen on port 80 for incoming REST requests.";
+            port80Listener.ListenerType = EntityHeader<ListenerTypes>.Create(ListenerTypes.Rest);
+            port80Listener.ListenOnPort = 80;
+            port80Listener.Anonymous = true;
+            port80Listener.SecureConnection = false;
+            port80Listener.ContentType = EntityHeader<DeviceMessaging.Admin.Models.MessageContentTypes>.Create(DeviceMessaging.Admin.Models.MessageContentTypes.JSON);
+
+            this.AddAuditProperties(port80Listener, createTimestamp, org, user);
+            this.AddId(port80Listener);
+            this.AddOwnedProperties(port80Listener, org);
+
+            await this._pipelineMgr.AddListenerConfigurationAsync(port80Listener, org, user);
+        }
+
         public async Task AddInputTranslatorAsync(EntityHeader org, EntityHeader user, DateTime createTimestamp)
         {
             var inputTranslator = new InputTranslatorConfiguration();
             inputTranslator.Name = "Default Input Translator";
             inputTranslator.Key = "default";
+            inputTranslator.Description = "The default input translator will use the definition of the message to parse the contents of the incoming message.";
             inputTranslator.InputTranslatorType = EntityHeader<InputTranslatorConfiguration.InputTranslatorTypes>.Create(InputTranslatorConfiguration.InputTranslatorTypes.MessageBased);
             this.AddAuditProperties(inputTranslator, createTimestamp, org, user);
             this.AddId(inputTranslator);
@@ -97,6 +117,7 @@ namespace LagoVista.IoT.StarterKit.Managers
             var outputTranslator = new OutputTranslatorConfiguration();
             outputTranslator.Name = "Default Output Translator";
             outputTranslator.Key = "default";
+            outputTranslator.Description = "The default output translator will use the definition of the message to build the contents of the outgoing message.";
             outputTranslator.OutputTranslatorType = EntityHeader<OutputTranslatorConfiguration.OutputTranslatorTypes>.Create(OutputTranslatorConfiguration.OutputTranslatorTypes.MessageBased);
             this.AddAuditProperties(outputTranslator, createTimestamp, org, user);
             this.AddId(outputTranslator);
@@ -104,5 +125,19 @@ namespace LagoVista.IoT.StarterKit.Managers
 
             await this._pipelineMgr.AddOutputTranslatorConfigurationAsync(outputTranslator, org, user);
         }
+
+        public async Task AddAnonymousSentinelAsync(EntityHeader org, EntityHeader user, DateTime createTimestamp)
+        {
+            var sentinal = new SentinelConfiguration();
+            sentinal.Name = "Anonymous";
+            sentinal.Key = "anonymous";
+            sentinal.Description = "The Anonymous sentinel module is appropriate for development or devices where authentication is performed via the transport.";
+            this.AddAuditProperties(sentinal, createTimestamp, org, user);
+            this.AddId(sentinal);
+            this.AddOwnedProperties(sentinal, org);
+
+            await this._pipelineMgr.AddSentinelConfigurationAsync(sentinal, org, user);
+        }
+        
     }
 }
