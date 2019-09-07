@@ -92,6 +92,8 @@ namespace LagoVista.IoT.StarterKit.Managers
             port80Listener.ListenOnPort = 80;
             port80Listener.Anonymous = true;
             port80Listener.SecureConnection = false;
+            port80Listener.RESTListenerType = RESTListenerTypes.PipelineModule;
+            port80Listener.RestServerType = EntityHeader<RESTServerTypes>.Create(RESTServerTypes.HTTP);
             port80Listener.ContentType = EntityHeader<DeviceMessaging.Admin.Models.MessageContentTypes>.Create(DeviceMessaging.Admin.Models.MessageContentTypes.JSON);
 
             this.AddAuditProperties(port80Listener, createTimestamp, org, user);
