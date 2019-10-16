@@ -1,8 +1,10 @@
 ﻿using LagoVista.Core.Models;
+using LagoVista.Core;
 using LagoVista.IoT.Billing;
 using LagoVista.IoT.Deployment.Admin;
 using LagoVista.IoT.DeviceAdmin.Interfaces.Managers;
 using LagoVista.IoT.DeviceManagement.Core.Managers;
+using LagoVista.IoT.DeviceManagement.Core.Models;
 using LagoVista.IoT.DeviceMessaging.Admin.Managers;
 using LagoVista.IoT.Pipeline.Admin.Managers;
 using LagoVista.IoT.Pipeline.Admin.Models;
@@ -55,11 +57,12 @@ namespace LagoVista.IoT.StarterKit.Managers
         public async Task Init(EntityHeader org, EntityHeader user, bool populateSampleData)
         {
             var creationTimeStamp = DateTime.UtcNow;
-            await this.AddTrialSubscriptionAsync(org, user, creationTimeStamp);
+            var subscription = await this.AddTrialSubscriptionAsync(org, user, creationTimeStamp);
             await this.AddInputTranslatorAsync(org, user, creationTimeStamp);
             await this.AddOutputTranslatorsAsync(org, user, creationTimeStamp);
             await this.AddAnonymousSentinelAsync(org, user, creationTimeStamp);
             await this.AddPort80Listener(org, user, creationTimeStamp);
+            await this.AddTrialRepository(subscription, org, user, creationTimeStamp);
         }
 
         public async Task<Subscription> AddTrialSubscriptionAsync(EntityHeader org, EntityHeader user, DateTime createTimeStamp)
@@ -69,17 +72,41 @@ namespace LagoVista.IoT.StarterKit.Managers
                 Id = Guid.NewGuid(),
                 OrgId = org.Id,
                 Name = "Trial Subscription",
-                Key = "trialsubscription",
-                Status = Subscription.Status_FreeAccount,
-                CreatedById = user.Id,                
+                Key = Subscription.SubscriptionKey_Trial,
+                Status = Subscription.Status_OK,
+                CreatedById = user.Id,
                 LastUpdatedById = user.Id,
                 CreationDate = createTimeStamp,
                 LastUpdatedDate = createTimeStamp,
             };
 
-            await this._subscriptionMgr.AddSubscriptionAsync(subscription, org, user);           
+            await this._subscriptionMgr.AddSubscriptionAsync(subscription, org, user);
 
             return subscription;
+        }
+
+        public async Task<DeviceRepository> AddTrialRepository(Subscription subscription, EntityHeader org, EntityHeader user, DateTime createTimestamp)
+        {
+            var repo = new DeviceRepository()
+            {
+                Id = Guid.NewGuid().ToId(),
+                OwnerOrganization = org,
+                Key = "trial",
+                Name = "25 Device Trial Repository",
+                Description = "Trial Device Repository that you can use with up to 25 devices.  Contact Software Logistics if you need additional devices",
+                RepositoryType = EntityHeader<RepositoryTypes>.Create(RepositoryTypes.NuvIoT),
+                DeviceCapacity = EntityHeader.Create("trialdevices", "25 Device Trial"),
+                StorageCapacity = EntityHeader.Create("trialstorage","200mb Trial Storage"),
+                Subscription = EntityHeader.Create(subscription.Id.ToString(), subscription.Name),
+                CreatedBy = user,
+                LastUpdatedBy = user,
+                CreationDate = createTimestamp.ToJSONString(),
+                LastUpdatedDate = createTimestamp.ToJSONString(),
+            };
+
+            await this._deviceRepoMgr.AddDeviceRepositoryAsync(repo, org, user);
+
+            return repo;
         }
 
         public async Task AddPort80Listener(EntityHeader org, EntityHeader user, DateTime createTimestamp)
@@ -142,6 +169,6 @@ namespace LagoVista.IoT.StarterKit.Managers
 
             await this._pipelineMgr.AddSentinelConfigurationAsync(sentinal, org, user);
         }
-        
+
     }
 }
