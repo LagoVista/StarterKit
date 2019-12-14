@@ -25,6 +25,10 @@ using LagoVista.CloudStorage.Storage;
 using LagoVista.IoT.Logging.Loggers;
 using LagoVista.Core.Validation;
 using LagoVista.IoT.DeviceAdmin.Models.Resources;
+using LagoVista.IoT.Simulator.Admin.Managers;
+using LagoVista.UserAdmin.Interfaces.Repos.Orgs;
+using LagoVista.IoT.Simulator.Admin.Models;
+using LagoVista.IoT.DeviceManagement.Core;
 
 namespace LagoVista.IoT.StarterKit.Managers
 {
@@ -41,12 +45,14 @@ namespace LagoVista.IoT.StarterKit.Managers
         IDeviceRepositoryManager _deviceRepoMgr;
         IProductManager _productManager;
         IVerifierManager _verifierMgr;
-
+        ISimulatorManager _simulatorMgr;
+        IDeviceManager _deviceManager;
+        IOrganizationRepo _orgRepo;
         StorageUtils _storageUtils;
 
         public OrgInitializer(IAdminLogger logger, IStarterKitConnection starterKitConnection, IDeviceAdminManager deviceAdminMgr, ISubscriptionManager subscriptionMgr, IPipelineModuleManager pipelineMgr, IDeviceTypeManager deviceTypeMgr, IDeviceRepositoryManager deviceRepoMgr,
                           IProductManager productManager, IDeviceTypeManager deviceTypeManager, IDeviceConfigurationManager deviceCfgMgr, IDeviceMessageDefinitionManager deviceMsgMgr, IDeploymentInstanceManager instanceMgr,
-                          IContainerRepositoryManager containerMgr, ISolutionManager solutionMgr, IVerifierManager verifierMgr)
+                          IDeviceManager deviceManager, IContainerRepositoryManager containerMgr, ISolutionManager solutionMgr, IOrganizationRepo orgMgr, ISimulatorManager simMgr, IVerifierManager verifierMgr)
         {
             _deviceAdminMgr = deviceAdminMgr;
             _subscriptionMgr = subscriptionMgr;
@@ -58,6 +64,9 @@ namespace LagoVista.IoT.StarterKit.Managers
             _productManager = productManager;
             _verifierMgr = verifierMgr;
             _deviceTypeMgr = deviceTypeManager;
+            _simulatorMgr = simMgr;
+            _orgRepo = orgMgr;
+            _deviceManager = deviceManager;
 
             _instanceMgr = instanceMgr;
             _solutionMgr = solutionMgr;
@@ -81,8 +90,14 @@ namespace LagoVista.IoT.StarterKit.Managers
             await this.AddInputTranslatorAsync(org, user, creationTimeStamp);
         }
 
-        public async Task<InvokeResult> CreateExampleAppAsync(EntityHeader org, EntityHeader user)
+        public async Task<InvokeResult> CreateExampleAppAsync(string environmentName, EntityHeader org, EntityHeader user)
         {
+            var instance = await _storageUtils.FindWithKeyAsync<DeploymentInstance>(EXAMPLE_MOTION_KEY, org, false);
+            if (instance != null && instance.IsDeployed)
+            {
+                return InvokeResult.FromError("The example instance is currently running, please go to Studio > Deployments > Instances > Motion Example > Manage and remove the instances.");
+            }
+
             var creationTimeStamp = DateTime.UtcNow;
 
             var defaultInputTranslator = await _storageUtils.FindWithKeyAsync<InputTranslatorConfiguration>(DEFAULT, org, false);
@@ -116,18 +131,32 @@ namespace LagoVista.IoT.StarterKit.Managers
             var deviceConfig = await this.AddDeviceConfigAsync("Exmaple - Motion", EXAMPLE_MOTION_KEY,
                 defaultSentinal, defaultInputTranslator, workflow, defaultOutputTranslator,
                 msg, org, user, creationTimeStamp);
-            await this.AddDeviceType("Example - Motion", EXAMPLE_MOTION_KEY, deviceConfig, org, user, creationTimeStamp);
+            var deviceTYpe = await this.AddDeviceType("Example - Motion", EXAMPLE_MOTION_KEY, deviceConfig, org, user, creationTimeStamp);
 
             var planner = await this.AddPlanner("Example", "exampleplanner", org, user, creationTimeStamp);
             var solution = await this.CreateSolutionAsync("Example - Motion", EXAMPLE_MOTION_KEY, org, user, creationTimeStamp, planner, deviceConfig, listener);
 
+            await _storageUtils.DeleteIfExistsAsync<DeploymentInstance>(EXAMPLE_MOTION_KEY, org);
+
             var trialRepo = await _storageUtils.FindWithKeyAsync<DeviceRepository>(TRIAL, org, false);
             if (trialRepo == null)
             {
-                await this.AddTrialRepository("25 Device Trial Repository", TRIAL, subscription, org, user, creationTimeStamp);
+                trialRepo = await this.AddTrialRepository("25 Device Trial Repository", TRIAL, subscription, org, user, creationTimeStamp);
             }
 
-            await this.CreateInstanceAsync(subscription, solution, trialRepo, "Example - Motion", EXAMPLE_MOTION_KEY, org, user, creationTimeStamp);
+            trialRepo = await _deviceRepoMgr.GetDeviceRepositoryWithSecretsAsync(trialRepo.Id, org, user);
+            if (!EntityHeader.IsNullOrEmpty(trialRepo.Instance))
+            {
+                trialRepo.Instance = null;
+                await this._deviceRepoMgr.UpdateDeviceRepositoryAsync(trialRepo, org, user);
+            }
+
+            var device = await AddDeviceAsync("Motion Sensor 1", "motion001", trialRepo, deviceConfig, deviceTYpe, org, user, creationTimeStamp);
+
+            instance = await this.CreateInstanceAsync(subscription, solution, trialRepo, "Example - Motion", EXAMPLE_MOTION_KEY, environmentName, org, user, creationTimeStamp);
+
+            await CreateSimulator(instance, device, "Example Motion Simulator", EXAMPLE_MOTION_KEY, org, user, creationTimeStamp);
+
 
             return InvokeResult.Success;
         }
@@ -389,7 +418,7 @@ namespace LagoVista.IoT.StarterKit.Managers
                 Key = "deviceidinpath",
                 Notes = "Will extract the device id from the provided URL path in this example it would extract [dev001] from the path /api/motion/dev001.  See help for more details.",
                 SearchLocation = EntityHeader<DeviceMessaging.Admin.Models.SearchLocations>.Create(DeviceMessaging.Admin.Models.SearchLocations.Path),
-                PathLocator = "/api/*/{messageidinpath}"
+                PathLocator = "/api/*/{deviceidinpath}"
             });
 
             planner.MessageTypeIdParsers.Add(new DeviceMessaging.Admin.Models.DeviceMessageDefinitionField()
@@ -500,11 +529,13 @@ namespace LagoVista.IoT.StarterKit.Managers
         }
 
         public async Task<DeploymentInstance> CreateInstanceAsync(Subscription subscription, Solution solution, DeviceRepository repo, string name, string key,
-            EntityHeader org, EntityHeader user, DateTime createTimestamp)
+            string environmentName, EntityHeader org, EntityHeader user, DateTime createTimestamp)
         {
             if (subscription == null) throw new ArgumentNullException(nameof(subscription));
             if (solution == null) throw new ArgumentNullException(nameof(solution));
             if (repo == null) throw new ArgumentNullException(nameof(repo));
+
+            var userOrg = await _orgRepo.GetOrganizationAsync(org.Id);
 
             await _storageUtils.DeleteIfExistsAsync<DeploymentInstance>(key, org);
 
@@ -513,6 +544,12 @@ namespace LagoVista.IoT.StarterKit.Managers
                 Name = name,
                 Key = key,
             };
+
+            var freeVMInstance = await _productManager.GetProductByKeyAsync("vms", "freetrial", org, user);
+            if (freeVMInstance == null)
+            {
+                throw new ArgumentNullException(nameof(freeVMInstance));
+            }
 
             this.AddId(instance);
             this.AddAuditProperties(instance, createTimestamp, org, user);
@@ -541,14 +578,111 @@ namespace LagoVista.IoT.StarterKit.Managers
             instance.NuvIoTEdition = EntityHeader<NuvIoTEditions>.Create(NuvIoTEditions.Container);
             instance.LogStorage = EntityHeader<LogStorage>.Create(LogStorage.Cloud);
             instance.WorkingStorage = EntityHeader<WorkingStorage>.Create(WorkingStorage.Cloud);
+            instance.IsDeployed = false;
             instance.Solution = new EntityHeader<Solution>() { Id = solution.Id, Text = solution.Name };
             instance.ContainerRepository = new EntityHeader() { Id = containerRepo.Id, Text = containerRepo.Name };
             instance.ContainerTag = containerRepo.PreferredTag;
-            instance.Size = EntityHeader.Create("freetrial", "Free");
+            instance.Size = EntityHeader.Create(freeVMInstance.Id.ToString(), freeVMInstance.Name);
+            instance.DnsHostName = environmentName == "production" ? $"{key}.{userOrg.Namespace}.iothost.net" : $"{key}.{userOrg.Namespace}.{environmentName}.iothost.net";
 
             await _instanceMgr.AddInstanceAsync(instance, org, user);
 
             return instance;
+        }
+
+        public string btoa(byte[] buffer)
+        {
+            string toReturn = System.Convert.ToBase64String(buffer);
+            return toReturn;
+        }
+
+        public async Task<Device> AddDeviceAsync(string name, string deviceId, DeviceRepository repo, DeviceConfiguration deviceConfig, DeviceType deviceType,
+            EntityHeader org, EntityHeader user, DateTime createTimestamp)
+        {
+            if (deviceType == null) throw new ArgumentNullException(nameof(deviceType));
+            if (deviceConfig == null) throw new ArgumentNullException(nameof(deviceConfig));
+            if (repo == null) throw new ArgumentNullException(nameof(repo));
+
+
+            var device = new Device();
+            device.Name = name;
+            device.DeviceId = deviceId;
+            device.DeviceRepository = new EntityHeader() { Id = repo.Id, Text = repo.Name };
+            device.DeviceType = new EntityHeader<DeviceType> { Id = deviceType.Id, Text = deviceType.Name };
+            device.DeviceConfiguration = new EntityHeader() { Id = deviceConfig.Id, Text = deviceConfig.Name };
+            device.SerialNumber = "SN0001";
+            var rnd = new Random();
+            var buffer = new byte[64];
+            rnd.NextBytes(buffer);
+            device.PrimaryAccessKey = btoa(buffer);
+            rnd.NextBytes(buffer);
+            device.SecondaryAccessKey = btoa(buffer);
+
+            AddId(device);
+            AddAuditProperties(device, createTimestamp, org, user);
+            AddOwnedProperties(device, org);
+
+            await _deviceManager.AddDeviceAsync(repo, device, org, user);
+
+            return device;
+        }
+
+        public async Task<LagoVista.IoT.Simulator.Admin.Models.Simulator> CreateSimulator(DeploymentInstance instance, Device device, string name, string key,
+            EntityHeader org, EntityHeader user, DateTime createTimestamp)
+        {
+            var sim = new LagoVista.IoT.Simulator.Admin.Models.Simulator()
+            {
+                Name = name,
+                Key = key,
+            };
+
+            AddId(sim);
+            AddOwnedProperties(sim, org);
+            AddAuditProperties(sim, createTimestamp, org, user);
+
+            sim.DefaultEndPoint = instance.DnsHostName;
+            sim.DefaultPort = 80;
+            sim.Anonymous = true;
+            sim.BasicAuth = false;
+            sim.DefaultPayloadType = EntityHeader<PaylodTypes>.Create(PaylodTypes.String);
+            sim.DefaultTransport = EntityHeader<Simulator.Admin.Models.TransportTypes>.Create(Simulator.Admin.Models.TransportTypes.RestHttp);
+            sim.DeviceId = device.DeviceId;
+            sim.Description = "This simulator is created as part of the Motion Tutorial, it will demonstrate how to send two messages, one that indicates motion has been seen and one that motion is no longer active.";
+
+            var motionMessage = new MessageTemplate()
+            {
+                ContentType = "application/json",
+                HttpVerb = "POST",
+                PayloadType = EntityHeader<PaylodTypes>.Create(PaylodTypes.String),
+                Name = "Motion Detected",
+                Key = "motiondetected",
+                Id = Guid.NewGuid().ToId(),
+                TextPayload = "{'motion':true}",
+                PathAndQueryString = "/api/motion/~deviceid~",
+                EndPoint = sim.DefaultEndPoint,
+                Transport = EntityHeader<TransportTypes>.Create(TransportTypes.RestHttp),
+            };
+
+            var motionClearedMessage = new MessageTemplate()
+            {
+                ContentType = "application/json",
+                HttpVerb = "POST",
+                PayloadType = EntityHeader<PaylodTypes>.Create(PaylodTypes.String),
+                Name = "Motion Cleared",
+                Key = "motioncleared",
+                Id = Guid.NewGuid().ToId(),
+                TextPayload = "{'motion':false}",
+                EndPoint = sim.DefaultEndPoint,
+                PathAndQueryString = "/api/motion/~deviceid~",
+                Transport = EntityHeader<TransportTypes>.Create(TransportTypes.RestHttp),
+            };
+
+            sim.MessageTemplates.Add(motionMessage);
+            sim.MessageTemplates.Add(motionClearedMessage);
+
+            await this._simulatorMgr.AddSimulatorAsync(sim, org, user);
+
+            return sim;
         }
     }
 }
