@@ -149,6 +149,7 @@ namespace LagoVista.IoT.StarterKit.Managers
             {
                 trialRepo.Instance = null;
                 await this._deviceRepoMgr.UpdateDeviceRepositoryAsync(trialRepo, org, user);
+                trialRepo = await _deviceRepoMgr.GetDeviceRepositoryWithSecretsAsync(trialRepo.Id, org, user);
             }
 
             var device = await AddDeviceAsync("Motion Sensor 1", "motion001", trialRepo, deviceConfig, deviceTYpe, org, user, creationTimeStamp);
