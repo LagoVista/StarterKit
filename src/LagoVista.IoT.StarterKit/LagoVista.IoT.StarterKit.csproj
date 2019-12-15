@@ -4,19 +4,20 @@
     <NetStandardImplicitPackageVersion>2.0.3</NetStandardImplicitPackageVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="LagoVista.Core" Version="2.1.732-beta1037" />
-    <PackageReference Include="LagoVista.Core.Networking" Version="2.1.732-beta1037" />
-    <PackageReference Include="LagoVista.UserAdmin" Version="2.1.732-beta1037" />
-    <PackageReference Include="LagoVista.IoT.Billing.Managers" Version="2.1.732-beta1037" />
-    <PackageReference Include="LagoVista.IoT.DeviceAdmin" Version="2.1.732-beta1037" />
-    <PackageReference Include="LagoVista.IoT.DeviceManagement.Core" Version="2.1.732-beta1037" />
-    <PackageReference Include="LagoVista.IoT.DeviceMessaging.Admin" Version="2.1.732-beta1037" />
-    <PackageReference Include="LagoVista.IoT.Logging" Version="2.1.732-beta1037" />
-    <PackageReference Include="LagoVista.IoT.Verifiers" Version="2.1.732-beta1037" />
-    <PackageReference Include="LagoVista.IoT.Runtime.Core" Version="2.1.732-beta1037" />
-    <PackageReference Include="LagoVista.IoT.Pipeline.Admin" Version="2.1.732-beta1037" />
-    <PackageReference Include="LagoVista.IoT.Deployment.Admin" Version="2.1.732-beta1037" />
-    <PackageReference Include="LagoVista.IoT.Simulator.Admin" Version="2.1.732-beta1037" />
+    <PackageReference Include="LagoVista.Core" Version="2.1.942-beta1215" />
+    <PackageReference Include="LagoVista.Core.Networking" Version="2.1.942-beta1215" />
+    <PackageReference Include="LagoVista.CloudStorage" Version="2.1.942-beta1422" />
+    <PackageReference Include="LagoVista.UserAdmin" Version="2.1.942-beta1841" />
+    <PackageReference Include="LagoVista.IoT.Billing.Managers" Version="2.1.942-beta1537" />
+    <PackageReference Include="LagoVista.IoT.DeviceAdmin" Version="2.1.942-beta1215" />
+    <PackageReference Include="LagoVista.IoT.DeviceManagement.Core" Version="2.1.942-beta1841" />
+    <PackageReference Include="LagoVista.IoT.DeviceMessaging.Admin" Version="2.1.942-beta1215" />
+    <PackageReference Include="LagoVista.IoT.Logging" Version="2.1.942-beta1215" />
+    <PackageReference Include="LagoVista.IoT.Verifiers" Version="2.1.942-beta1215" />
+    <PackageReference Include="LagoVista.IoT.Runtime.Core" Version="2.1.942-beta1215" />
+    <PackageReference Include="LagoVista.IoT.Pipeline.Admin" Version="2.1.942-beta1215" />
+    <PackageReference Include="LagoVista.IoT.Deployment.Admin" Version="2.1.942-beta1215" />
+    <PackageReference Include="LagoVista.IoT.Simulator.Admin" Version="2.1.942-beta1215" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
   </ItemGroup>
 </Project>
