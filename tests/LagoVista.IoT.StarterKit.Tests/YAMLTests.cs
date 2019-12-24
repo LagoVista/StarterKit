@@ -15,6 +15,7 @@ using LagoVista.Core;
 using LagoVista.IoT.Runtime.Core.Models.Verifiers;
 using LagoVista.IoT.DeviceAdmin.Models.Resources;
 using YamlDotNet.Core;
+using System.Collections;
 
 namespace LagoVista.IoT.StarterKit.Tests
 {
@@ -78,13 +79,25 @@ namespace LagoVista.IoT.StarterKit.Tests
                     }
                     else if (yaml[key] is String value)
                     {
-                        if (prop.PropertyType == typeof(bool))
+                        if (prop.GetAccessors().Where(acc => acc.Name == $"set_{prop.Name}").Any())
                         {
-                            prop.SetValue(obj, bool.Parse(value));
-                        }
-                        else
-                        {
-                            prop.SetValue(obj, yaml[key]);
+                            if (prop.PropertyType == typeof(bool))
+                            {
+                                prop.SetValue(obj, bool.Parse(value));
+                            }
+                            else if (prop.PropertyType == typeof(double))
+                            {
+                                prop.SetValue(obj, double.Parse(value));
+                            }
+                            else if(prop.PropertyType == typeof(int))
+                            {
+                                prop.SetValue(obj, int.Parse(value));
+                            }
+                            else
+                            {
+                                value = value.Replace("\\r", "\r").Replace("\\n", "\n");
+                                prop.SetValue(obj, value);
+                            }
                         }
                     }
                     else if (yaml[key] is Dictionary<object, object>)
@@ -270,39 +283,59 @@ function onSet(value /* String */) {
             var indent = "";
             for (var idx = 0; idx < level; ++idx)
             {
-                indent += "\t";
+                indent += "  ";
             }
 
             if (isList)
-            {
-                bldr.Append("{indent}- ");
+            {                
+                bldr.Append($"{indent}- ");
+                indent = String.Empty;
                 level++;
                 for (var idx = 0; idx < level; ++idx)
                 {
-                    indent += "\t";
+                    indent += "  ";
                 }
             }
 
+            var first = true;
             var props = obj.GetType().GetProperties();
-            foreach (var prop in props)
+            foreach (var prop in props.Where(prp => !prp.GetAccessors(true).First().IsStatic)) 
             {
                 var value = prop.GetValue(obj);
+                if(value == null)
+                {
+                    continue;
+                }
+                var currentIndent = first && isList ? String.Empty : indent;
 
                 if (value is System.Collections.IEnumerable list && !(value is String))
                 {
-                    bldr.AppendLine($"{indent}{prop.Name}");
-
+                    var size = 0;
                     foreach (var child in list)
                     {
-                        GenerateXaml(child, bldr, level + 1, true);
+                        size++;
+                    }
+
+                    if (size > 0)
+                    {
+                        bldr.AppendLine($"{indent}{prop.Name}:");
+
+                        foreach (var child in list)
+                        {
+                            GenerateXaml(child, bldr, level + 1, true);
+                        }
                     }
                 }
                 else {
                     switch (prop.Name)
                     {
+                        case "DatabaseName":
+                        case "EntityName":
+                        case "Environment":
                         case "Id":
                         case "OwnerOrganization":
                         case "IsPublic":
+                        case "HasValue":
                         case "CreationDate":
                         case "LastUpdatedDate":
                         case "LastUpdatedBy":
@@ -312,26 +345,37 @@ function onSet(value /* String */) {
                         case "Owner":
                             break;
                         default:
+
                             switch (prop.PropertyType.Name)
                             {
+                                case "Bool":
+                                case "Boolean":
+                                    bldr.AppendLine($"{currentIndent}{prop.Name}: {prop.GetValue(obj)}");
+                                    break;
                                 case "Int32":
                                 case "int":
                                 case "double":
                                 case "Double":
-                                    bldr.AppendLine($"{indent}{prop.Name}: {prop.GetValue(obj)}");
+                                    bldr.AppendLine($"{currentIndent}{prop.Name}: {prop.GetValue(obj)}");
+                                    first = false;
                                     break;
                                 case "String":
                                 case "string":
-                                    var strValue = value as String;
+                                    var strValue = value as String;                                    
                                     if (!String.IsNullOrEmpty(strValue))
                                     {
-
-                                        bldr.AppendLine($"{indent}{prop.Name}: {strValue}");
+                                        strValue = strValue.Replace("\n", "\\n").Replace("\r", "\\r");
+                                        bldr.AppendLine($"{currentIndent}{prop.Name}: {strValue}");
                                     }
+                                    first = false;
+                                    break;
+                                case "EntityHeader":
+                                case "EntityHeader`1":
                                     break;
                                 default:
-                                    bldr.AppendLine($"{indent}{prop.Name}");
-
+                                    
+                                    bldr.AppendLine($"{currentIndent}{prop.Name} - UNSUPPROTED- {prop.PropertyType}");
+                                    first = false;
                                     GenerateXaml(value, bldr, level + 1);
                                     break;
                             }
@@ -368,11 +412,38 @@ function onSet(value /* String */) {
             var wf = AddDeviceWorkflow("my WF", "mywf", org, usr, dateStamp);
 
             var bldr = new StringBuilder();
-            bldr.AppendLine("workflow");
+            bldr.AppendLine("workflow:");
 
             GenerateXaml(wf, bldr, 1);
 
             Console.WriteLine(bldr.ToString());
+
+            var rdr = new StringReader(bldr.ToString());
+            var deserializer = new DeserializerBuilder().Build();
+            var output = deserializer.Deserialize(rdr) as Dictionary<object, object>;
+            foreach (var key in output.Keys)
+            {
+                var childItem = output[key];
+                if (key is String keyStr)
+                    switch (keyStr)
+                    {
+                        case "msgtype":
+                            var msg = CreateMessageType<DeviceMessageDefinition>(dateStamp, org, usr, childItem as Dictionary<object, object>);
+                            
+                            break;
+                        case "msgtypeVerifier":
+                            var verifier = CreateMessageType<Verifier>(dateStamp, org, usr, childItem as Dictionary<object, object>);                            
+                            break;
+                        case "workflow":
+                            var createdWF = CreateMessageType<DeviceWorkflow>(dateStamp, org, usr, childItem as Dictionary<object, object>);
+
+                            
+
+                            break;
+                    }
+            }
+
+
         }
     }
 }
