@@ -1,0 +1,41 @@
+﻿msgtype:
+    Name: Message Parser
+    Key: msgparser
+    Description: descr
+    MessageDirection: Incoming
+    ContentType: JSON
+    Fields:
+        - Name : Field One
+          Key: fldone
+          JsonPath: path1
+          SearchLocation: Body
+          ContentType: JSON
+          StorageType: String
+          ParsedStringFieldType: String
+    SampleMessages:
+        - Name: Sample Message
+          Key: smpl
+          Description: This is it's description.
+          PathAndQueryString: "/foo/fee"
+          Topic: "foo/fee"
+          Payload: "{'motion':'on'}"
+          Headers: 
+            - Name: x-field-One
+              Value: it has value
+msgtypeVerifier:
+    Name: Field One verifierType
+    Key: fieldoneverifier
+    Description: Field One Verifier
+    Component:
+        FKey: 
+            TypeId: msgtype
+            Key: msgparser
+    ExpectedOutputs:
+        - Key: motion
+          Value: on
+    InputType: Text
+    Description: Should be good
+    Input: "{'motion':'on'}"
+    PathAndQueryString: "/smplmot001/device001"
+    ShouldSucceed: true
+    VerifierType: MessageParser    

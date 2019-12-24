@@ -140,7 +140,7 @@ namespace LagoVista.IoT.StarterKit.Managers
 
             var msg = await this.AddDefaultMessage("Example - Motion Message", EXAMPLE_MOTION_KEY, org, user, creationTimeStamp);
             var workflow = await this.AddDeviceWorkflow("Example - Motion", EXAMPLE_MOTION_KEY, org, user, creationTimeStamp);
-            var listener = await this.AddPort80Listener("exampleport80", org, user, creationTimeStamp);
+            var listener = await this.AddPort80Listener("exampleport80", "Port 80 REST Listener", "A simple listener that will listen on port 80 for incoming REST requests.", org, user, creationTimeStamp);
 
             var deviceConfig = await this.AddDeviceConfigAsync("Example - Motion", EXAMPLE_MOTION_KEY,
                 defaultSentinal, defaultInputTranslator, workflow, defaultOutputTranslator,
@@ -148,6 +148,8 @@ namespace LagoVista.IoT.StarterKit.Managers
             var deviceType = await this.AddDeviceType("Example - Motion", EXAMPLE_MOTION_KEY, deviceConfig, org, user, creationTimeStamp);
 
             var planner = await this.AddPlanner("Example", "exampleplanner", org, user, creationTimeStamp);
+
+
             var solution = await this.CreateSolutionAsync("Example - Motion", EXAMPLE_MOTION_KEY, org, user, creationTimeStamp, planner, deviceConfig, listener);
 
             await _storageUtils.DeleteIfExistsAsync<DeploymentInstance>(EXAMPLE_MOTION_KEY, org);
@@ -605,14 +607,14 @@ function onSet(value /* String */) {
             return repo;
         }
 
-        public async Task<ListenerConfiguration> AddPort80Listener(string key, EntityHeader org, EntityHeader user, DateTime createTimestamp)
+        public async Task<ListenerConfiguration> AddPort80Listener(string key, string name, string description, EntityHeader org, EntityHeader user, DateTime createTimestamp)
         {
             await _storageUtils.DeleteIfExistsAsync<ListenerConfiguration>(key, org);
 
             var port80Listener = new ListenerConfiguration();
-            port80Listener.Name = "Port 80 REST Listener";
+            port80Listener.Name = name;
             port80Listener.Key = key;
-            port80Listener.Description = "A simple listener that will listen on port 80 for incoming REST requests.";
+            port80Listener.Description = description;
             port80Listener.ListenerType = EntityHeader<ListenerTypes>.Create(ListenerTypes.Rest);
             port80Listener.ListenOnPort = 80;
             port80Listener.Anonymous = true;
