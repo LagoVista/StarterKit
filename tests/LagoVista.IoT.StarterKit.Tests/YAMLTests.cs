@@ -89,7 +89,7 @@ namespace LagoVista.IoT.StarterKit.Tests
                             {
                                 prop.SetValue(obj, double.Parse(value));
                             }
-                            else if(prop.PropertyType == typeof(int))
+                            else if (prop.PropertyType == typeof(int))
                             {
                                 prop.SetValue(obj, int.Parse(value));
                             }
@@ -275,7 +275,7 @@ function onSet(value /* String */) {
 
         public void GenerateXaml(Object obj, StringBuilder bldr, int level, bool isList = false)
         {
-            if(obj == null)
+            if (obj == null)
             {
                 return;
             }
@@ -287,7 +287,7 @@ function onSet(value /* String */) {
             }
 
             if (isList)
-            {                
+            {
                 bldr.Append($"{indent}- ");
                 indent = String.Empty;
                 level++;
@@ -299,10 +299,10 @@ function onSet(value /* String */) {
 
             var first = true;
             var props = obj.GetType().GetProperties();
-            foreach (var prop in props.Where(prp => !prp.GetAccessors(true).First().IsStatic)) 
+            foreach (var prop in props.Where(prp => !prp.GetAccessors(true).First().IsStatic))
             {
                 var value = prop.GetValue(obj);
-                if(value == null)
+                if (value == null)
                 {
                     continue;
                 }
@@ -326,7 +326,8 @@ function onSet(value /* String */) {
                         }
                     }
                 }
-                else {
+                else
+                {
                     switch (prop.Name)
                     {
                         case "DatabaseName":
@@ -361,7 +362,7 @@ function onSet(value /* String */) {
                                     break;
                                 case "String":
                                 case "string":
-                                    var strValue = value as String;                                    
+                                    var strValue = value as String;
                                     if (!String.IsNullOrEmpty(strValue))
                                     {
                                         strValue = strValue.Replace("\n", "\\n").Replace("\r", "\\r");
@@ -370,10 +371,17 @@ function onSet(value /* String */) {
                                     first = false;
                                     break;
                                 case "EntityHeader":
+                                    break;
                                 case "EntityHeader`1":
+                                    var objValue = prop.GetValue(obj) as EntityHeader;
+                                    var valueProp = objValue.GetType().GetProperties().Where(prp => prp.Name == "Value").First();
+                                    var enumValue = valueProp.GetValue(objValue);
+
+                                    bldr.AppendLine($"{currentIndent}{prop.Name}: {enumValue}");
+                                    first = false;
                                     break;
                                 default:
-                                    
+
                                     bldr.AppendLine($"{currentIndent}{prop.Name} - UNSUPPROTED- {prop.PropertyType}");
                                     first = false;
                                     GenerateXaml(value, bldr, level + 1);
@@ -429,15 +437,15 @@ function onSet(value /* String */) {
                     {
                         case "msgtype":
                             var msg = CreateMessageType<DeviceMessageDefinition>(dateStamp, org, usr, childItem as Dictionary<object, object>);
-                            
+
                             break;
                         case "msgtypeVerifier":
-                            var verifier = CreateMessageType<Verifier>(dateStamp, org, usr, childItem as Dictionary<object, object>);                            
+                            var verifier = CreateMessageType<Verifier>(dateStamp, org, usr, childItem as Dictionary<object, object>);
                             break;
                         case "workflow":
                             var createdWF = CreateMessageType<DeviceWorkflow>(dateStamp, org, usr, childItem as Dictionary<object, object>);
 
-                            
+
 
                             break;
                     }
