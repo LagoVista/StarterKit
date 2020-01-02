@@ -39,13 +39,20 @@ namespace LagoVista.IoT.StarterKit.Rest.Controllers
         }
 
 
+        /// <summary>
+        /// Generate YAML for the given record type and ID.
+        /// </summary>
+        /// <param name="recordtype"></param>
+        /// <param name="recordid"></param>
+        /// <returns></returns>
         [HttpGet("/api/dataservices/yaml/{recordtype}/{recordid}/generate")]
         public async Task<IActionResult> GetYAMLAsync(String recordtype, string recordid)
         {
             var result = await _yamlServices.GetYamlAsync(recordtype, recordid, OrgEntityHeader, UserEntityHeader);
 
             var buffer = System.Text.ASCIIEncoding.ASCII.GetBytes(result.Result);
-            return File(buffer, "application/yaml", "out.yaml");
+         
+            return File(buffer, "text/yaml", "out.yaml");
         }
     }
 }
