@@ -365,6 +365,32 @@ namespace LagoVista.IoT.StarterKit.Managers
             solution.Planner = new EntityHeader<PlannerConfiguration>() { Id = planner.Id, Text = planner.Name };
             solution.DeviceConfigurations.Add(new EntityHeader<DeviceConfiguration>() { Id = deviceConfig.Id, Text = deviceConfig.Name });
             solution.Listeners.Add(new EntityHeader<ListenerConfiguration>() { Id = listener.Id, Text = listener.Name });
+
+
+            var setting = new CustomField
+            {
+                DefaultValue = "32",
+                FieldType = EntityHeader<ParameterTypes>.Create(ParameterTypes.Integer),
+                Label = "Example Settung 1",
+                Key = "example1",
+                Name = "Example Setting 1",
+                HelpText = "You can create custom settings for your solution you can access from our API or from the scripting environment."
+            };
+
+            solution.Settings.Add(setting);
+
+            var setting2 = new CustomField
+            {
+                DefaultValue = "32",
+                FieldType = EntityHeader<ParameterTypes>.Create(ParameterTypes.Integer),
+                Label = "Example Setting 2",
+                Key = "example2",
+                Name = "Example Setting 2",
+                HelpText = "A second optional setting for your solution."
+            };
+
+            solution.Settings.Add(setting2);
+
             await _solutionMgr.AddSolutionsAsync(solution, org, user);
 
             return solution;
