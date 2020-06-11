@@ -54,5 +54,17 @@ namespace LagoVista.IoT.StarterKit.Rest.Controllers
          
             return File(buffer, "text/yaml", "out.yaml");
         }
+
+
+        /// <summary>
+        /// Import YAML objct
+        /// </summary>
+        /// <param name="yaml"></param>
+        /// <returns></returns>
+        [HttpGet("/api/dataservices/yaml/import")]
+        public async Task<InvokeResult> ImportObject(String yaml)
+        {
+            return await _yamlServices.ApplyXaml(yaml, OrgEntityHeader, UserEntityHeader);
+        }
     }
 }
