@@ -31,34 +31,34 @@ namespace LagoVista.IoT.StarterKit.Services
 {
     public class YamlServices : IYamlServices
     {
-        private List<string> _ignoredProperties = new List<string>()
+        readonly private List<string> _ignoredProperties = new List<string>()
         { "DatabaseName","EntityName","EntityType", "Environment","Id","OwnerOrganization","IsPublic","HasValue",
             "CreationDate","LastUpdatedDate","LastUpdatedBy","OwnerUser","IsValid","CreatedBy","Owner" };
 
-        private List<string> _referenceProperties = new List<string>()
+        readonly private List<string> _referenceProperties = new List<string>()
         {   nameof(Verifier.Component),
             "Listeners",
             "Planner",
             "DeviceConfigurations",
             nameof(DeviceType.DefaultDeviceConfiguration) };
 
-        IDeviceAdminManager _deviceAdminMgr;
-        ISubscriptionManager _subscriptionMgr;
-        IPipelineModuleManager _pipelineMgr;
-        IDeviceTypeManager _deviceTypeMgr;
-        IDeviceMessageDefinitionManager _deviceMsgMgr;
-        IDeploymentInstanceManager _instanceMgr;
-        IDeploymentHostManager _hostManager;
-        ISolutionManager _solutionMgr;
-        IDeviceConfigurationManager _deviceCfgMgr;
-        IDeviceRepositoryManager _deviceRepoMgr;
-        IProductManager _productManager;
-        IVerifierManager _verifierMgr;
-        ISimulatorManager _simulatorMgr;
-        IDeviceManager _deviceManager;
-        IOrganizationRepo _orgRepo;
-        IUserManager _userManager;
-        StorageUtils _storageUtils;
+        readonly IDeviceAdminManager _deviceAdminMgr;
+        readonly ISubscriptionManager _subscriptionMgr;
+        readonly IPipelineModuleManager _pipelineMgr;
+        readonly IDeviceTypeManager _deviceTypeMgr;
+        readonly IDeviceMessageDefinitionManager _deviceMsgMgr;
+        readonly IDeploymentInstanceManager _instanceMgr;
+        readonly IDeploymentHostManager _hostManager;
+        readonly ISolutionManager _solutionMgr;
+        readonly IDeviceConfigurationManager _deviceCfgMgr;
+        readonly IDeviceRepositoryManager _deviceRepoMgr;
+        readonly IProductManager _productManager;
+        readonly IVerifierManager _verifierMgr;
+        readonly ISimulatorManager _simulatorMgr;
+        readonly IDeviceManager _deviceManager;
+        readonly IOrganizationRepo _orgRepo;
+        readonly IUserManager _userManager;
+        readonly StorageUtils _storageUtils;
 
         private EntityHeader _org;
         private EntityHeader _user;
@@ -275,7 +275,7 @@ namespace LagoVista.IoT.StarterKit.Services
                         }
                     }
                 }
-                catch(Exception ex)
+                catch(Exception)
                 {
                     Console.WriteLine($"!!! Error attempting to get value of {prop.Name} of type {prop.PropertyType.Name}");
                     throw;

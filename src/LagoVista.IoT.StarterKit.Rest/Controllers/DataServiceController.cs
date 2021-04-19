@@ -23,8 +23,8 @@ namespace LagoVista.IoT.StarterKit.Rest.Controllers
     [AppBuilder]
     public class DataServiceController : LagoVistaBaseController
     {
-        IYamlServices _yamlServices;
-        IHostingEnvironment _env;
+        readonly IYamlServices _yamlServices;
+        readonly IWebHostEnvironment _env;
 
         /// <summary>
         /// Constructor for controller that creates sample projects.
@@ -32,7 +32,8 @@ namespace LagoVista.IoT.StarterKit.Rest.Controllers
         /// <param name="orgInitializer"></param>
         /// <param name="userManager"></param>
         /// <param name="logger"></param>
-        public DataServiceController(IYamlServices orgInitializer, UserManager<AppUser> userManager, IAdminLogger logger, IHostingEnvironment env) : base(userManager, logger)
+        /// <param name="env" />
+        public DataServiceController(IYamlServices orgInitializer, UserManager<AppUser> userManager, IAdminLogger logger, IWebHostEnvironment env) : base(userManager, logger)
         {
             this._yamlServices = orgInitializer ?? throw new ArgumentNullException(nameof(orgInitializer));
             this._env = env ?? throw new ArgumentNullException(nameof(env));
