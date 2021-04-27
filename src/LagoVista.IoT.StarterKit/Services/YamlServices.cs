@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -284,16 +285,27 @@ namespace LagoVista.IoT.StarterKit.Services
         }
 
 
-        public Task<InvokeResult> ApplyXaml(string yaml, EntityHeader org, EntityHeader usr)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<InvokeResult<string>> GetYamlAsync(string recordType, string id, EntityHeader org, EntityHeader usr)
+        public async Task<InvokeResult<Tuple<bool, string[]>>> ApplyXamlAsync(string recordType, Stream strm, EntityHeader org, EntityHeader usr)
         {
             _org = org;
             _user = usr;
 
+            using (var rdr = new StreamReader(strm))
+            {
+                var yaml = await rdr.ReadToEndAsync();
+                var yamlIsMissing = string.IsNullOrWhiteSpace(yaml);
+                var result = Tuple.Create(!yamlIsMissing, new[] { yamlIsMissing ? "No YAML provided" : $"We Have YAML for {recordType}!" });
+
+                return InvokeResult<Tuple<bool, string[]>>.Create(result);
+            }
+        }
+
+        public async Task<InvokeResult<Tuple<string, string>>> GetYamlAsync(string recordType, string id, EntityHeader org, EntityHeader usr)
+        {
+            _org = org;
+            _user = usr;
+
+            string recordKey = string.Empty;
             StringBuilder bldr = new StringBuilder();
             bldr.AppendLine($"{recordType}:");
 
@@ -302,6 +314,7 @@ namespace LagoVista.IoT.StarterKit.Services
                 case nameof(DeviceMessageDefinition):
                     var msg = await _deviceMsgMgr.GetDeviceMessageDefinitionAsync(id, org, usr);
                     await GenerateYaml(bldr, msg, 1);
+                    recordKey = msg.Key;
 
                     var verifiers = await _verifierMgr.GetVerifierForComponentAsync(id, org, usr);
                     foreach (var verifier in verifiers)
@@ -315,25 +328,31 @@ namespace LagoVista.IoT.StarterKit.Services
                 case nameof(DeviceConfiguration):
                     var deviceConfig = await _deviceCfgMgr.GetDeviceConfigurationAsync(id, org, usr);
                     await GenerateYaml(bldr, deviceConfig, 1);
+                    recordKey = deviceConfig.Key;
                     break;
                 case nameof(DeviceType):
                     var deviceType = await _deviceTypeMgr.GetDeviceTypeAsync(id, org, usr);
                     await GenerateYaml(bldr, deviceType, 1);
+                    recordKey = deviceType.Key;
                     break;
                 case nameof(ListenerConfiguration):
                     var listener = await _pipelineMgr.GetListenerConfigurationAsync(id, org, usr);
                     await GenerateYaml(bldr, listener, 1);
+                    recordKey = listener.Key;
 
                     break;
                 case nameof(Solution):
                     var solution = await _solutionMgr.GetSolutionAsync(id, org, usr);
                     await GenerateYaml(bldr, solution, 1);
+                    recordKey = solution.Key;
                     break;
                 default:
-                    return InvokeResult<String>.FromError($"Don't know how to handle object of type [{recordType}]");
+                    return InvokeResult<Tuple<string, string>>.FromError($"Don't know how to handle object of type [{recordType}]");
             }
 
-            return InvokeResult<string>.Create(bldr.ToString());
+            var fileName = $"{(await _orgRepo.GetOrganizationAsync(org.Id)).Namespace}.{recordKey}.yaml"; ;
+
+            return InvokeResult<Tuple<string, string>>.Create(Tuple.Create(bldr.ToString(), fileName));
         }
     }
 

@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.Http;
 
 namespace LagoVista.IoT.StarterKit.Rest.Controllers
 {
@@ -26,18 +27,18 @@ namespace LagoVista.IoT.StarterKit.Rest.Controllers
         readonly IYamlServices _yamlServices;
         readonly IWebHostEnvironment _env;
 
-        /// <summary>
-        /// Constructor for controller that creates sample projects.
-        /// </summary>
-        /// <param name="orgInitializer"></param>
-        /// <param name="userManager"></param>
-        /// <param name="logger"></param>
-        /// <param name="env" />
-        public DataServiceController(IYamlServices orgInitializer, UserManager<AppUser> userManager, IAdminLogger logger, IWebHostEnvironment env) : base(userManager, logger)
+		/// <summary>
+		/// Constructor for controller that creates sample projects.
+		/// </summary>
+		/// <param name="orgInitializer"></param>
+		/// <param name="userManager"></param>
+		/// <param name="logger"></param>
+		/// <param name="env"></param>
+		public DataServiceController(IYamlServices orgInitializer, UserManager<AppUser> userManager, IAdminLogger logger, IWebHostEnvironment env) : base(userManager, logger)
         {
             this._yamlServices = orgInitializer ?? throw new ArgumentNullException(nameof(orgInitializer));
             this._env = env ?? throw new ArgumentNullException(nameof(env));
-        }
+		}
 
 
         /// <summary>
@@ -51,21 +52,36 @@ namespace LagoVista.IoT.StarterKit.Rest.Controllers
         {
             var result = await _yamlServices.GetYamlAsync(recordtype, recordid, OrgEntityHeader, UserEntityHeader);
 
-            var buffer = System.Text.ASCIIEncoding.ASCII.GetBytes(result.Result);
-         
-            return File(buffer, "text/yaml", "out.yaml");
+            var buffer = System.Text.ASCIIEncoding.ASCII.GetBytes(result.Result.Item1);
+
+            return File(buffer, "text/yaml", result.Result.Item2);
         }
 
-
-        /// <summary>
-        /// Import YAML objct
-        /// </summary>
-        /// <param name="yaml"></param>
-        /// <returns></returns>
-        [HttpGet("/api/dataservices/yaml/import")]
-        public async Task<InvokeResult> ImportObject(String yaml)
+		/// <summary>
+		/// YAML upload a new Object.
+		/// </summary>
+		/// <param name="recordType"></param>
+		/// <param name="file"></param>
+		/// <returns></returns>
+		[HttpPost("/api/dataservices/yaml/{recordType}/import")]
+        public async Task<InvokeResult<Tuple<bool, string[]>>> ApplyXamlAsync(string recordType, [FromForm] IFormFile file)
         {
-            return await _yamlServices.ApplyXaml(yaml, OrgEntityHeader, UserEntityHeader);
+            using (var strm = file.OpenReadStream())
+            {
+                return await _yamlServices.ApplyXamlAsync(recordType, strm, OrgEntityHeader, UserEntityHeader);
+            }
         }
+
+
+        ///// <summary>
+        ///// Import YAML objct
+        ///// </summary>
+        ///// <param name="yaml"></param>
+        ///// <returns></returns>
+        //[HttpGet("/api/dataservices/yaml/import")]
+        //public async Task<InvokeResult> ImportObject(String yaml)
+        //{
+        //    return await _yamlServices.ApplyXaml(yaml, OrgEntityHeader, UserEntityHeader);
+        //}
     }
 }
