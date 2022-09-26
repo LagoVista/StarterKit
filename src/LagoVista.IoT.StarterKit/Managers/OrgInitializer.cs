@@ -152,7 +152,7 @@ namespace LagoVista.IoT.StarterKit.Managers
 
             var solution = await this.CreateSolutionAsync("Example - Motion", EXAMPLE_MOTION_KEY, org, user, creationTimeStamp, planner, deviceConfig, listener);
 
-            await _storageUtils.DeleteIfExistsAsync<DeploymentInstance>(EXAMPLE_MOTION_KEY, org);
+            await _storageUtils.DeleteByKeyIfExistsAsync<DeploymentInstance>(EXAMPLE_MOTION_KEY, org);
 
             var trialRepo = await this.AddTrialRepository("Example Motion Detector Repository", TRIAL, subscription, org, user, creationTimeStamp);
 
@@ -168,10 +168,10 @@ namespace LagoVista.IoT.StarterKit.Managers
 
         public async Task DeleteExample(EntityHeader org, EntityHeader user)
         {
-            await _storageUtils.DeleteIfExistsAsync<DeviceMessageDefinition>(EXAMPLE_MOTION_KEY, org);
-            await _storageUtils.DeleteIfExistsAsync<PlannerConfiguration>(EXAMPLE_MOTION_KEY, org);
-            await _storageUtils.DeleteIfExistsAsync<DeviceType>(EXAMPLE_MOTION_KEY, org);
-            await _storageUtils.DeleteIfExistsAsync<DeviceConfiguration>(EXAMPLE_MOTION_KEY, org);
+            await _storageUtils.DeleteByKeyIfExistsAsync<DeviceMessageDefinition>(EXAMPLE_MOTION_KEY, org);
+            await _storageUtils.DeleteByKeyIfExistsAsync<PlannerConfiguration>(EXAMPLE_MOTION_KEY, org);
+            await _storageUtils.DeleteByKeyIfExistsAsync<DeviceType>(EXAMPLE_MOTION_KEY, org);
+            await _storageUtils.DeleteByKeyIfExistsAsync<DeviceConfiguration>(EXAMPLE_MOTION_KEY, org);
         }
 
         public async Task<Subscription> AddTrialSubscriptionAsync(EntityHeader org, EntityHeader user, DateTime createTimeStamp)
@@ -196,8 +196,8 @@ namespace LagoVista.IoT.StarterKit.Managers
 
         public async Task<DeviceMessageDefinition> AddDefaultMessage(string name, string key, EntityHeader org, EntityHeader user, DateTime createTimeStamp)
         {
-            await _storageUtils.DeleteIfExistsAsync<DeviceMessageDefinition>(key, org);
-            await _storageUtils.DeleteIfExistsAsync<Verifier>("exmplmotgparser", org);
+            await _storageUtils.DeleteByKeyIfExistsAsync<DeviceMessageDefinition>(key, org);
+            await _storageUtils.DeleteByKeyIfExistsAsync<Verifier>("exmplmotgparser", org);
 
             var msgDefinition = new DeviceMessageDefinition()
             {
@@ -238,7 +238,7 @@ namespace LagoVista.IoT.StarterKit.Managers
 
             await _deviceMsgMgr.AddDeviceMessageDefinitionAsync(msgDefinition, org, user);
 
-            await _storageUtils.DeleteIfExistsAsync<Verifier>("examplemotionmsgparser", org);
+            await _storageUtils.DeleteByKeyIfExistsAsync<Verifier>("examplemotionmsgparser", org);
 
             var verifier = new Verifier()
             {
@@ -278,7 +278,7 @@ namespace LagoVista.IoT.StarterKit.Managers
             if (output == null) throw new ArgumentNullException(nameof(output));
             if (msg == null) throw new ArgumentNullException(nameof(msg));
 
-            await _storageUtils.DeleteIfExistsAsync<DeviceConfiguration>(key, org);
+            await _storageUtils.DeleteByKeyIfExistsAsync<DeviceConfiguration>(key, org);
 
             var deviceConfig = new DeviceConfiguration()
             {
@@ -350,7 +350,7 @@ namespace LagoVista.IoT.StarterKit.Managers
         public async Task<Solution> CreateSolutionAsync(string name, string key, EntityHeader org, EntityHeader user, DateTime createTimestamp,
             PlannerConfiguration planner, DeviceConfiguration deviceConfig, ListenerConfiguration listener)
         {
-            await _storageUtils.DeleteIfExistsAsync<Solution>(key, org);
+            await _storageUtils.DeleteByKeyIfExistsAsync<Solution>(key, org);
 
             var solution = new Solution()
             {
@@ -398,7 +398,7 @@ namespace LagoVista.IoT.StarterKit.Managers
 
         public async Task<DeviceType> AddDeviceType(string name, string key, DeviceConfiguration deviceConfg, EntityHeader org, EntityHeader user, DateTime createTimestamp)
         {
-            await _storageUtils.DeleteIfExistsAsync<DeviceType>(key, org);
+            await _storageUtils.DeleteByKeyIfExistsAsync<DeviceType>(key, org);
 
             var deviceType = new DeviceType()
             {
@@ -418,7 +418,7 @@ namespace LagoVista.IoT.StarterKit.Managers
 
         public async Task<DeviceWorkflow> AddDeviceWorkflow(String name, string key, EntityHeader org, EntityHeader user, DateTime createTimestamp)
         {
-            await _storageUtils.DeleteIfExistsAsync<DeviceWorkflow>(key, org);
+            await _storageUtils.DeleteByKeyIfExistsAsync<DeviceWorkflow>(key, org);
 
             var appUser = await _userManager.FindByIdAsync(user.Id);
 
@@ -525,9 +525,9 @@ function onSet(value /* String */) {
 
         public async Task<PlannerConfiguration> AddPlanner(string name, string key, EntityHeader org, EntityHeader user, DateTime createTimestamp)
         {
-            await _storageUtils.DeleteIfExistsAsync<PlannerConfiguration>(key, org);
-            await _storageUtils.DeleteIfExistsAsync<Verifier>("explmotmsgidinpath", org);
-            await _storageUtils.DeleteIfExistsAsync<Verifier>("explmotdeveidheader", org);
+            await _storageUtils.DeleteByKeyIfExistsAsync<PlannerConfiguration>(key, org);
+            await _storageUtils.DeleteByKeyIfExistsAsync<Verifier>("explmotmsgidinpath", org);
+            await _storageUtils.DeleteByKeyIfExistsAsync<Verifier>("explmotdeveidheader", org);
 
 
             var planner = new PlannerConfiguration()
@@ -608,7 +608,7 @@ function onSet(value /* String */) {
 
         public async Task<DeviceRepository> AddTrialRepository(string name, string key, Subscription subscription, EntityHeader org, EntityHeader user, DateTime createTimestamp)
         {
-            await _storageUtils.DeleteIfExistsAsync<DeviceRepository>(key, org);
+            await _storageUtils.DeleteByKeyIfExistsAsync<DeviceRepository>(key, org);
 
             var repo = new DeviceRepository()
             {
@@ -635,7 +635,7 @@ function onSet(value /* String */) {
 
         public async Task<ListenerConfiguration> AddPort80Listener(string key, string name, string description, EntityHeader org, EntityHeader user, DateTime createTimestamp)
         {
-            await _storageUtils.DeleteIfExistsAsync<ListenerConfiguration>(key, org);
+            await _storageUtils.DeleteByKeyIfExistsAsync<ListenerConfiguration>(key, org);
 
             var port80Listener = new ListenerConfiguration();
             port80Listener.Name = name;
@@ -713,8 +713,8 @@ function onSet(value /* String */) {
 
             var userOrg = await _orgRepo.GetOrganizationAsync(org.Id);
 
-            await _storageUtils.DeleteIfExistsAsync<DeploymentInstance>(key, org);
-            await _storageUtils.DeleteIfExistsAsync<DeploymentHost>(key, org);
+            await _storageUtils.DeleteByKeyIfExistsAsync<DeploymentInstance>(key, org);
+            await _storageUtils.DeleteByKeyIfExistsAsync<DeploymentHost>(key, org);
 
             var instance = new DeploymentInstance()
             {
@@ -810,7 +810,7 @@ function onSet(value /* String */) {
         public async Task<LagoVista.IoT.Simulator.Admin.Models.Simulator> CreateSimulator(DeploymentInstance instance, Device device, string name, string key,
             EntityHeader org, EntityHeader user, DateTime createTimestamp)
         {
-            await _storageUtils.DeleteIfExistsAsync<LagoVista.IoT.Simulator.Admin.Models.Simulator>(key, org);
+            await _storageUtils.DeleteByKeyIfExistsAsync<LagoVista.IoT.Simulator.Admin.Models.Simulator>(key, org);
 
             var sim = new LagoVista.IoT.Simulator.Admin.Models.Simulator()
             {

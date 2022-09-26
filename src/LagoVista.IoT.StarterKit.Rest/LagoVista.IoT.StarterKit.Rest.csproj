@@ -5,12 +5,12 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="LagoVista.Core" Version="3.0.1954.1303" />
-    <PackageReference Include="LagoVista.IoT.Pipeline.Admin" Version="3.0.1954.1303" />
-    <PackageReference Include="LagoVista.IoT.Logging" Version="3.0.1954.1303" />
-    <PackageReference Include="LagoVista.IoT.Runtime.Core" Version="3.0.1954.1303" />
-    <PackageReference Include="LagoVista.IoT.Web.Common" Version="3.0.1954.1303" />
-    <PackageReference Include="LagoVista.UserAdmin" Version="3.0.1954.1303" />
+    <PackageReference Include="LagoVista.Core" Version="3.0.1958.0509" />
+    <PackageReference Include="LagoVista.IoT.Pipeline.Admin" Version="3.0.1958.0509" />
+    <PackageReference Include="LagoVista.IoT.Logging" Version="3.0.1958.0509" />
+    <PackageReference Include="LagoVista.IoT.Runtime.Core" Version="3.0.1958.0509" />
+    <PackageReference Include="LagoVista.IoT.Web.Common" Version="3.0.1958.0509" />
+    <PackageReference Include="LagoVista.UserAdmin" Version="3.0.1958.0509" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
   <ItemGroup>
