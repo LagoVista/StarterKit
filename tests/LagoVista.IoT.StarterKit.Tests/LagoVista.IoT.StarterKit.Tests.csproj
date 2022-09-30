@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <DebugType>portable</DebugType>
     <AssemblyName>LagoVista.IoT.StarterKit.Tests</AssemblyName>
     <PackageId>LagoVista.IoT.StarterKit.Tests</PackageId>
