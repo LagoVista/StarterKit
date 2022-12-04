@@ -50,7 +50,7 @@ namespace LagoVista.IoT.StarterKit.Rest.Controllers
         [HttpGet("/api/dataservices/yaml/{recordtype}/{recordid}/generate")]
         public async Task<IActionResult> GetYAMLAsync(String recordtype, string recordid)
         {
-            var result = await _yamlServices.GetYamlAsync(recordtype, recordid, OrgEntityHeader, UserEntityHeader);
+            var result = await _yamlServices.SerilizeToYamlAsync(recordtype, recordid, OrgEntityHeader, UserEntityHeader);
 
             var buffer = System.Text.ASCIIEncoding.ASCII.GetBytes(result.Result.Item1);
 
@@ -64,11 +64,11 @@ namespace LagoVista.IoT.StarterKit.Rest.Controllers
 		/// <param name="file"></param>
 		/// <returns></returns>
 		[HttpPost("/api/dataservices/yaml/{recordType}/import")]
-        public async Task<InvokeResult<Tuple<bool, string[]>>> ApplyXamlAsync(string recordType, [FromForm] IFormFile file)
+        public async Task<InvokeResult<object>> ApplyYamlAsync(string recordType, [FromForm] IFormFile file)
         {
             using (var strm = file.OpenReadStream())
             {
-                return await _yamlServices.ApplyXamlAsync(recordType, strm, OrgEntityHeader, UserEntityHeader);
+                return await _yamlServices.DeserializeFromYamlAsync(recordType, strm, OrgEntityHeader, UserEntityHeader);
             }
         }
 

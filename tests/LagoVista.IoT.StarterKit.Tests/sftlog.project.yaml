@@ -1,0 +1,149 @@
+Module:
+  Name: Project Managment
+  Key: project
+  CardIcon: nuv-project-management
+  CardTitle: Project Management
+  CardSummary: Manage Projects and Tasks
+  Status: Development
+  RestrictByDefault: False
+  IsLegacyNGX: False
+  IsExternalLink: False
+  OpenInNewPage: False
+  SortOrder: 0
+  Areas:
+    - SortOrder: 1
+      Name: Management
+      Key: mgmt
+      CardIcon: nuv-system-admin
+      CardTitle: Project Management
+      CardSummary: Manage all aspects of projects
+      Status: Development
+      RestrictByDefault: True
+      DoNotDisplay: False
+      Pages:
+        - SortOrder: 1
+          Name: Projects
+          Key: projects
+          CardIcon: nuv-system-messages
+          CardTitle: Projects
+          CardSummary: Create and Update Projects
+          Status: Development
+          RestrictByDefault: False
+          DoNotDisplay: False
+    - SortOrder: 2
+      Name: Work
+      Key: work
+      CardIcon: nuv-tools
+      CardTitle: Project Work
+      CardSummary: Track work associated with projects
+      Status: Development
+      RestrictByDefault: False
+      DoNotDisplay: False
+      Pages:
+        - SortOrder: 1
+          Name: Project Task
+          Key: projecttask
+          CardIcon: nuv-using-7-segment-parser
+          CardTitle: Project Task
+          CardSummary: A project task is a unit of work that needs to be completed
+          Status: Development
+          RestrictByDefault: True
+          DoNotDisplay: False
+          Features:
+            - Name: Discussion
+              Key: discuss
+              Icon: icon-ae-chat-2
+              MenuTitle: Discussion
+              Summary: Discussions related to the ticket
+              DoNotDisplay: False
+              RestrictByDefault: False
+            - Name: Details
+              Key: details
+              Icon: icon-fo-list
+              MenuTitle: Details
+              Summary: Details of the task
+              DoNotDisplay: False
+              RestrictByDefault: False
+            - Name: Time
+              Key: time
+              Icon: icon-pz-time
+              MenuTitle: Time
+              Summary: Time billed against ticket
+              DoNotDisplay: False
+              RestrictByDefault: False
+            - Name: Team
+              Key: team
+              Icon: icon-pz-teamwork
+              MenuTitle: Team
+              Summary: Manage the team associated with this project
+              DoNotDisplay: True
+              RestrictByDefault: False
+            - Name: Issues
+              Key: issues
+              Icon: icon-pz-problem-solving
+              MenuTitle: Issues
+              Summary: Open Issues and Blockers on the ticket.
+              DoNotDisplay: False
+              RestrictByDefault: False
+            - Name: Risks
+              Key: risks
+              Icon: icon-ae-banned
+              MenuTitle: Risks
+              Summary: Risks are areas of the tasks that may present problems
+              DoNotDisplay: True
+              RestrictByDefault: True
+            - Name: Help Resources
+              Key: helpresources
+              Icon: icon-fo-help-resource
+              MenuTitle: Help Resources
+              Summary: Help Resources for this ticket.
+              DoNotDisplay: False
+              RestrictByDefault: False
+            - Name: Expected Outcomes
+              Key: expectoutcome
+              Icon: icon-ae-agile
+              MenuTitle: Expected Outcomes
+              Summary: Expected outcomes define what should be completed within the project.
+              DoNotDisplay: True
+              RestrictByDefault: True
+            - Name: Additional Information
+              Key: additionalinformatoin
+              Icon: icon-ae-document
+              MenuTitle: Additional Information
+              Summary: Additional information may provide useful data on completing the tasks
+              DoNotDisplay: True
+              RestrictByDefault: False
+            - Name: Sub Tasks
+              Key: subtasks
+              Icon: icon-fo-online-task
+              MenuTitle: Sub Tasks
+              Summary: Manage sub tasks associated with this task
+              DoNotDisplay: True
+              RestrictByDefault: False
+    - SortOrder: 3
+      Name: Reports
+      Key: reports
+      CardIcon: nuv-device-repository
+      CardTitle: Reports
+      CardSummary: Project Management Related Reports
+      Status: Development
+      RestrictByDefault: False
+      DoNotDisplay: False
+    - SortOrder: 4
+      Name: Settings
+      Key: settings
+      CardIcon: nuv-user-management
+      CardTitle: Settings
+      CardSummary: Configure Settings for Project management Module
+      Status: Development
+      RestrictByDefault: False
+      DoNotDisplay: False
+    - SortOrder: 5
+      Name: Project Board
+      Key: projectboard
+      CardIcon: nuv-project-management
+      CardTitle: Project Board
+      CardSummary: View tasks by status and assignments
+      Status: Development
+      RestrictByDefault: False
+      DoNotDisplay: False

@@ -8,8 +8,8 @@ namespace LagoVista.IoT.StarterKit
 {
     public interface IYamlServices
     {
-        Task<InvokeResult<Tuple<string, string>>> GetYamlAsync(string recordType, string id, EntityHeader org, EntityHeader usr);
+        Task<InvokeResult<Tuple<string, string>>> SerilizeToYamlAsync(string recordType, string id, EntityHeader org, EntityHeader usr);
 
-        Task<InvokeResult<Tuple<bool, string[]>>> ApplyXamlAsync(string recordType, Stream strm, EntityHeader org, EntityHeader usr);
+        Task<InvokeResult<object>> DeserializeFromYamlAsync(string recordType, Stream strm, EntityHeader org, EntityHeader usr);
     }
 }

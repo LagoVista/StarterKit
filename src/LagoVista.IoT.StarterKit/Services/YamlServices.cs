@@ -27,6 +27,7 @@ using LagoVista.IoT.Simulator.Admin.Managers;
 using LagoVista.IoT.Verifiers.Managers;
 using LagoVista.UserAdmin.Interfaces.Managers;
 using LagoVista.UserAdmin.Interfaces.Repos.Orgs;
+using YamlDotNet.Serialization;
 
 namespace LagoVista.IoT.StarterKit.Services
 {
@@ -59,14 +60,16 @@ namespace LagoVista.IoT.StarterKit.Services
         readonly IDeviceManager _deviceManager;
         readonly IOrganizationRepo _orgRepo;
         readonly IUserManager _userManager;
+        readonly IModuleManager _moduleManager;
+        readonly IRoleManager _roleManager;
         readonly StorageUtils _storageUtils;
 
         private EntityHeader _org;
         private EntityHeader _user;
 
         public YamlServices(IAdminLogger logger, IStarterKitConnection starterKitConnection, IDeviceAdminManager deviceAdminMgr, ISubscriptionManager subscriptionMgr, IPipelineModuleManager pipelineMgr, IDeviceTypeManager deviceTypeMgr, IDeviceRepositoryManager deviceRepoMgr,
-                          IUserManager userManager, IProductManager productManager, IDeviceTypeManager deviceTypeManager, IDeviceConfigurationManager deviceCfgMgr, IDeviceMessageDefinitionManager deviceMsgMgr, IDeploymentInstanceManager instanceMgr,
-                          IDeploymentHostManager hostMgr, IDeviceManager deviceManager, IContainerRepositoryManager containerMgr, ISolutionManager solutionMgr, IOrganizationRepo orgMgr, ISimulatorManager simMgr, IVerifierManager verifierMgr)
+                          IUserManager userManager, IModuleManager moduleManager, IProductManager productManager, IDeviceTypeManager deviceTypeManager, IDeviceConfigurationManager deviceCfgMgr, IDeviceMessageDefinitionManager deviceMsgMgr, IDeploymentInstanceManager instanceMgr,
+                          IDeploymentHostManager hostMgr, IRoleManager roleManager, IDeviceManager deviceManager, IContainerRepositoryManager containerMgr, ISolutionManager solutionMgr, IOrganizationRepo orgMgr, ISimulatorManager simMgr, IVerifierManager verifierMgr)
         {
             _userManager = userManager;
             _deviceAdminMgr = deviceAdminMgr;
@@ -83,16 +86,14 @@ namespace LagoVista.IoT.StarterKit.Services
             _orgRepo = orgMgr;
             _deviceManager = deviceManager;
             _hostManager = hostMgr;
-
+            _moduleManager = moduleManager;
+            _roleManager = roleManager;
             _instanceMgr = instanceMgr;
             _solutionMgr = solutionMgr;
 
             _storageUtils = new StorageUtils(new Uri(starterKitConnection.StarterKitStorage.Uri), starterKitConnection.StarterKitStorage.AccessKey,
                 starterKitConnection.StarterKitStorage.ResourceName, logger);
         }
-
-
-
 
         protected void AddAuditProperties(IAuditableEntity entity, DateTime creationTimeStamp, EntityHeader org, EntityHeader user)
         {
@@ -111,6 +112,98 @@ namespace LagoVista.IoT.StarterKit.Services
         protected void AddId(IIDEntity entity)
         {
             entity.Id = Guid.NewGuid().ToId();
+        }
+
+
+        private Object CreateNuvIoTObject(Type objType, DateTime createDateStamp, EntityHeader org, EntityHeader user, Dictionary<object, object> yaml)
+        {
+            var obj = Activator.CreateInstance(objType);
+
+            foreach (var key in yaml.Keys)
+            {
+                if (key is String keyStr)
+                {
+                    var prop = objType.GetProperties().Where(p => p.Name == keyStr).FirstOrDefault();
+                    if (prop == null)
+                    {
+                        throw new Exception($"Uknown Property {keyStr}");
+                    }
+                    else if (prop.PropertyType.Name == "EntityHeader`1")
+                    {
+                        var enumType = prop.PropertyType.GetGenericArguments().First();
+                        var enumValue = Enum.Parse(enumType, yaml[key] as string);
+                        var createMethod = prop.PropertyType.GetMethod("Create");
+                        var ehValue = createMethod.Invoke(null, new object[] { enumValue });
+                        prop.SetValue(obj, ehValue);
+
+                    }
+                    else if (yaml[key] is IEnumerable<Object> childList)
+                    {
+                        var childListType = prop.PropertyType.GetGenericArguments().First();
+
+                        var addMethod = prop.PropertyType.GetMethod("Add");
+                        foreach (Dictionary<object, object> child in childList)
+                        {
+                            var childObject = CreateNuvIoTObject(childListType, createDateStamp, org, user, child);
+                            addMethod.Invoke(prop.GetValue(obj), new object[] { childObject });
+                        }
+
+                    }
+                    else if (yaml[key] is String value)
+                    {
+                        if (prop.GetAccessors().Where(acc => acc.Name == $"set_{prop.Name}").Any())
+                        {
+                            if (prop.PropertyType == typeof(bool))
+                            {
+                                prop.SetValue(obj, bool.Parse(value));
+                            }
+                            else if (prop.PropertyType == typeof(double))
+                            {
+                                prop.SetValue(obj, double.Parse(value));
+                            }
+                            else if (prop.PropertyType == typeof(int))
+                            {
+                                prop.SetValue(obj, int.Parse(value));
+                            }
+                            else
+                            {
+                                value = value.Replace("\\r", "\r").Replace("\\n", "\n");
+                                prop.SetValue(obj, value);
+                            }
+                        }
+                    }
+                    else if (yaml[key] is Dictionary<object, object>)
+                    {
+                        Console.WriteLine("hi");
+                    }
+                    else
+                    {
+                        throw new Exception($"Uknown value type for {keyStr}");
+                    }
+                }
+            }
+
+            if (obj is IIDEntity)
+            {
+                AddId(obj as IIDEntity);
+            }
+
+            if (obj is IAuditableEntity)
+            {
+                AddAuditProperties(obj as IAuditableEntity, createDateStamp, org, user);
+            }
+
+            if (obj is IOwnedEntity)
+            {
+                AddOwnedProperties(obj as IOwnedEntity, org);
+            }
+
+            return obj;
+        }
+
+        private T CreateNuvIoTObject<T>(DateTime createDateStamp, EntityHeader org, EntityHeader user, Dictionary<object, object> yaml) where T : class
+        {
+            return CreateNuvIoTObject(typeof(T), createDateStamp, org, user, yaml) as T;
         }
 
         public async Task ApplyReferenceEntityHeader(String propName, StringBuilder bldr, String indent, EntityHeader eh, Object model = null)
@@ -276,7 +369,7 @@ namespace LagoVista.IoT.StarterKit.Services
                         }
                     }
                 }
-                catch(Exception)
+                catch (Exception)
                 {
                     Console.WriteLine($"!!! Error attempting to get value of {prop.Name} of type {prop.PropertyType.Name}");
                     throw;
@@ -285,22 +378,40 @@ namespace LagoVista.IoT.StarterKit.Services
         }
 
 
-        public async Task<InvokeResult<Tuple<bool, string[]>>> ApplyXamlAsync(string recordType, Stream strm, EntityHeader org, EntityHeader usr)
+        public async Task<InvokeResult<Object>> DeserializeFromYamlAsync(string recordType, Stream strm, EntityHeader org, EntityHeader usr)
         {
             _org = org;
             _user = usr;
+            var dateStamp = DateTime.UtcNow;
+
 
             using (var rdr = new StreamReader(strm))
             {
-                var yaml = await rdr.ReadToEndAsync();
-                var yamlIsMissing = string.IsNullOrWhiteSpace(yaml);
-                var result = Tuple.Create(!yamlIsMissing, new[] { yamlIsMissing ? "No YAML provided" : $"We Have YAML for {recordType}!" });
+                var deserializer = new DeserializerBuilder().Build();
+                var output = deserializer.Deserialize(rdr) as Dictionary<object, object>;
+                if(output == null)
+                    return InvokeResult<Object>.FromError($"Could not deserilaize YAML.");
 
-                return InvokeResult<Tuple<bool, string[]>>.Create(result);
+                foreach (var key in output.Keys)
+                {
+                    var childItem = output[key];
+                    if (key is String keyStr)
+                        switch (recordType.ToLower())
+                        {
+                            case "module":
+                                Console.WriteLine("do module");
+                                var module = CreateNuvIoTObject<LagoVista.UserAdmin.Models.Security.Module>(dateStamp, org, usr, childItem as Dictionary<object, object>);
+                                return InvokeResult<Object>.Create(module);
+                            default:
+                                return InvokeResult<Object>.FromError($"object type: [{recordType}] not supported.");
+                        }
+
+                }
             }
+            return InvokeResult<Object>.FromError("could not create object");
         }
 
-        public async Task<InvokeResult<Tuple<string, string>>> GetYamlAsync(string recordType, string id, EntityHeader org, EntityHeader usr)
+        public async Task<InvokeResult<Tuple<string, string>>> SerilizeToYamlAsync(string recordType, string id, EntityHeader org, EntityHeader usr)
         {
             _org = org;
             _user = usr;
@@ -346,11 +457,22 @@ namespace LagoVista.IoT.StarterKit.Services
                     await GenerateYaml(bldr, solution, 1);
                     recordKey = solution.Key;
                     break;
+                case nameof(LagoVista.UserAdmin.Models.Security.Module):
+                    var module = await _moduleManager.GetModuleAsync(id, org, usr);
+                    await GenerateYaml(bldr, module, 1);
+                    recordKey = module.Key;
+                    break;
+                case nameof(LagoVista.UserAdmin.Models.Users.Role):
+                    var role = await _moduleManager.GetModuleAsync(id, org, usr);
+                    await GenerateYaml(bldr, role, 1);
+                    recordKey = role.Key;
+                    break;
+
                 default:
                     return InvokeResult<Tuple<string, string>>.FromError($"Don't know how to handle object of type [{recordType}]");
             }
 
-            var fileName = $"{(await _orgRepo.GetOrganizationAsync(org.Id)).Namespace}.{recordKey}.yaml"; ;
+            var fileName = $"{(await _orgRepo.GetOrganizationAsync(org.Id)).Namespace}.{recordType}.{recordKey}.yaml"; ;
 
             return InvokeResult<Tuple<string, string>>.Create(Tuple.Create(bldr.ToString(), fileName));
         }
