@@ -189,7 +189,10 @@ namespace LagoVista.IoT.StarterKit.Managers
                 LastUpdatedDate = createTimeStamp,
             };
 
+
+            _subscriptionMgr.IsForInitialization = true;
             await this._subscriptionMgr.AddSubscriptionAsync(subscription, org, user);
+            _subscriptionMgr.IsForInitialization = false;
 
             return subscription;
         }
@@ -601,6 +604,8 @@ function onSet(value /* String */) {
             AddId(messageIdParserVerifier1);
             AddOwnedProperties(messageIdParserVerifier1, org);
             AddAuditProperties(messageIdParserVerifier1, createTimestamp, org, user);
+
+
             await _verifierMgr.AddVerifierAsync(messageIdParserVerifier1, org, user);
 
             return planner;
@@ -625,7 +630,9 @@ function onSet(value /* String */) {
             AddOwnedProperties(repo, org);
             AddAuditProperties(repo, createTimestamp, org, user);
 
+            _pipelineMgr.IsForInitialization = true;
             await this._deviceRepoMgr.AddDeviceRepositoryAsync(repo, org, user);
+            _pipelineMgr.IsForInitialization = false;
 
             /* when it gets created all the "stuff" to access the repo won't be present, load it to get those values. */
             repo = await this._deviceRepoMgr.GetDeviceRepositoryWithSecretsAsync(repo.Id, org, user);
@@ -653,7 +660,9 @@ function onSet(value /* String */) {
             this.AddId(port80Listener);
             this.AddOwnedProperties(port80Listener, org);
 
+            _pipelineMgr.IsForInitialization = true;
             await this._pipelineMgr.AddListenerConfigurationAsync(port80Listener, org, user);
+            _pipelineMgr.IsForInitialization = false;
 
             return port80Listener;
         }
@@ -668,7 +677,9 @@ function onSet(value /* String */) {
             this.AddId(sentinal);
             this.AddOwnedProperties(sentinal, org);
 
+            _pipelineMgr.IsForInitialization = true;
             await this._pipelineMgr.AddSentinelConfigurationAsync(sentinal, org, user);
+            _pipelineMgr.IsForInitialization = false;
 
             return sentinal;
         }
@@ -683,7 +694,10 @@ function onSet(value /* String */) {
             this.AddAuditProperties(inputTranslator, createTimestamp, org, user);
             this.AddId(inputTranslator);
             this.AddOwnedProperties(inputTranslator, org);
+
+            _pipelineMgr.IsForInitialization = true;
             await this._pipelineMgr.AddInputTranslatorConfigurationAsync(inputTranslator, org, user);
+            _pipelineMgr.IsForInitialization = false;
 
             return inputTranslator;
         }
@@ -699,7 +713,9 @@ function onSet(value /* String */) {
             this.AddId(outputTranslator);
             this.AddOwnedProperties(outputTranslator, org);
 
+            _pipelineMgr.IsForInitialization = true;
             await this._pipelineMgr.AddOutputTranslatorConfigurationAsync(outputTranslator, org, user);
+            _pipelineMgr.IsForInitialization = false;
 
             return outputTranslator;
         }
