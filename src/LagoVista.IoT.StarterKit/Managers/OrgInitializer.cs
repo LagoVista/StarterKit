@@ -818,7 +818,7 @@ function onSet(value /* String */) {
             AddAuditProperties(device, createTimestamp, org, user);
             AddOwnedProperties(device, org);
 
-            await _deviceManager.AddDeviceAsync(repo, device, org, user);
+            await _deviceManager.AddDeviceAsync(repo, device, false, org, user);
 
             return device;
         }
