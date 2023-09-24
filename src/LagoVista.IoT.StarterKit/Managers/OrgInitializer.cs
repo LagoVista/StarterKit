@@ -90,9 +90,10 @@ namespace LagoVista.IoT.StarterKit.Managers
             var creationTimeStamp = DateTime.UtcNow;
             await this.AddTrialSubscriptionAsync(org, user, creationTimeStamp);
 
+            await this.AddInputTranslatorAsync(org, user, creationTimeStamp);
             await this.AddOutputTranslatorsAsync(org, user, creationTimeStamp);
             await this.AddAnonymousSentinelAsync(org, user, creationTimeStamp);
-            await this.AddInputTranslatorAsync(org, user, creationTimeStamp);
+            await this.AddDefaultWorkflowAsync(org, user, creationTimeStamp);
         }
 
         public async Task<InvokeResult> CreateExampleAppAsync(string environmentName, EntityHeader org, EntityHeader user)
@@ -700,6 +701,30 @@ function onSet(value /* String */) {
             _pipelineMgr.IsForInitialization = false;
 
             return inputTranslator;
+        }
+
+        public async Task<DeviceWorkflow> AddDefaultWorkflowAsync(EntityHeader org, EntityHeader user, DateTime createTimestamp)
+        {
+            var wf = new DeviceWorkflow();
+            wf.Pages.Add(new Page()
+            {
+                PageNumber = 1,
+                Name = DeviceLibraryResources.Common_PageNumberOne
+            });
+
+            wf.Name = "Default Workflow (empty)";
+            wf.Key = DEFAULT;
+            wf.Description = "The default empty workflow that can be customized as necessary.";
+            this.AddAuditProperties(wf, createTimestamp, org, user);
+            this.AddId(wf);
+            this.AddOwnedProperties(wf, org);
+
+            _deviceAdminMgr.IsForInitialization = true;
+            await _deviceAdminMgr.AddDeviceWorkflowAsync(wf, org, user);
+            _deviceAdminMgr.IsForInitialization = false;
+
+
+            return wf;
         }
 
         public async Task<OutputTranslatorConfiguration> AddOutputTranslatorsAsync(EntityHeader org, EntityHeader user, DateTime createTimestamp)
