@@ -166,6 +166,7 @@ namespace LagoVista.IoT.StarterKit.Managers
             {
                 Name = "Sample Temperature Message",
                 Key = "sampletempmsg",
+                Delimiter = ",",
                 SampleMessages = new List<DeviceMessaging.Admin.Models.SampleMessage>()
                 {
                     new DeviceMessaging.Admin.Models.SampleMessage()

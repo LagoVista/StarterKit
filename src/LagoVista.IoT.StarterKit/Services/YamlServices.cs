@@ -25,6 +25,8 @@ using LagoVista.IoT.Pipeline.Admin.Models;
 using LagoVista.IoT.Runtime.Core.Models.Verifiers;
 using LagoVista.IoT.Simulator.Admin.Managers;
 using LagoVista.IoT.Verifiers.Managers;
+using LagoVista.ProjectManagement;
+using LagoVista.ProjectManagement.Models;
 using LagoVista.UserAdmin.Interfaces.Managers;
 using LagoVista.UserAdmin.Interfaces.Repos.Orgs;
 using YamlDotNet.Serialization;
@@ -63,13 +65,19 @@ namespace LagoVista.IoT.StarterKit.Services
         readonly IModuleManager _moduleManager;
         readonly IRoleManager _roleManager;
         readonly StorageUtils _storageUtils;
+        readonly ISurveyManager _surveyManager;
+        readonly ISiteContentManager _siteContentManager;
+        readonly IGuideManager _guideManager;
+        readonly IGlossaryManager _glossaryManager;
+        readonly ISurveyResponseManager _surveyResponseManager;
 
         private EntityHeader _org;
         private EntityHeader _user;
 
         public YamlServices(IAdminLogger logger, IStarterKitConnection starterKitConnection, IDeviceAdminManager deviceAdminMgr, ISubscriptionManager subscriptionMgr, IPipelineModuleManager pipelineMgr, IDeviceTypeManager deviceTypeMgr, IDeviceRepositoryManager deviceRepoMgr,
                           IUserManager userManager, IModuleManager moduleManager, IProductManager productManager, IDeviceTypeManager deviceTypeManager, IDeviceConfigurationManager deviceCfgMgr, IDeviceMessageDefinitionManager deviceMsgMgr, IDeploymentInstanceManager instanceMgr,
-                          IDeploymentHostManager hostMgr, IRoleManager roleManager, IDeviceManager deviceManager, IContainerRepositoryManager containerMgr, ISolutionManager solutionMgr, IOrganizationRepo orgMgr, ISimulatorManager simMgr, IVerifierManager verifierMgr)
+                          IDeploymentHostManager hostMgr, IRoleManager roleManager, IDeviceManager deviceManager, IContainerRepositoryManager containerMgr, ISolutionManager solutionMgr, IOrganizationRepo orgMgr, ISimulatorManager simMgr, IVerifierManager verifierMgr,
+                          ISurveyManager surveyManager, ISurveyResponseManager surveyResponseManager, ISiteContentManager siteContentManager, IGuideManager guideManager, IGlossaryManager glossaryManager)
         {
             _userManager = userManager;
             _deviceAdminMgr = deviceAdminMgr;
@@ -90,6 +98,11 @@ namespace LagoVista.IoT.StarterKit.Services
             _roleManager = roleManager;
             _instanceMgr = instanceMgr;
             _solutionMgr = solutionMgr;
+            _surveyManager = surveyManager;
+            _siteContentManager = siteContentManager;
+            _guideManager = guideManager;
+            _glossaryManager = glossaryManager;
+            _surveyResponseManager = surveyResponseManager;
 
             _storageUtils = new StorageUtils(new Uri(starterKitConnection.StarterKitStorage.Uri), starterKitConnection.StarterKitStorage.AccessKey,
                 starterKitConnection.StarterKitStorage.ResourceName, logger);
@@ -296,8 +309,7 @@ namespace LagoVista.IoT.StarterKit.Services
                     }
                     break;
                 default:
-
-                    bldr.AppendLine($"{indent}{prop.Name} - UNSUPPROTED- {prop.PropertyType}");
+                    bldr.AppendLine($"{indent}{prop.Name}:");
                     await GenerateYaml(bldr, value, level + 1);
                     break;
             }
@@ -399,9 +411,20 @@ namespace LagoVista.IoT.StarterKit.Services
                         switch (recordType.ToLower())
                         {
                             case "module":
-                                Console.WriteLine("do module");
                                 var module = CreateNuvIoTObject<LagoVista.UserAdmin.Models.Security.Module>(dateStamp, org, usr, childItem as Dictionary<object, object>);
                                 return InvokeResult<Object>.Create(module);
+                            case "survey":
+                                var survey = CreateNuvIoTObject<Survey>(dateStamp, org, usr, childItem as Dictionary<object, object>);
+                                return InvokeResult<Object>.Create(survey);
+                            case "glossary":
+                                var glossary = CreateNuvIoTObject<Glossary>(dateStamp, org, usr, childItem as Dictionary<object, object>);
+                                return InvokeResult<Object>.Create(glossary);
+                            case "sitecontent":
+                                var sitecontent = CreateNuvIoTObject<SiteContent>(dateStamp, org, usr, childItem as Dictionary<object, object>);
+                                return InvokeResult<Object>.Create(sitecontent);
+                            case "guide":
+                                var guide = CreateNuvIoTObject<SiteContent>(dateStamp, org, usr, childItem as Dictionary<object, object>);
+                                return InvokeResult<Object>.Create(guide);
                             default:
                                 return InvokeResult<Object>.FromError($"object type: [{recordType}] not supported.");
                         }
@@ -450,7 +473,21 @@ namespace LagoVista.IoT.StarterKit.Services
                     var listener = await _pipelineMgr.GetListenerConfigurationAsync(id, org, usr);
                     await GenerateYaml(bldr, listener, 1);
                     recordKey = listener.Key;
-
+                    break;
+                case nameof(SiteContent):
+                    var siteContent = await _siteContentManager.GetSiteContentAsync(id, org, usr);
+                    await GenerateYaml(bldr, siteContent, 1);
+                    recordKey = siteContent.Key;
+                    break;
+                case nameof(Glossary):
+                    var glossary = await _glossaryManager.GetGlossaryAsync(id, org, usr);
+                    await GenerateYaml(bldr, glossary, 1);
+                    recordKey = glossary.Key;
+                    break;
+                case nameof(Guide):
+                    var guide = await _guideManager.GetGuideAsync(id, org, usr);
+                    await GenerateYaml(bldr, guide, 1);
+                    recordKey = guide.Key;
                     break;
                 case nameof(Solution):
                     var solution = await _solutionMgr.GetSolutionAsync(id, org, usr);
@@ -461,6 +498,16 @@ namespace LagoVista.IoT.StarterKit.Services
                     var module = await _moduleManager.GetModuleAsync(id, org, usr);
                     await GenerateYaml(bldr, module, 1);
                     recordKey = module.Key;
+                    break;
+                case nameof(LagoVista.ProjectManagement.Models.Survey):
+                    var survey = await _surveyManager.GetSurveyAsync(id, org, usr);
+                    await GenerateYaml(bldr, survey, 1);
+                    recordKey = survey.Key;
+                    break;
+                case nameof(LagoVista.ProjectManagement.Models.SurveyResponse):
+                    var surveyResponse = await _surveyResponseManager.GetSurveyResponseAsync(id, org.Id, org, usr);
+                    await GenerateYaml(bldr, surveyResponse, 1);
+                    recordKey = surveyResponse.Survey.Key;
                     break;
                 case nameof(LagoVista.UserAdmin.Models.Users.Role):
                     var role = await _moduleManager.GetModuleAsync(id, org, usr);

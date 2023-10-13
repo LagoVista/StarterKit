@@ -1,4 +1,5 @@
-﻿using LagoVista.Core.Models;
+﻿using LagoVista.Core;
+using LagoVista.Core.Models;
 using LagoVista.IoT.Billing;
 using LagoVista.IoT.Deployment.Admin;
 using LagoVista.IoT.Deployment.Admin.Models;
@@ -11,6 +12,8 @@ using LagoVista.IoT.DeviceMessaging.Admin.Models;
 using LagoVista.IoT.Pipeline.Admin.Managers;
 using LagoVista.IoT.Pipeline.Admin.Models;
 using LagoVista.IoT.Verifiers.Managers;
+using LagoVista.ProjectManagement;
+using LagoVista.ProjectManagement.Models;
 using LagoVista.UserAdmin.Interfaces.Managers;
 using System;
 using System.Collections.Generic;
@@ -33,10 +36,12 @@ namespace LagoVista.IoT.StarterKit.Managers
         IDeviceRepositoryManager _deviceRepoMgr;
         IProductManager _productManager;
         IVerifierManager _verifierMgr;
+        IProjectManager _projectManager;
+        ITaskManager _taskMgr;
 
         public CloneServices(IDeviceAdminManager deviceAdminMgr, ISubscriptionManager subscriptionMgr, IPipelineModuleManager pipelineMgr, IDeviceTypeManager deviceTypeMgr, IDeviceRepositoryManager deviceRepoMgr,
            IProductManager productManager, IDeviceConfigurationManager deviceCfgMgr, IDeviceMessageDefinitionManager deviceMsgMgr, IDeploymentHostManager hostMgr, IDeploymentInstanceManager instanceMgr,
-           ISolutionManager solutionMgr, IVerifierManager verifierMgr)
+           ISolutionManager solutionMgr, IVerifierManager verifierMgr, IProjectManager projectManager, ITaskManager taskManager)
         {
             _deviceAdminMgr = deviceAdminMgr;
             _subscriptionMgr = subscriptionMgr;
@@ -51,6 +56,8 @@ namespace LagoVista.IoT.StarterKit.Managers
             _hostMgr = hostMgr;
             _instanceMgr = instanceMgr;
             _solutionMgr = solutionMgr;
+
+            _projectManager = projectManager;
         }
 
         public async Task<DeviceMessageDefinition> CloneMessageAsync(string originalMessageId, EntityHeader org, EntityHeader user)
@@ -122,6 +129,26 @@ namespace LagoVista.IoT.StarterKit.Managers
             throw new NotImplementedException();
         }
         #endregion
+
+        public async Task<Project> CloneProjectAsync(string originalProjectId, EntityHeader org, EntityHeader user)
+        {
+            var project = await _projectManager.GetProjectAsync(originalProjectId, org, user);
+
+            var timeStamp = DateTime.UtcNow.ToJSONString();
+
+            project.Id = Guid.NewGuid().ToId();
+            project.CreatedBy = user;
+            project.LastUpdatedBy = user;
+            project.CreationDate = timeStamp;
+            project.LastUpdatedDate = timeStamp;
+            project.OwnerOrganization = org;
+
+            await _projectManager.AddProjectAsync(project, org, user);
+
+            var tasks = _task
+
+            return project;
+        }
 
     }
 }
