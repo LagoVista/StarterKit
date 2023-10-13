@@ -1,5 +1,7 @@
 ﻿using LagoVista.Core;
+using LagoVista.Core.Exceptions;
 using LagoVista.Core.Models;
+using LagoVista.Core.Models.UIMetaData;
 using LagoVista.IoT.Billing;
 using LagoVista.IoT.Deployment.Admin;
 using LagoVista.IoT.Deployment.Admin.Models;
@@ -36,12 +38,13 @@ namespace LagoVista.IoT.StarterKit.Managers
         IDeviceRepositoryManager _deviceRepoMgr;
         IProductManager _productManager;
         IVerifierManager _verifierMgr;
-        IProjectManager _projectManager;
-        ITaskManager _taskMgr;
+        IProjectRepo _projectRepo;
+        IWorkTaskRepo _taskRepo;
+       
 
         public CloneServices(IDeviceAdminManager deviceAdminMgr, ISubscriptionManager subscriptionMgr, IPipelineModuleManager pipelineMgr, IDeviceTypeManager deviceTypeMgr, IDeviceRepositoryManager deviceRepoMgr,
            IProductManager productManager, IDeviceConfigurationManager deviceCfgMgr, IDeviceMessageDefinitionManager deviceMsgMgr, IDeploymentHostManager hostMgr, IDeploymentInstanceManager instanceMgr,
-           ISolutionManager solutionMgr, IVerifierManager verifierMgr, IProjectManager projectManager, ITaskManager taskManager)
+           ISolutionManager solutionMgr, IVerifierManager verifierMgr, IProjectRepo projectRepo, IWorkTaskRepo taskRepo)
         {
             _deviceAdminMgr = deviceAdminMgr;
             _subscriptionMgr = subscriptionMgr;
@@ -57,7 +60,8 @@ namespace LagoVista.IoT.StarterKit.Managers
             _instanceMgr = instanceMgr;
             _solutionMgr = solutionMgr;
 
-            _projectManager = projectManager;
+            _projectRepo = projectRepo;
+            _taskRepo = taskRepo;
         }
 
         public async Task<DeviceMessageDefinition> CloneMessageAsync(string originalMessageId, EntityHeader org, EntityHeader user)
@@ -130,22 +134,44 @@ namespace LagoVista.IoT.StarterKit.Managers
         }
         #endregion
 
-        public async Task<Project> CloneProjectAsync(string originalProjectId, EntityHeader org, EntityHeader user)
+        public async Task<Project> CloneProjectAsync(string originalProjectId, string name, string code, EntityHeader org, EntityHeader user)
         {
-            var project = await _projectManager.GetProjectAsync(originalProjectId, org, user);
+            var project = await _projectRepo.GetProjectAsync(originalProjectId);
+            if (!project.IsPublic && project.OwnerOrganization.Id != org.Id)
+                throw new NotAuthorizedException($"Attempt to clone a non public project that is not owned by the current org.  Current Org: {org.Text}  Owner Org: {project.OwnerOrganization.Text}");
 
             var timeStamp = DateTime.UtcNow.ToJSONString();
 
             project.Id = Guid.NewGuid().ToId();
+            project.Name = name;
+            project.ProjectCode = code;
             project.CreatedBy = user;
             project.LastUpdatedBy = user;
             project.CreationDate = timeStamp;
             project.LastUpdatedDate = timeStamp;
             project.OwnerOrganization = org;
 
-            await _projectManager.AddProjectAsync(project, org, user);
+            await _projectRepo.AddProjectAsync(project);
 
-            var tasks = _task
+            var request = new ListRequest()
+            {
+                PageSize = 99999
+            };
+
+            var tasks = await _taskRepo.GetTasksForProjectAsync(originalProjectId, org.Id, request);
+            var idx = 0;
+            foreach(var taskSummary in tasks.Model)
+            {
+                var task = await _taskRepo.GetWorkTaskAsync(taskSummary.Id);
+                task.Project = EntityHeader.Create(project.Id, project.Key, project.Name);
+                task.CreatedBy = user;
+                task.LastUpdatedBy = user;
+                task.CreationDate = timeStamp;
+                task.LastUpdatedDate = timeStamp;
+                task.OwnerOrganization = org;
+                task.TaskCode = $"{project.ProjectCode}-{idx:00000}";
+                await _taskRepo.AddWorkTaskAsync(task);
+            }
 
             return project;
         }
