@@ -24,7 +24,7 @@ using System.Threading.Tasks;
 
 namespace LagoVista.IoT.StarterKit.Managers
 {
-    public class CloneServices
+    public class CloneServices : ICloneServices
     {
         IDeviceAdminManager _deviceAdminMgr;
         ISubscriptionManager _subscriptionMgr;
@@ -40,7 +40,7 @@ namespace LagoVista.IoT.StarterKit.Managers
         IVerifierManager _verifierMgr;
         IProjectRepo _projectRepo;
         IWorkTaskRepo _taskRepo;
-       
+
 
         public CloneServices(IDeviceAdminManager deviceAdminMgr, ISubscriptionManager subscriptionMgr, IPipelineModuleManager pipelineMgr, IDeviceTypeManager deviceTypeMgr, IDeviceRepositoryManager deviceRepoMgr,
            IProductManager productManager, IDeviceConfigurationManager deviceCfgMgr, IDeviceMessageDefinitionManager deviceMsgMgr, IDeploymentHostManager hostMgr, IDeploymentInstanceManager instanceMgr,
@@ -134,33 +134,41 @@ namespace LagoVista.IoT.StarterKit.Managers
         }
         #endregion
 
-        public async Task<Project> CloneProjectAsync(string originalProjectId, string name, string code, EntityHeader org, EntityHeader user)
+        public async Task<Project> CloneProjectAsync(CloneProjectRequest cloneRequest, EntityHeader org, EntityHeader user)
         {
-            var project = await _projectRepo.GetProjectAsync(originalProjectId);
+            var project = await _projectRepo.GetProjectAsync(cloneRequest.OriginalProject.Id);
             if (!project.IsPublic && project.OwnerOrganization.Id != org.Id)
                 throw new NotAuthorizedException($"Attempt to clone a non public project that is not owned by the current org.  Current Org: {org.Text}  Owner Org: {project.OwnerOrganization.Text}");
 
             var timeStamp = DateTime.UtcNow.ToJSONString();
 
             project.Id = Guid.NewGuid().ToId();
-            project.Name = name;
-            project.ProjectCode = code;
+            project.Name = cloneRequest.NewProjectName;
+            project.ProjectCode = cloneRequest.NewProjectCode;
             project.CreatedBy = user;
             project.LastUpdatedBy = user;
             project.CreationDate = timeStamp;
             project.LastUpdatedDate = timeStamp;
             project.OwnerOrganization = org;
-
-            await _projectRepo.AddProjectAsync(project);
+            project.CurrentTaskIndex = 1;
+            project.HoursUsed = 0;
+            project.Status = EntityHeader<ProjectStatus>.Create(ProjectStatus.Pending);
+            project.Customer = cloneRequest.Customer;
+            project.Agreement = cloneRequest.Agreement;
+            project.Sprints = new List<EnumDescription>();
+            project.Notes = new List<ProjectNotes>();
+            project.ProjectLead = cloneRequest.ProjectLead;
+            project.DefaultPrimaryContributor = cloneRequest.DefaultPrimaryContributor;
+            project.DefaultQAResource = cloneRequest.DefaultQAResource;
+            project.ProjectAdminLead = cloneRequest.ProjectAdminLead;
 
             var request = new ListRequest()
             {
                 PageSize = 99999
             };
 
-            var tasks = await _taskRepo.GetTasksForProjectAsync(originalProjectId, org.Id, request);
-            var idx = 0;
-            foreach(var taskSummary in tasks.Model)
+            var tasks = await _taskRepo.GetTasksForProjectAsync(cloneRequest.OriginalProject.Id, org.Id, request);
+            foreach (var taskSummary in tasks.Model)
             {
                 var task = await _taskRepo.GetWorkTaskAsync(taskSummary.Id);
                 task.Project = EntityHeader.Create(project.Id, project.Key, project.Name);
@@ -169,12 +177,70 @@ namespace LagoVista.IoT.StarterKit.Managers
                 task.CreationDate = timeStamp;
                 task.LastUpdatedDate = timeStamp;
                 task.OwnerOrganization = org;
-                task.TaskCode = $"{project.ProjectCode}-{idx:00000}";
+                task.Discussions = new List<WorkTaskDiscussion>();
+                task.Issues = new List<WorkTaskIssue>();
+                task.DueDate = null;
+                task.TaskCode = $"{project.ProjectCode}-{project.CurrentTaskIndex++:00000}";
+                task.History = new List<WorkTaskHistory>();
+                task.AddHistory("Cloned", $"Cloned from Project {project.Name}.", user);
+                task.AssignedByUser = user;
+                task.AssignedToUser = cloneRequest.ProjectLead;
+                task.QaResource = cloneRequest.DefaultQAResource;
+                task.PrimaryContributorUser = cloneRequest.DefaultPrimaryContributor;
+                task.ExternalTaskCode = null;
+                task.ExternalTaskLink = null;
+                task.ExternalId = null;
+                task.ExternalStatusConfigurationType = null;
+
+                task.ExpectedCloseDate = null;
+
+                var idx = 1;
+                foreach (var outcome in task.ExpectedOutcomes)
+                {
+                    outcome.Id = Guid.NewGuid().ToId();
+                    outcome.ExpectedOutcomeCode = $"{task.TaskCode}-EO-{idx++}";
+                    outcome.VerifiedBy = null;
+                    outcome.CreationDate = timeStamp;
+                    outcome.VerificationDate = null;
+                    outcome.CompletionDate = null;
+                    outcome.Verified = false;
+                    outcome.Completed = false;
+                    outcome.CompletedBy = null;
+                    outcome.CompletionDate = null;
+                    outcome.Attachments = new List<Attachment>();
+                    outcome.VerificationRuns = new List<VerificationRun>();
+                    foreach (var step in outcome.VerificationSteps)
+                    {
+                        step.Id = Guid.NewGuid().ToId();
+                    }
+                }
+
+                idx = 1;
+                foreach (var subtask in task.SubTasks)
+                {
+                    subtask.Id = Guid.NewGuid().ToId();
+                    subtask.SubTaskCode = $"{task.TaskCode}-ST-{idx++}";
+                    subtask.CreationDate = timeStamp;
+                    subtask.Issues = new List<WorkTaskIssue>();
+                    subtask.Discussions = new List<WorkTaskDiscussion>();
+                    subtask.AssignedToUser = cloneRequest.DefaultPrimaryContributor;
+                    subtask.AssignedByUser = user;
+                }
                 await _taskRepo.AddWorkTaskAsync(task);
             }
 
+            foreach (var module in project.Modules)
+            {
+                module.Id = Guid.NewGuid().ToId();
+                module.CreatedBy = user;
+                module.LastUpdatedBy = user;
+                module.CreationDate = timeStamp;
+                module.LastUpdatedDate = timeStamp;
+            }
+
+            await _projectRepo.AddProjectAsync(project);
+
             return project;
         }
-
     }
 }
