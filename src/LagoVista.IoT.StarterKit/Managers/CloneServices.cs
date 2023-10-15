@@ -155,7 +155,6 @@ namespace LagoVista.IoT.StarterKit.Managers
             project.Status = EntityHeader<ProjectStatus>.Create(ProjectStatus.Pending);
             project.Customer = cloneRequest.Customer;
             project.Agreement = cloneRequest.Agreement;
-            project.Sprints = new List<EnumDescription>();
             project.Notes = new List<ProjectNotes>();
             project.ProjectLead = cloneRequest.ProjectLead;
             project.DefaultPrimaryContributor = cloneRequest.DefaultPrimaryContributor;
