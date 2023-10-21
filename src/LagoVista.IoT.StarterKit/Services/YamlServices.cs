@@ -44,6 +44,7 @@ namespace LagoVista.IoT.StarterKit.Services
             "Listeners",
             "Planner",
             "DeviceConfigurations",
+            "ChildSurveyType",
             nameof(DeviceType.DefaultDeviceConfiguration) };
 
         readonly IDeviceAdminManager _deviceAdminMgr;
@@ -128,7 +129,7 @@ namespace LagoVista.IoT.StarterKit.Services
         }
 
 
-        private Object CreateNuvIoTObject(Type objType, DateTime createDateStamp, EntityHeader org, EntityHeader user, Dictionary<object, object> yaml)
+        private async Task<Object> CreateNuvIoTObject(Type objType, DateTime createDateStamp, EntityHeader org, EntityHeader user, Dictionary<object, object> yaml)
         {
             var obj = Activator.CreateInstance(objType);
 
@@ -157,7 +158,7 @@ namespace LagoVista.IoT.StarterKit.Services
                         var addMethod = prop.PropertyType.GetMethod("Add");
                         foreach (Dictionary<object, object> child in childList)
                         {
-                            var childObject = CreateNuvIoTObject(childListType, createDateStamp, org, user, child);
+                            var childObject = await CreateNuvIoTObject(childListType, createDateStamp, org, user, child);
                             addMethod.Invoke(prop.GetValue(obj), new object[] { childObject });
                         }
 
@@ -185,10 +186,37 @@ namespace LagoVista.IoT.StarterKit.Services
                             }
                         }
                     }
-                    else if (yaml[key] is Dictionary<object, object>)
+                    else if (yaml[key] is Dictionary<object, object> )
                     {
-                        Console.WriteLine("hi");
-                    }
+                        var props = yaml[key] as Dictionary<object, object>;
+                        Console.WriteLine($"found dictionary for {key}");
+                        foreach (var childProp in props)
+                        {
+                            Console.WriteLine($"\t {childProp.Key} - {childProp.Value}");
+                            if(childProp.Key as string == "ehReference")
+                            {
+                                var childPropDict = childProp.Value as Dictionary<object, object>;
+                                var ehName = childPropDict["name"] as string;
+                                var ehKey = childPropDict["key"] as string;
+                                var ehType = childPropDict["type"] as string;
+                                Console.Write($" {ehName} - {ehKey} - {ehType}");
+                                switch (ehType)
+                                {
+                                    case nameof(Survey):
+                                        var childSurvey = await _surveyManager.GetSurveyByKeyAsync(ehKey, org, user);
+
+                                        prop.SetValue(obj, new EntityHeader()
+                                        {
+                                            Id = childSurvey.Id,
+                                            Key = childSurvey.Key,
+                                            Text = childSurvey.Name
+                                        });
+                                        break;
+                                }
+                            }
+
+                        }
+                        }
                     else
                     {
                         throw new Exception($"Uknown value type for {keyStr}");
@@ -214,9 +242,9 @@ namespace LagoVista.IoT.StarterKit.Services
             return obj;
         }
 
-        private T CreateNuvIoTObject<T>(DateTime createDateStamp, EntityHeader org, EntityHeader user, Dictionary<object, object> yaml) where T : class
+        private async Task<T> CreateNuvIoTObject<T>(DateTime createDateStamp, EntityHeader org, EntityHeader user, Dictionary<object, object> yaml) where T : class
         {
-            return CreateNuvIoTObject(typeof(T), createDateStamp, org, user, yaml) as T;
+            return await CreateNuvIoTObject(typeof(T), createDateStamp, org, user, yaml) as T;
         }
 
         public async Task ApplyReferenceEntityHeader(String propName, StringBuilder bldr, String indent, EntityHeader eh, Object model = null)
@@ -249,6 +277,12 @@ namespace LagoVista.IoT.StarterKit.Services
                     bldr.AppendLine($"{indent}  type: Planner");
                     bldr.AppendLine($"{indent}  name: {planner.Name}");
                     bldr.AppendLine($"{indent}  key: {planner.Key}");
+                    break;
+                case nameof(SurveyQuestion.ChildSurveyType):
+                    var survey = await _surveyManager.GetSurveyAsync(eh.Id, _org, _user);
+                    bldr.AppendLine($"{indent}  type: Survey");
+                    bldr.AppendLine($"{indent}  name: {survey.Name}");
+                    bldr.AppendLine($"{indent}  key: {survey.Key}");
 
                     break;
                 default:
@@ -270,7 +304,7 @@ namespace LagoVista.IoT.StarterKit.Services
         public async Task ApplyProperty(PropertyInfo prop, StringBuilder bldr, string indent, Object model, Object value, int level)
         {
 
-            Console.WriteLine(model.GetType().Name + "." + prop.Name + " " + prop.PropertyType.Name);
+            //Console.WriteLine(model.GetType().Name + "." + prop.Name + " " + prop.PropertyType.Name);
 
             switch (prop.PropertyType.Name)
             {
@@ -294,6 +328,7 @@ namespace LagoVista.IoT.StarterKit.Services
                     }
                     break;
                 case "EntityHeader":
+
                 case "EntityHeader`1":
                     if (_referenceProperties.Contains(prop.Name))
                     {
@@ -396,12 +431,11 @@ namespace LagoVista.IoT.StarterKit.Services
             _user = usr;
             var dateStamp = DateTime.UtcNow;
 
-
             using (var rdr = new StreamReader(strm))
             {
                 var deserializer = new DeserializerBuilder().Build();
                 var output = deserializer.Deserialize(rdr) as Dictionary<object, object>;
-                if(output == null)
+                if (output == null)
                     return InvokeResult<Object>.FromError($"Could not deserilaize YAML.");
 
                 foreach (var key in output.Keys)
@@ -411,19 +445,19 @@ namespace LagoVista.IoT.StarterKit.Services
                         switch (recordType.ToLower())
                         {
                             case "module":
-                                var module = CreateNuvIoTObject<LagoVista.UserAdmin.Models.Security.Module>(dateStamp, org, usr, childItem as Dictionary<object, object>);
+                                var module = await CreateNuvIoTObject<LagoVista.UserAdmin.Models.Security.Module>(dateStamp, org, usr, childItem as Dictionary<object, object>);
                                 return InvokeResult<Object>.Create(module);
                             case "survey":
-                                var survey = CreateNuvIoTObject<Survey>(dateStamp, org, usr, childItem as Dictionary<object, object>);
+                                var survey = await CreateNuvIoTObject<Survey>(dateStamp, org, usr, childItem as Dictionary<object, object>);
                                 return InvokeResult<Object>.Create(survey);
                             case "glossary":
-                                var glossary = CreateNuvIoTObject<Glossary>(dateStamp, org, usr, childItem as Dictionary<object, object>);
+                                var glossary = await CreateNuvIoTObject<Glossary>(dateStamp, org, usr, childItem as Dictionary<object, object>);
                                 return InvokeResult<Object>.Create(glossary);
                             case "sitecontent":
-                                var sitecontent = CreateNuvIoTObject<SiteContent>(dateStamp, org, usr, childItem as Dictionary<object, object>);
+                                var sitecontent = await CreateNuvIoTObject<SiteContent>(dateStamp, org, usr, childItem as Dictionary<object, object>);
                                 return InvokeResult<Object>.Create(sitecontent);
                             case "guide":
-                                var guide = CreateNuvIoTObject<SiteContent>(dateStamp, org, usr, childItem as Dictionary<object, object>);
+                                var guide = await CreateNuvIoTObject<SiteContent>(dateStamp, org, usr, childItem as Dictionary<object, object>);
                                 return InvokeResult<Object>.Create(guide);
                             default:
                                 return InvokeResult<Object>.FromError($"object type: [{recordType}] not supported.");
