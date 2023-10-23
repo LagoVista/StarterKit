@@ -1,0 +1,206 @@
+﻿using LagoVista.Core;
+using LagoVista.Core.Models;
+using LagoVista.Core.Validation;
+using LagoVista.IoT.Deployment.Admin;
+using LagoVista.IoT.DeviceAdmin.Interfaces.Managers;
+using LagoVista.IoT.Pipeline.Admin.Managers;
+using LagoVista.IoT.StarterKit.Models;
+using LagoVista.ProjectManagement;
+using LagoVista.ProjectManagement.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace LagoVista.IoT.StarterKit.Managers
+{
+    public class AppWizard : IAppWizard
+    {
+        ISurveyResponseManager _surveyResponseManager;
+        IProjectManager _projectManager;
+        IPipelineModuleManager _pipelineMgr;
+        IDeviceConfigurationManager _deviceCfgMgr;
+        IDeviceTypeManager _deviceTypeMgr;
+        ITaskManager _taskManger;
+
+        public AppWizard(ISurveyResponseManager responseManager, ITaskManager taskManger, IProjectManager projectManager, IPipelineModuleManager pipelineMgr, IDeviceTypeManager deviceTypeMgr,
+                         IDeviceConfigurationManager deviceCfgMgr)
+        {
+            _surveyResponseManager = responseManager ?? throw new ArgumentNullException(nameof(responseManager));
+            _projectManager = projectManager ?? throw new ArgumentNullException(nameof(projectManager));
+            _pipelineMgr = pipelineMgr ?? throw new ArgumentNullException(nameof(pipelineMgr));
+            _deviceTypeMgr = deviceTypeMgr ?? throw new ArgumentNullException(nameof(deviceTypeMgr));
+            _deviceCfgMgr = deviceCfgMgr ?? throw new ArgumentNullException(nameof(deviceCfgMgr));
+            _taskManger = taskManger ?? throw new ArgumentNullException(nameof(taskManger));
+        }
+
+        public async Task<InvokeResult<Project>> CreateProjectAsync(AppWizardRequest appWizardRequest, EntityHeader org, EntityHeader user)
+        {
+            var timeStamp = DateTime.UtcNow.ToJSONString();
+
+            var project = new Project()
+            {
+                CreatedBy = user,
+                LastUpdatedBy = user,
+                OwnerOrganization = org,
+                CreationDate = timeStamp,
+                LastUpdatedDate = timeStamp,
+                Description = appWizardRequest.Description,
+                Name = appWizardRequest.ProjectName,
+                Key = appWizardRequest.ProjectKey,
+                ProjectCode = appWizardRequest.ProjectKey.ToUpper(),
+            };
+
+            var projectEH = EntityHeader.Create(project.Id, project.Key, project.Name);
+
+            var response = await _surveyResponseManager.GetSurveyResponseAsync(appWizardRequest.SurveyResponseId, org.Id, org, user);
+
+            project.Survey = EntityHeader.Create(response.Survey.Id, response.Survey.Key, response.Survey.Name);
+            project.TopLevelSurveyResponse = EntityHeader.Create(response.Response.TopLevelSurveyResponseId, response.Response.SurveyResponseName);
+            project.ParentSurveyResponse = EntityHeader.Create(response.Response.CurrentSurveyResponseId, response.Response.SurveyResponseName);
+
+
+            foreach (var qs in response.Survey.QuestionSets)
+            {
+                var questions = new List<TaskSurveyQuestionSummary>();
+
+                foreach (var question in qs.Questions)
+                {
+                    questions.Add(new TaskSurveyQuestionSummary()
+                    {
+                        QuestionId = question.Id,
+                        Question = question.QuestionText,
+                        QuestionKey = question.Key,
+                    });
+
+                    var answers = response.Answers.Where(ans => ans.QuestionId == question.Id);
+                    foreach (var answer in answers)
+                    {
+                        var answerOption = question.Answers.FirstOrDefault(ao => ao.Id == answer.AnswerId);
+                        if (answerOption != null && !EntityHeader.IsNullOrEmpty(answerOption.TaskTemplate))
+                        {
+                            var taskResult = await _taskManger.CreateTaskFromTemplateAsync(answerOption.TaskTemplate.Id, projectEH, org, user);
+                            var questionSummary = new TaskSurveyQuestionSummary()
+                            {
+                                TimeStamp = timeStamp,
+                                Question = question.QuestionText,
+                                QuestionKey = question.Key,
+                                QuestionId = question.Id
+                            };
+
+                            questionSummary.Answers.Add(new TaskSurveyAnswerSummary()
+                            {
+                                TimeStamp = timeStamp,
+                                Answer = answer.Answer,
+                                AnswerKey = answerOption.Key
+                            });
+
+                            taskResult.Result.TaskSurveySummary = new TaskSurveySummary()
+                            {
+                                TimeStamp = timeStamp,
+                                SurveyName = response.Survey.Name,
+                                SurveyId = response.Survey.Id,
+                                QuestionSet = qs.Title,
+                                QuestionSetId = qs.Id,
+                                QuestionSetKey = qs.Key
+                            };
+                            taskResult.Result.TaskSurveySummary.Questions.Add(questionSummary);
+
+                            await _taskManger.AddWorkTaskAsync(taskResult.Result, org, user);
+                        }
+                    }
+
+                    if (!EntityHeader.IsNullOrEmpty(question.TaskTemplate))
+                    {
+                        var taskResult = await _taskManger.CreateTaskFromTemplateAsync(question.TaskTemplate.Id, projectEH, org, user);
+                        var questionSummary = new TaskSurveyQuestionSummary()
+                        {
+                            TimeStamp = timeStamp,
+                            Question = question.QuestionText,
+                            QuestionKey = question.Key,
+                            QuestionId = question.Id
+                        };
+
+                        foreach (var answer in answers)
+                        {
+                            var answerOption = question.Answers.FirstOrDefault(ao => ao.Id == answer.AnswerId);
+                            if (answerOption != null)
+                            {
+                                questionSummary.Answers.Add(new TaskSurveyAnswerSummary()
+                                {
+                                    TimeStamp = timeStamp,
+                                    Answer = answer.Answer,
+                                    AnswerKey = answerOption.Key
+                                });
+                            }
+                            else
+                            {
+                                questionSummary.Answers.Add(new TaskSurveyAnswerSummary()
+                                {
+                                    TimeStamp = timeStamp,
+                                    Answer = answer.Answer,
+                                });
+                            }
+                        }
+
+                        taskResult.Result.TaskSurveySummary = new TaskSurveySummary()
+                        {
+                            TimeStamp = timeStamp,
+                            SurveyName = response.Survey.Name,
+                            SurveyId = response.Survey.Id,
+                            QuestionSet = qs.Title,
+                            QuestionSetId = qs.Id,
+                            QuestionSetKey = qs.Key,
+                        };
+
+                        taskResult.Result.TaskSurveySummary.Questions.Add(questionSummary);
+                        await _taskManger.AddWorkTaskAsync(taskResult.Result, org, user);
+                    }
+                }
+
+                if (!EntityHeader.IsNullOrEmpty(qs.TaskTemplate))
+                {
+                    var taskResult = await _taskManger.CreateTaskFromTemplateAsync(qs.TaskTemplate.Id, projectEH, org, user);
+                    foreach(var question in qs.Questions)
+                    {
+                        var questionSummary = new TaskSurveyQuestionSummary()
+                        {
+                            TimeStamp = timeStamp,
+                            Question = question.QuestionText,
+                            QuestionKey = question.Key,
+                            QuestionId = question.Id
+                        };
+
+                        var answers = response.Answers.Where(ans => ans.QuestionId == question.Id);
+                        foreach (var answer in answers)
+                        {
+                            var answerOption = question.Answers.FirstOrDefault(ao => ao.Id == answer.AnswerId);
+                            if (answerOption != null)
+                            {
+                                questionSummary.Answers.Add(new TaskSurveyAnswerSummary()
+                                {
+                                    TimeStamp = timeStamp,
+                                    Answer = answer.Answer,
+                                    AnswerKey = answerOption.Key
+                                });
+                            }
+                            else
+                            {
+                                questionSummary.Answers.Add(new TaskSurveyAnswerSummary()
+                                {
+                                    TimeStamp = timeStamp,
+                                    Answer = answer.Answer,
+                                });
+                            }
+                        }
+
+                        taskResult.Result.TaskSurveySummary.Questions.Add(questionSummary);
+                    }
+                    await _taskManger.AddWorkTaskAsync(taskResult.Result, org, user);
+                }
+            }
+
+            return InvokeResult<Project>.Create(project);
+        }
+    }
+}

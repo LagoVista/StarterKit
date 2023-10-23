@@ -30,6 +30,7 @@ using LagoVista.UserAdmin.Interfaces.Repos.Orgs;
 using LagoVista.IoT.Simulator.Admin.Models;
 using LagoVista.IoT.DeviceManagement.Core;
 using LagoVista.IoT.Runtime.Core.Models.Verifiers;
+using LagoVista.IoT.Billing.Managers;
 
 namespace LagoVista.IoT.StarterKit.Managers
 {
@@ -51,11 +52,15 @@ namespace LagoVista.IoT.StarterKit.Managers
         IDeviceManager _deviceManager;
         IOrganizationRepo _orgRepo;
         IUserManager _userManager;
+        ICustomerManager _customerManager;
+        IBillingManager _billingManager;
+
         StorageUtils _storageUtils;
 
         public OrgInitializer(IAdminLogger logger, IStarterKitConnection starterKitConnection, IDeviceAdminManager deviceAdminMgr, ISubscriptionManager subscriptionMgr, IPipelineModuleManager pipelineMgr, IDeviceTypeManager deviceTypeMgr, IDeviceRepositoryManager deviceRepoMgr,
                           IUserManager userManager, IProductManager productManager, IDeviceTypeManager deviceTypeManager, IDeviceConfigurationManager deviceCfgMgr, IDeviceMessageDefinitionManager deviceMsgMgr, IDeploymentInstanceManager instanceMgr,
-                          IDeploymentHostManager hostMgr, IDeviceManager deviceManager, IContainerRepositoryManager containerMgr, ISolutionManager solutionMgr, IOrganizationRepo orgMgr, ISimulatorManager simMgr, IVerifierManager verifierMgr)
+                          IDeploymentHostManager hostMgr, IDeviceManager deviceManager, IContainerRepositoryManager containerMgr, ISolutionManager solutionMgr,
+                            IOrganizationRepo orgMgr, ISimulatorManager simMgr, IVerifierManager verifierMgr, ICustomerManager customerManager, IBillingManager billingManager)
         {
             _userManager = userManager;
             _deviceAdminMgr = deviceAdminMgr;
@@ -72,12 +77,14 @@ namespace LagoVista.IoT.StarterKit.Managers
             _orgRepo = orgMgr;
             _deviceManager = deviceManager;
             _hostManager = hostMgr;
-
+            _customerManager = customerManager;
+            _billingManager = billingManager;
             _instanceMgr = instanceMgr;
             _solutionMgr = solutionMgr;
 
             _storageUtils = new StorageUtils(new Uri(starterKitConnection.StarterKitStorage.Uri), starterKitConnection.StarterKitStorage.AccessKey,
                 starterKitConnection.StarterKitStorage.ResourceName, logger);
+            _billingManager = billingManager;
         }
 
         private const string EXAMPLE_MOTION_KEY = "examplemotion";

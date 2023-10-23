@@ -12,6 +12,7 @@ namespace LagoVista.IoT.StarterKit
             services.AddTransient<IOrgInitializer, OrgInitializer>();
             services.AddTransient<IYamlServices, YamlServices>();
             services.AddTransient<ICloneServices, CloneServices>();
+            services.AddTransient<IAppWizard, AppWizard>();
         }
     }
 }

@@ -71,6 +71,9 @@ namespace LagoVista.IoT.StarterKit.Services
         readonly IGuideManager _guideManager;
         readonly IGlossaryManager _glossaryManager;
         readonly ISurveyResponseManager _surveyResponseManager;
+        readonly IWorkTaskTypeManager _workTaskTypeManager;
+        readonly ITaskTemplateManager _taskTemplateManager;
+        readonly IStatusConfigurationManager _statusConfigurationManager;
 
         private EntityHeader _org;
         private EntityHeader _user;
@@ -78,7 +81,8 @@ namespace LagoVista.IoT.StarterKit.Services
         public YamlServices(IAdminLogger logger, IStarterKitConnection starterKitConnection, IDeviceAdminManager deviceAdminMgr, ISubscriptionManager subscriptionMgr, IPipelineModuleManager pipelineMgr, IDeviceTypeManager deviceTypeMgr, IDeviceRepositoryManager deviceRepoMgr,
                           IUserManager userManager, IModuleManager moduleManager, IProductManager productManager, IDeviceTypeManager deviceTypeManager, IDeviceConfigurationManager deviceCfgMgr, IDeviceMessageDefinitionManager deviceMsgMgr, IDeploymentInstanceManager instanceMgr,
                           IDeploymentHostManager hostMgr, IRoleManager roleManager, IDeviceManager deviceManager, IContainerRepositoryManager containerMgr, ISolutionManager solutionMgr, IOrganizationRepo orgMgr, ISimulatorManager simMgr, IVerifierManager verifierMgr,
-                          ISurveyManager surveyManager, ISurveyResponseManager surveyResponseManager, ISiteContentManager siteContentManager, IGuideManager guideManager, IGlossaryManager glossaryManager)
+                          ISurveyManager surveyManager, ISurveyResponseManager surveyResponseManager, ISiteContentManager siteContentManager, IGuideManager guideManager, IGlossaryManager glossaryManager, IWorkTaskTypeManager workTaskTypeManager, ITaskTemplateManager taskTemplateManager,
+                          IStatusConfigurationManager statusConfigurationManager)
         {
             _userManager = userManager;
             _deviceAdminMgr = deviceAdminMgr;
@@ -104,9 +108,13 @@ namespace LagoVista.IoT.StarterKit.Services
             _guideManager = guideManager;
             _glossaryManager = glossaryManager;
             _surveyResponseManager = surveyResponseManager;
+            _workTaskTypeManager = workTaskTypeManager;
+            _taskTemplateManager = taskTemplateManager;
+            _statusConfigurationManager = statusConfigurationManager;
 
             _storageUtils = new StorageUtils(new Uri(starterKitConnection.StarterKitStorage.Uri), starterKitConnection.StarterKitStorage.AccessKey,
                 starterKitConnection.StarterKitStorage.ResourceName, logger);
+            
         }
 
         protected void AddAuditProperties(IAuditableEntity entity, DateTime creationTimeStamp, EntityHeader org, EntityHeader user)
@@ -459,6 +467,16 @@ namespace LagoVista.IoT.StarterKit.Services
                             case "guide":
                                 var guide = await CreateNuvIoTObject<SiteContent>(dateStamp, org, usr, childItem as Dictionary<object, object>);
                                 return InvokeResult<Object>.Create(guide);
+                            case "worktasktype":
+                                var workTaskType = await CreateNuvIoTObject<WorkTaskType>(dateStamp, org, usr, childItem as Dictionary<object, object>);
+                                return InvokeResult<Object>.Create(workTaskType);
+                            case "tasktemplate":
+                                var template = await CreateNuvIoTObject<TaskTemplate>(dateStamp, org, usr, childItem as Dictionary<object, object>);
+                                return InvokeResult<Object>.Create(template);
+                            case "statusconfiguration":
+                                var statusConfig = await CreateNuvIoTObject<StatusConfiguration>(dateStamp, org, usr, childItem as Dictionary<object, object>);
+                                return InvokeResult<Object>.Create(statusConfig);
+
                             default:
                                 return InvokeResult<Object>.FromError($"object type: [{recordType}] not supported.");
                         }
@@ -542,6 +560,21 @@ namespace LagoVista.IoT.StarterKit.Services
                     var surveyResponse = await _surveyResponseManager.GetSurveyResponseAsync(id, org.Id, org, usr);
                     await GenerateYaml(bldr, surveyResponse, 1);
                     recordKey = surveyResponse.Survey.Key;
+                    break;
+                case nameof(StatusConfiguration):
+                    var statusConfig = await _statusConfigurationManager.GetStatusConfigurationAsync(id, org, usr);
+                    await GenerateYaml(bldr, statusConfig, 1);
+                    recordKey = statusConfig.Key;
+                    break;
+                case nameof(TaskTemplate):
+                    var template = await _taskTemplateManager.GetTaskTemplateAsync(id, org, usr);
+                    await GenerateYaml(bldr, template, 1);
+                    recordKey = template.Key;
+                    break;
+                case nameof(WorkTaskType):
+                    var workTaskType = await _workTaskTypeManager.GetWorkTaskTypeAsync(id, org, usr);
+                    await GenerateYaml(bldr, workTaskType, 1);
+                    recordKey = workTaskType.Key;
                     break;
                 case nameof(LagoVista.UserAdmin.Models.Users.Role):
                     var role = await _moduleManager.GetModuleAsync(id, org, usr);
