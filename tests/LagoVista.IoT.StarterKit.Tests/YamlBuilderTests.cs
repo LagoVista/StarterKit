@@ -46,7 +46,7 @@ namespace LagoVista.IoT.StarterKit.Tests
             });
 
             _yamlSerivces = new YamlServices(new Mock<IAdminLogger>().Object, _starterKitConnection, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
-                 _orgRepo.Object, null, null, _surveyManager.Object, null, null, null, null, null, null, null);
+                 _orgRepo.Object, null, null, _surveyManager.Object, null, null, null, null, null, null, null,null);
         }
 
         [TestMethod]

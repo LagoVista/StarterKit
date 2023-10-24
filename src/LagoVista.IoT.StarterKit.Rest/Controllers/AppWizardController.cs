@@ -1,4 +1,5 @@
-﻿using LagoVista.Core.Models.UIMetaData;
+﻿using LagoVista.Core.Models;
+using LagoVista.Core.Models.UIMetaData;
 using LagoVista.Core.Validation;
 using LagoVista.IoT.Logging.Loggers;
 using LagoVista.IoT.StarterKit.Models;
@@ -49,14 +50,40 @@ namespace LagoVista.IoT.StarterKit.Rest.Controllers
         /// </summary>
         /// <param name="surveyresponseid">Survey Response ID used to create the project</param>
         /// <returns>Form Detail Object used to Populate Details for creating an app.</returns>
-        [HttpGet("/api/appwizard/{surveyresponseid}/request/factory")]
-        public DetailResponse<AppWizardRequest> CreateRequest(string surveyresponseid)
+        [HttpGet("/api/appwizard/survey/{surveyresponseid}/request/factory")]
+        public DetailResponse<AppWizardRequest> CreateSurveyRequest(string surveyresponseid)
         {
             var request = new AppWizardRequest()
             {
                 SurveyResponseId = surveyresponseid
             };
-            return DetailResponse<AppWizardRequest>.Create(request);
+            return DetailResponse<AppWizardRequest>.Create(request, false);
+        }
+
+        /// <summary>
+        /// AppWizard - Create a survey request object that can be populated via User Interface to create a project.
+        /// </summary>
+        /// <param name="projectemplateid">Survey Response ID used to create the project</param>
+        /// <returns>Form Detail Object used to Populate Details for creating an app.</returns>
+        [HttpGet("/api/appwizard/projecttemplate/{projectemplateid}/request/factory")]
+        public DetailResponse<AppWizardRequest> CreateProjectRequest(string projectemplateid)
+        {
+            var request = new AppWizardRequest()
+            {
+                ProjectTemplate = EntityHeader.Create(projectemplateid, "na")
+            };
+            return DetailResponse<AppWizardRequest>.Create(request, false);
+        }
+
+        /// <summary>
+        /// AppWizard - Create a survey request object that can be populated via User Interface to create a project.
+        /// </summary>
+        /// <returns>Form Detail Object used to Populate Details for creating an app.</returns>
+        [HttpGet("/api/appwizard/projecttemplate/request/factory")]
+        public DetailResponse<AppWizardRequest> CreateProjectRequest()
+        {
+            var request = new AppWizardRequest();            
+            return DetailResponse<AppWizardRequest>.Create(request, false);
         }
 
     }

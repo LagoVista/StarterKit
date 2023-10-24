@@ -26,6 +26,7 @@ using LagoVista.IoT.Runtime.Core.Models.Verifiers;
 using LagoVista.IoT.Simulator.Admin.Managers;
 using LagoVista.IoT.Verifiers.Managers;
 using LagoVista.ProjectManagement;
+using LagoVista.ProjectManagement.Core;
 using LagoVista.ProjectManagement.Models;
 using LagoVista.UserAdmin.Interfaces.Managers;
 using LagoVista.UserAdmin.Interfaces.Repos.Orgs;
@@ -73,6 +74,7 @@ namespace LagoVista.IoT.StarterKit.Services
         readonly ISurveyResponseManager _surveyResponseManager;
         readonly IWorkTaskTypeManager _workTaskTypeManager;
         readonly ITaskTemplateManager _taskTemplateManager;
+        readonly IProjectTemplateManager _projectTemplateManager;
         readonly IStatusConfigurationManager _statusConfigurationManager;
 
         private EntityHeader _org;
@@ -82,7 +84,7 @@ namespace LagoVista.IoT.StarterKit.Services
                           IUserManager userManager, IModuleManager moduleManager, IProductManager productManager, IDeviceTypeManager deviceTypeManager, IDeviceConfigurationManager deviceCfgMgr, IDeviceMessageDefinitionManager deviceMsgMgr, IDeploymentInstanceManager instanceMgr,
                           IDeploymentHostManager hostMgr, IRoleManager roleManager, IDeviceManager deviceManager, IContainerRepositoryManager containerMgr, ISolutionManager solutionMgr, IOrganizationRepo orgMgr, ISimulatorManager simMgr, IVerifierManager verifierMgr,
                           ISurveyManager surveyManager, ISurveyResponseManager surveyResponseManager, ISiteContentManager siteContentManager, IGuideManager guideManager, IGlossaryManager glossaryManager, IWorkTaskTypeManager workTaskTypeManager, ITaskTemplateManager taskTemplateManager,
-                          IStatusConfigurationManager statusConfigurationManager)
+                          IStatusConfigurationManager statusConfigurationManager, IProjectTemplateManager projectTemplateManager)
         {
             _userManager = userManager;
             _deviceAdminMgr = deviceAdminMgr;
@@ -111,6 +113,7 @@ namespace LagoVista.IoT.StarterKit.Services
             _workTaskTypeManager = workTaskTypeManager;
             _taskTemplateManager = taskTemplateManager;
             _statusConfigurationManager = statusConfigurationManager;
+            _projectTemplateManager = projectTemplateManager;
 
             _storageUtils = new StorageUtils(new Uri(starterKitConnection.StarterKitStorage.Uri), starterKitConnection.StarterKitStorage.AccessKey,
                 starterKitConnection.StarterKitStorage.ResourceName, logger);
@@ -476,7 +479,10 @@ namespace LagoVista.IoT.StarterKit.Services
                             case "statusconfiguration":
                                 var statusConfig = await CreateNuvIoTObject<StatusConfiguration>(dateStamp, org, usr, childItem as Dictionary<object, object>);
                                 return InvokeResult<Object>.Create(statusConfig);
-
+                            case "projecttemplate":
+                                var projectTemplate = await CreateNuvIoTObject<ProjectTemplate>(dateStamp, org, usr, childItem as Dictionary<object, object>);
+                                return InvokeResult<Object>.Create(projectTemplate);
+                                break;
                             default:
                                 return InvokeResult<Object>.FromError($"object type: [{recordType}] not supported.");
                         }
@@ -570,6 +576,11 @@ namespace LagoVista.IoT.StarterKit.Services
                     var template = await _taskTemplateManager.GetTaskTemplateAsync(id, org, usr);
                     await GenerateYaml(bldr, template, 1);
                     recordKey = template.Key;
+                    break;
+                case nameof(ProjectTemplate):
+                    var projectTemplate = await _projectTemplateManager.GetProjectTemplateAsync(id, org, usr);
+                    await GenerateYaml(bldr, projectTemplate, 1);
+                    recordKey = projectTemplate.Key;
                     break;
                 case nameof(WorkTaskType):
                     var workTaskType = await _workTaskTypeManager.GetWorkTaskTypeAsync(id, org, usr);

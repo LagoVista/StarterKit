@@ -1,8 +1,8 @@
-﻿/*10/23/2023 4:23:39 PM*/
+﻿/*10/24/2023 6:03:29 PM*/
 using System.Globalization;
 using System.Reflection;
 
-//Resources:StarterKitResources:AppWizard_Help
+//Resources:StarterKitResources:AppWizard_Description
 namespace LagoVista.IoT.StarterKit.Resources
 {
 	public class StarterKitResources
@@ -56,6 +56,9 @@ namespace LagoVista.IoT.StarterKit.Resources
 			return new HtmlString(str);
         }*/
 		
+		public static string AppWizard_Description { get { return GetResourceString("AppWizard_Description"); } }
+//Resources:StarterKitResources:AppWizard_Help
+
 		public static string AppWizard_Help { get { return GetResourceString("AppWizard_Help"); } }
 //Resources:StarterKitResources:AppWizard_ProjectDescription
 
@@ -66,16 +69,25 @@ namespace LagoVista.IoT.StarterKit.Resources
 //Resources:StarterKitResources:AppWizard_ProjectName
 
 		public static string AppWizard_ProjectName { get { return GetResourceString("AppWizard_ProjectName"); } }
+//Resources:StarterKitResources:AppWizard_ProjectTemplate
+
+		public static string AppWizard_ProjectTemplate { get { return GetResourceString("AppWizard_ProjectTemplate"); } }
+//Resources:StarterKitResources:AppWizard_ProjectTemplate_Select
+
+		public static string AppWizard_ProjectTemplate_Select { get { return GetResourceString("AppWizard_ProjectTemplate_Select"); } }
 //Resources:StarterKitResources:AppWizard_TItle
 
 		public static string AppWizard_TItle { get { return GetResourceString("AppWizard_TItle"); } }
 
 		public static class Names
 		{
+			public const string AppWizard_Description = "AppWizard_Description";
 			public const string AppWizard_Help = "AppWizard_Help";
 			public const string AppWizard_ProjectDescription = "AppWizard_ProjectDescription";
 			public const string AppWizard_ProjectKey = "AppWizard_ProjectKey";
 			public const string AppWizard_ProjectName = "AppWizard_ProjectName";
+			public const string AppWizard_ProjectTemplate = "AppWizard_ProjectTemplate";
+			public const string AppWizard_ProjectTemplate_Select = "AppWizard_ProjectTemplate_Select";
 			public const string AppWizard_TItle = "AppWizard_TItle";
 		}
 	}

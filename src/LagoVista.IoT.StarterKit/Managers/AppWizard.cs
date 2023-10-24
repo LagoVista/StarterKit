@@ -6,6 +6,7 @@ using LagoVista.IoT.DeviceAdmin.Interfaces.Managers;
 using LagoVista.IoT.Pipeline.Admin.Managers;
 using LagoVista.IoT.StarterKit.Models;
 using LagoVista.ProjectManagement;
+using LagoVista.ProjectManagement.Core;
 using LagoVista.ProjectManagement.Models;
 using System;
 using System.Collections.Generic;
@@ -18,23 +19,35 @@ namespace LagoVista.IoT.StarterKit.Managers
     {
         ISurveyResponseManager _surveyResponseManager;
         IProjectManager _projectManager;
+        IProjectTemplateManager _projectTemplateManger;
         IPipelineModuleManager _pipelineMgr;
         IDeviceConfigurationManager _deviceCfgMgr;
         IDeviceTypeManager _deviceTypeMgr;
         ITaskManager _taskManger;
 
         public AppWizard(ISurveyResponseManager responseManager, ITaskManager taskManger, IProjectManager projectManager, IPipelineModuleManager pipelineMgr, IDeviceTypeManager deviceTypeMgr,
-                         IDeviceConfigurationManager deviceCfgMgr)
+                         IDeviceConfigurationManager deviceCfgMgr, IProjectTemplateManager projectTemplateManager)
         {
             _surveyResponseManager = responseManager ?? throw new ArgumentNullException(nameof(responseManager));
             _projectManager = projectManager ?? throw new ArgumentNullException(nameof(projectManager));
             _pipelineMgr = pipelineMgr ?? throw new ArgumentNullException(nameof(pipelineMgr));
             _deviceTypeMgr = deviceTypeMgr ?? throw new ArgumentNullException(nameof(deviceTypeMgr));
             _deviceCfgMgr = deviceCfgMgr ?? throw new ArgumentNullException(nameof(deviceCfgMgr));
+            _projectTemplateManger = projectTemplateManager ?? throw new ArgumentNullException(nameof(projectTemplateManager));
             _taskManger = taskManger ?? throw new ArgumentNullException(nameof(taskManger));
         }
 
         public async Task<InvokeResult<Project>> CreateProjectAsync(AppWizardRequest appWizardRequest, EntityHeader org, EntityHeader user)
+        {
+            if (!String.IsNullOrEmpty(appWizardRequest.SurveyResponseId))
+                return await CreateProjectForSurveyAsync(appWizardRequest, org, user);
+            else if (!EntityHeader.IsNullOrEmpty(appWizardRequest.ProjectTemplate))
+                return await CreateProjectForProjectTemplateAsync(appWizardRequest, org, user);
+
+            throw new NotImplementedException("App/Project Wizard only support survey response and project template.");
+        }
+
+        private async Task<InvokeResult<Project>> CreateProjectForProjectTemplateAsync(AppWizardRequest appWizardRequest, EntityHeader org, EntityHeader user)
         {
             var timeStamp = DateTime.UtcNow.ToJSONString();
 
@@ -48,6 +61,46 @@ namespace LagoVista.IoT.StarterKit.Managers
                 Description = appWizardRequest.Description,
                 Name = appWizardRequest.ProjectName,
                 Key = appWizardRequest.ProjectKey,
+                ProjectAdminLead = appWizardRequest.ProjectAdminLead,
+                ProjectLead = appWizardRequest.ProjectLead,
+                DefaultQAResource = appWizardRequest.DefaultQAResource,
+                DefaultPrimaryContributor = appWizardRequest.DefaultPrimaryContributor,
+                ProjectCode = appWizardRequest.ProjectKey.ToUpper(),
+            };
+            await _projectManager.AddProjectAsync(project, org, user);
+
+            var projectEH = EntityHeader.Create(project.Id, project.Key, project.Name);
+
+            var template = await _projectTemplateManger.GetProjectTemplateAsync(appWizardRequest.ProjectTemplate.Id, org, user);
+        
+            foreach(var taskTemplate in template.TaskTemplates)
+            {
+                await _taskManger.CreateAndSaveTaskFromTemplateAsync(taskTemplate.Id, projectEH, org, user);
+            }
+
+            var newProject = await _projectManager.GetProjectAsync(project.Id, org, user);
+            return InvokeResult<Project>.Create(newProject);
+        }
+
+        private async Task<InvokeResult<Project>> CreateProjectForSurveyAsync(AppWizardRequest appWizardRequest, EntityHeader org, EntityHeader user)
+        {
+
+            var timeStamp = DateTime.UtcNow.ToJSONString();
+
+            var project = new Project()
+            {
+                CreatedBy = user,
+                LastUpdatedBy = user,
+                OwnerOrganization = org,
+                CreationDate = timeStamp,
+                LastUpdatedDate = timeStamp,
+                Description = appWizardRequest.Description,
+                Name = appWizardRequest.ProjectName,
+                ProjectAdminLead = appWizardRequest.ProjectAdminLead,
+                ProjectLead = appWizardRequest.ProjectLead,
+                DefaultQAResource = appWizardRequest.DefaultQAResource,
+                DefaultPrimaryContributor = appWizardRequest.DefaultPrimaryContributor,
+                Key = appWizardRequest.ProjectKey,
                 ProjectCode = appWizardRequest.ProjectKey.ToUpper(),
             };
 
@@ -58,7 +111,7 @@ namespace LagoVista.IoT.StarterKit.Managers
             project.Survey = EntityHeader.Create(response.Survey.Id, response.Survey.Key, response.Survey.Name);
             project.TopLevelSurveyResponse = EntityHeader.Create(response.Response.TopLevelSurveyResponseId, response.Response.SurveyResponseName);
             project.ParentSurveyResponse = EntityHeader.Create(response.Response.CurrentSurveyResponseId, response.Response.SurveyResponseName);
-
+            await _projectManager.AddProjectAsync(project, org, user);
 
             foreach (var qs in response.Survey.QuestionSets)
             {
@@ -79,7 +132,7 @@ namespace LagoVista.IoT.StarterKit.Managers
                         var answerOption = question.Answers.FirstOrDefault(ao => ao.Id == answer.AnswerId);
                         if (answerOption != null && !EntityHeader.IsNullOrEmpty(answerOption.TaskTemplate))
                         {
-                            var taskResult = await _taskManger.CreateTaskFromTemplateAsync(answerOption.TaskTemplate.Id, projectEH, org, user);
+                            var taskResult = await _taskManger.CreateAndSaveTaskFromTemplateAsync(answerOption.TaskTemplate.Id, projectEH, org, user);
                             var questionSummary = new TaskSurveyQuestionSummary()
                             {
                                 TimeStamp = timeStamp,
@@ -112,7 +165,7 @@ namespace LagoVista.IoT.StarterKit.Managers
 
                     if (!EntityHeader.IsNullOrEmpty(question.TaskTemplate))
                     {
-                        var taskResult = await _taskManger.CreateTaskFromTemplateAsync(question.TaskTemplate.Id, projectEH, org, user);
+                        var taskResult = await _taskManger.CreateAndSaveTaskFromTemplateAsync(question.TaskTemplate.Id, projectEH, org, user);
                         var questionSummary = new TaskSurveyQuestionSummary()
                         {
                             TimeStamp = timeStamp,
@@ -160,8 +213,8 @@ namespace LagoVista.IoT.StarterKit.Managers
 
                 if (!EntityHeader.IsNullOrEmpty(qs.TaskTemplate))
                 {
-                    var taskResult = await _taskManger.CreateTaskFromTemplateAsync(qs.TaskTemplate.Id, projectEH, org, user);
-                    foreach(var question in qs.Questions)
+                    var taskResult = await _taskManger.CreateAndSaveTaskFromTemplateAsync(qs.TaskTemplate.Id, projectEH, org, user);
+                    foreach (var question in qs.Questions)
                     {
                         var questionSummary = new TaskSurveyQuestionSummary()
                         {
