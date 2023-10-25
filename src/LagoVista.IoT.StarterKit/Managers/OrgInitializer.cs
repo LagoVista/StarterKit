@@ -31,6 +31,7 @@ using LagoVista.IoT.Simulator.Admin.Models;
 using LagoVista.IoT.DeviceManagement.Core;
 using LagoVista.IoT.Runtime.Core.Models.Verifiers;
 using LagoVista.IoT.Billing.Managers;
+using LagoVista.ProjectManagement;
 
 namespace LagoVista.IoT.StarterKit.Managers
 {
@@ -54,13 +55,14 @@ namespace LagoVista.IoT.StarterKit.Managers
         IUserManager _userManager;
         ICustomerManager _customerManager;
         IBillingManager _billingManager;
+        IToDoManager _todoManager;
 
         StorageUtils _storageUtils;
 
         public OrgInitializer(IAdminLogger logger, IStarterKitConnection starterKitConnection, IDeviceAdminManager deviceAdminMgr, ISubscriptionManager subscriptionMgr, IPipelineModuleManager pipelineMgr, IDeviceTypeManager deviceTypeMgr, IDeviceRepositoryManager deviceRepoMgr,
                           IUserManager userManager, IProductManager productManager, IDeviceTypeManager deviceTypeManager, IDeviceConfigurationManager deviceCfgMgr, IDeviceMessageDefinitionManager deviceMsgMgr, IDeploymentInstanceManager instanceMgr,
-                          IDeploymentHostManager hostMgr, IDeviceManager deviceManager, IContainerRepositoryManager containerMgr, ISolutionManager solutionMgr,
-                            IOrganizationRepo orgMgr, ISimulatorManager simMgr, IVerifierManager verifierMgr, ICustomerManager customerManager, IBillingManager billingManager)
+                          IDeploymentHostManager hostMgr, IDeviceManager deviceManager, IContainerRepositoryManager containerMgr, ISolutionManager solutionMgr, IOrganizationRepo orgMgr, ISimulatorManager simMgr, IVerifierManager verifierMgr, ICustomerManager customerManager, 
+                          IBillingManager billingManager, IToDoManager toDoManager)
         {
             _userManager = userManager;
             _deviceAdminMgr = deviceAdminMgr;
@@ -81,6 +83,7 @@ namespace LagoVista.IoT.StarterKit.Managers
             _billingManager = billingManager;
             _instanceMgr = instanceMgr;
             _solutionMgr = solutionMgr;
+            _todoManager = toDoManager;
 
             _storageUtils = new StorageUtils(new Uri(starterKitConnection.StarterKitStorage.Uri), starterKitConnection.StarterKitStorage.AccessKey,
                 starterKitConnection.StarterKitStorage.ResourceName, logger);
@@ -180,6 +183,17 @@ namespace LagoVista.IoT.StarterKit.Managers
             await _storageUtils.DeleteByKeyIfExistsAsync<PlannerConfiguration>(EXAMPLE_MOTION_KEY, org);
             await _storageUtils.DeleteByKeyIfExistsAsync<DeviceType>(EXAMPLE_MOTION_KEY, org);
             await _storageUtils.DeleteByKeyIfExistsAsync<DeviceConfiguration>(EXAMPLE_MOTION_KEY, org);
+        }
+
+        private async Task CreateOrgSetupToDo(EntityHeader org, EntityHeader user, string creationTimeStamp)
+        {
+            await _todoManager.AddToDoAsync(new ProjectManagement.Models.ToDo()
+            {
+                OwnerOrganization = org,
+                AssignedByUser = user,
+                AssignedToUser = user,
+                CreatedBy = user,
+            }, org, user);
         }
 
         public async Task<Subscription> AddTrialSubscriptionAsync(EntityHeader org, EntityHeader user, DateTime createTimeStamp)
