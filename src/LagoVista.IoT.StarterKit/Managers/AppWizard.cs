@@ -60,21 +60,23 @@ namespace LagoVista.IoT.StarterKit.Managers
                 LastUpdatedDate = timeStamp,
                 Description = appWizardRequest.Description,
                 Name = appWizardRequest.ProjectName,
-                Key = appWizardRequest.ProjectKey,
+                Key = appWizardRequest.ProjectCode.ToLower(),
                 ProjectAdminLead = appWizardRequest.ProjectAdminLead,
                 ProjectLead = appWizardRequest.ProjectLead,
                 DefaultQAResource = appWizardRequest.DefaultQAResource,
                 DefaultPrimaryContributor = appWizardRequest.DefaultPrimaryContributor,
-                ProjectCode = appWizardRequest.ProjectKey.ToUpper(),
+                ProjectCode = appWizardRequest.ProjectCode,
+                Status = EntityHeader<ProjectStatus>.Create(ProjectStatus.InProcess),
             };
+
             await _projectManager.AddProjectAsync(project, org, user);
 
             var projectEH = EntityHeader.Create(project.Id, project.Key, project.Name);
-
             var template = await _projectTemplateManger.GetProjectTemplateAsync(appWizardRequest.ProjectTemplate.Id, org, user);
         
             foreach(var taskTemplate in template.TaskTemplates)
             {
+                Console.WriteLine($"[AppWizard__CreateProjectForProjectTemplateAsync] - Task Template: {taskTemplate.Text}");
                 await _taskManger.CreateAndSaveTaskFromTemplateAsync(taskTemplate.Id, projectEH, org, user);
             }
 
@@ -100,8 +102,9 @@ namespace LagoVista.IoT.StarterKit.Managers
                 ProjectLead = appWizardRequest.ProjectLead,
                 DefaultQAResource = appWizardRequest.DefaultQAResource,
                 DefaultPrimaryContributor = appWizardRequest.DefaultPrimaryContributor,
-                Key = appWizardRequest.ProjectKey,
-                ProjectCode = appWizardRequest.ProjectKey.ToUpper(),
+                Key = appWizardRequest.ProjectCode.ToLower(),
+                ProjectCode = appWizardRequest.ProjectCode,
+                Status = EntityHeader<ProjectStatus>.Create(ProjectStatus.InProcess),
             };
 
             var projectEH = EntityHeader.Create(project.Id, project.Key, project.Name);
