@@ -22,9 +22,9 @@ namespace LagoVista.IoT.StarterKit.Models
             ResourceType: typeof(StarterKitResources), IsRequired: true, IsUserEditable: true)]
         public string ProjectName { get; set; }
 
-        [FormField(LabelResource: StarterKitResources.Names.AppWizard_ProjectKey, FieldType: FieldTypes.Key,
-            ResourceType: typeof(StarterKitResources), IsRequired: true, IsUserEditable: true)]
-        public string ProjectKey { get; set; }
+        [FormField(LabelResource: PMResources.Names.Project_ProjectCode, ValidationRegEx: @"^[A-Z]{3,20}$", RegExValidationMessageResource: PMResources.Names.Project_ProjectCode_HelpValidation, HelpResource: PMResources.Names.Project_ProjectCode_Help,
+                FieldType: FieldTypes.Text, ResourceType: typeof(PMResources), IsRequired: true, IsUserEditable: true)]
+        public string ProjectCode { get; set; }
 
         [FormField(LabelResource: PMResources.Names.Project_ProjectLead, FieldType: FieldTypes.UserPicker, ResourceType: typeof(PMResources), WaterMark: PMResources.Names.Project_ProjectLead_Select, IsRequired: true)]
         public EntityHeader ProjectLead { get; set; }
@@ -49,7 +49,7 @@ namespace LagoVista.IoT.StarterKit.Models
             {
                 nameof(ProjectTemplate),
                 nameof(ProjectName),
-                nameof(ProjectKey),
+                nameof(ProjectCode),
                 nameof(ProjectLead),
                 nameof(ProjectAdminLead),
                 nameof(DefaultPrimaryContributor),                

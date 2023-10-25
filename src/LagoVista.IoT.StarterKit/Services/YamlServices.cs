@@ -197,37 +197,31 @@ namespace LagoVista.IoT.StarterKit.Services
                             }
                         }
                     }
-                    else if (yaml[key] is Dictionary<object, object> )
+                    else if (yaml[key] is Dictionary<object, object>)
                     {
                         var props = yaml[key] as Dictionary<object, object>;
                         Console.WriteLine($"found dictionary for {key}");
                         foreach (var childProp in props)
                         {
                             Console.WriteLine($"\t {childProp.Key} - {childProp.Value}");
-                            if(childProp.Key as string == "ehReference")
+                            if (childProp.Key as string == "ehReference")
                             {
                                 var childPropDict = childProp.Value as Dictionary<object, object>;
                                 var ehName = childPropDict["name"] as string;
                                 var ehKey = childPropDict["key"] as string;
                                 var ehType = childPropDict["type"] as string;
                                 Console.Write($" {ehName} - {ehKey} - {ehType}");
-                                switch (ehType)
+
+                                var record = await _storageUtils.FindWithKeyAsync(ehKey, ehKey, org);
+                                prop.SetValue(obj, new EntityHeader()
                                 {
-                                    case nameof(Survey):
-                                        var childSurvey = await _surveyManager.GetSurveyByKeyAsync(ehKey, org, user);
-
-                                        prop.SetValue(obj, new EntityHeader()
-                                        {
-                                            Id = childSurvey.Id,
-                                            Key = childSurvey.Key,
-                                            Text = childSurvey.Name
-                                        });
-                                        break;
-                                }
+                                    Id = record.Id,
+                                    Key = record.Key,
+                                    Text = record.Name
+                                });
                             }
-
                         }
-                        }
+                    }
                     else
                     {
                         throw new Exception($"Uknown value type for {keyStr}");
@@ -296,6 +290,13 @@ namespace LagoVista.IoT.StarterKit.Services
                     bldr.AppendLine($"{indent}  key: {survey.Key}");
 
                     break;
+                case nameof(TaskTemplate.WorkTaskType):
+                    var taskType = await _workTaskTypeManager.GetWorkTaskTypeAsync(eh.Id, _org, _user);
+                    bldr.AppendLine($"{indent}  type: {nameof(TaskTemplate.WorkTaskType)}");
+                    bldr.AppendLine($"{indent}  name: {taskType.Name}");
+                    bldr.AppendLine($"{indent}  key: {taskType.Key}");
+
+                    break;
                 default:
                     bldr.AppendLine($"{indent}  Don't know how to process {propName}");
                     break;
@@ -339,6 +340,9 @@ namespace LagoVista.IoT.StarterKit.Services
                     }
                     break;
                 case "EntityHeader":
+                    bldr.AppendLine($"{indent}{prop.Name}:");
+                    await ApplyEntityHeader(prop, bldr, indent + "  ", model, value);
+                    break;
 
                 case "EntityHeader`1":
                     if (_referenceProperties.Contains(prop.Name))
