@@ -148,83 +148,98 @@ namespace LagoVista.IoT.StarterKit.Services
             {
                 if (key is String keyStr)
                 {
-                    var prop = objType.GetProperties().Where(p => p.Name == keyStr).FirstOrDefault();
-                    if (prop == null)
+                    try
                     {
-                        throw new Exception($"Uknown Property {keyStr}");
-                    }
-                    else if (prop.PropertyType.Name == "EntityHeader`1")
-                    {
-                        var enumType = prop.PropertyType.GetGenericArguments().First();
-                        var enumValue = Enum.Parse(enumType, yaml[key] as string);
-                        var createMethod = prop.PropertyType.GetMethod("Create");
-                        var ehValue = createMethod.Invoke(null, new object[] { enumValue });
-                        prop.SetValue(obj, ehValue);
-
-                    }
-                    else if (yaml[key] is IEnumerable<Object> childList)
-                    {
-                        var childListType = prop.PropertyType.GetGenericArguments().First();
-
-                        var addMethod = prop.PropertyType.GetMethod("Add");
-                        foreach (Dictionary<object, object> child in childList)
+                        var prop = objType.GetProperties().Where(p => p.Name == keyStr).FirstOrDefault();
+                        Console.WriteLine("0.1");
+                        if (prop == null)
                         {
-                            var childObject = await CreateNuvIoTObject(childListType, createDateStamp, org, user, child);
-                            addMethod.Invoke(prop.GetValue(obj), new object[] { childObject });
+                            throw new Exception($"Uknown Property {keyStr}");
                         }
-
-                    }
-                    else if (yaml[key] is String value)
-                    {
-                        if (prop.GetAccessors().Where(acc => acc.Name == $"set_{prop.Name}").Any())
+                        else if (prop.PropertyType.Name == "EntityHeader`1")
                         {
-                            if (prop.PropertyType == typeof(bool))
-                            {
-                                prop.SetValue(obj, bool.Parse(value));
-                            }
-                            else if (prop.PropertyType == typeof(double))
-                            {
-                                prop.SetValue(obj, double.Parse(value));
-                            }
-                            else if (prop.PropertyType == typeof(int))
-                            {
-                                prop.SetValue(obj, int.Parse(value));
-                            }
-                            else
-                            {
-                                value = value.Replace("\\r", "\r").Replace("\\n", "\n");
-                                prop.SetValue(obj, value);
-                            }
+                            Console.WriteLine("0.11");
+                            var enumType = prop.PropertyType.GetGenericArguments().First();
+                            var enumValue = Enum.Parse(enumType, yaml[key] as string);
+                            var createMethod = prop.PropertyType.GetMethod("Create", new Type[] { enumType });
+                            var ehValue = createMethod.Invoke(null, new object[] { enumValue });
+                            prop.SetValue(obj, ehValue);
+
                         }
-                    }
-                    else if (yaml[key] is Dictionary<object, object>)
-                    {
-                        var props = yaml[key] as Dictionary<object, object>;
-                        Console.WriteLine($"found dictionary for {key}");
-                        foreach (var childProp in props)
+                        else if (yaml[key] is IEnumerable<Object> childList)
                         {
-                            Console.WriteLine($"\t {childProp.Key} - {childProp.Value}");
-                            if (childProp.Key as string == "ehReference")
-                            {
-                                var childPropDict = childProp.Value as Dictionary<object, object>;
-                                var ehName = childPropDict["name"] as string;
-                                var ehKey = childPropDict["key"] as string;
-                                var ehType = childPropDict["type"] as string;
-                                Console.Write($" {ehName} - {ehKey} - {ehType}");
+                            var childListType = prop.PropertyType.GetGenericArguments().First();
 
-                                var record = await _storageUtils.FindWithKeyAsync(ehKey, ehKey, org);
-                                prop.SetValue(obj, new EntityHeader()
+                            var addMethod = prop.PropertyType.GetMethod("Add");
+                            foreach (Dictionary<object, object> child in childList)
+                            {
+                                var childObject = await CreateNuvIoTObject(childListType, createDateStamp, org, user, child);
+                                addMethod.Invoke(prop.GetValue(obj), new object[] { childObject });
+                            }
+
+                        }
+                        else if (yaml[key] is String value)
+                        {
+                            Console.WriteLine("1");
+                            if (prop.GetAccessors().Where(acc => acc.Name == $"set_{prop.Name}").Any())
+                            {
+                                if (prop.PropertyType == typeof(bool))
                                 {
-                                    Id = record.Id,
-                                    Key = record.Key,
-                                    Text = record.Name
-                                });
+                                    prop.SetValue(obj, bool.Parse(value));
+                                }
+                                else if (prop.PropertyType == typeof(double))
+                                {
+                                    prop.SetValue(obj, double.Parse(value));
+                                }
+                                else if (prop.PropertyType == typeof(int))
+                                {
+                                    prop.SetValue(obj, int.Parse(value));
+                                }
+                                else
+                                {
+                                    value = value.Replace("\\r", "\r").Replace("\\n", "\n");
+                                    prop.SetValue(obj, value);
+                                }
+                            }
+                            Console.WriteLine("2");
+                        }
+                        else if (yaml[key] is Dictionary<object, object>)
+                        {
+                            var props = yaml[key] as Dictionary<object, object>;
+                            Console.WriteLine($"found dictionary for {key}");
+                            foreach (var childProp in props)
+                            {
+                                Console.WriteLine($"\t {childProp.Key} - {childProp.Value}");
+                                if (childProp.Key as string == "ehReference")
+                                {
+                                    var childPropDict = childProp.Value as Dictionary<object, object>;
+                                    var ehName = childPropDict["name"] as string;
+                                    var ehKey = childPropDict["key"] as string;
+                                    var ehType = childPropDict["type"] as string;
+                                    Console.Write($" {ehName} - {ehKey} - {ehType}");
+
+                                    var record = await _storageUtils.FindWithKeyAsync(ehKey, ehKey, org);
+                                    prop.SetValue(obj, new EntityHeader()
+                                    {
+                                        Id = record.Id,
+                                        Key = record.Key,
+                                        Text = record.Name
+                                    });
+                                }
                             }
                         }
+                        else
+                        {
+                            throw new Exception($"Uknown value type for {keyStr}");
+                        }
                     }
-                    else
+                    catch(Exception ex)
                     {
-                        throw new Exception($"Uknown value type for {keyStr}");
+                        Console.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                        Console.WriteLine($"[YamlServices__CreateNuvIoTObject] {ex.Message} ObjectType: {objType.Name} Key: {key}");
+                        Console.WriteLine(ex.StackTrace);
+                        Console.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                        throw;
                     }
                 }
             }

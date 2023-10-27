@@ -104,6 +104,7 @@ namespace LagoVista.IoT.StarterKit.Managers
             await this.AddOutputTranslatorsAsync(org, user, creationTimeStamp);
             await this.AddAnonymousSentinelAsync(org, user, creationTimeStamp);
             await this.AddDefaultWorkflowAsync(org, user, creationTimeStamp);
+            await this.CreateOrgSetupToDoAsync(org, user, creationTimeStamp);
         }
 
         public async Task<InvokeResult> CreateExampleAppAsync(string environmentName, EntityHeader org, EntityHeader user)
@@ -185,7 +186,7 @@ namespace LagoVista.IoT.StarterKit.Managers
             await _storageUtils.DeleteByKeyIfExistsAsync<DeviceConfiguration>(EXAMPLE_MOTION_KEY, org);
         }
 
-        private async Task CreateOrgSetupToDo(EntityHeader org, EntityHeader user, string creationTimeStamp)
+        private async Task CreateOrgSetupToDoAsync(EntityHeader org, EntityHeader user, DateTime createTimeStamp)
         {
             await _todoManager.AddToDoAsync(new ProjectManagement.Models.ToDo()
             {
@@ -193,6 +194,26 @@ namespace LagoVista.IoT.StarterKit.Managers
                 AssignedByUser = user,
                 AssignedToUser = user,
                 CreatedBy = user,
+                LastUpdatedBy = user,
+                CreationDate = createTimeStamp.ToJSONString(),
+                LastUpdatedDate = createTimeStamp.ToJSONString(),
+                Name = "Build your Team.",
+                Instructions = "Add your team members and assign them the appropriate roles",
+                WebLink = "/organization/users/manage"
+            }, org, user);
+
+            await _todoManager.AddToDoAsync(new ProjectManagement.Models.ToDo()
+            {
+                OwnerOrganization = org,
+                AssignedByUser = user,
+                AssignedToUser = user,
+                CreatedBy = user,
+                LastUpdatedBy = user,
+                CreationDate = createTimeStamp.ToJSONString(),
+                LastUpdatedDate = createTimeStamp.ToJSONString(),
+                Name = "Create your First IoT Application.",
+                Instructions = "User our Quick Start Template to create your first IoT application with NuvIoT.",
+                WebLink = "/project/fromtemplate"
             }, org, user);
         }
 
@@ -208,7 +229,7 @@ namespace LagoVista.IoT.StarterKit.Managers
                 CreatedById = user.Id,
                 LastUpdatedById = user.Id,
                 CreationDate = createTimeStamp,
-                LastUpdatedDate = createTimeStamp,
+                LastUpdatedDate = createTimeStamp,                
             };
 
 
