@@ -69,7 +69,12 @@ namespace LagoVista.IoT.StarterKit.Managers
                 Status = EntityHeader<ProjectStatus>.Create(ProjectStatus.InProcess),
             };
 
-            await _projectManager.AddProjectAsync(project, org, user);
+        
+            var tasks = new List<WorkTask>();
+
+            var result = await _projectManager.AddProjectAsync(project, org, user);
+            if (!result.Successful)
+                return InvokeResult<Project>.FromInvokeResult(result);
 
             var projectEH = EntityHeader.Create(project.Id, project.Key, project.Name);
             var template = await _projectTemplateManger.GetProjectTemplateAsync(appWizardRequest.ProjectTemplate.Id, org, user);
@@ -77,7 +82,7 @@ namespace LagoVista.IoT.StarterKit.Managers
             foreach(var taskTemplate in template.TaskTemplates)
             {
                 Console.WriteLine($"[AppWizard__CreateProjectForProjectTemplateAsync] - Task Template: {taskTemplate.Text}");
-                await _taskManger.CreateAndSaveTaskFromTemplateAsync(taskTemplate.Id, projectEH, org, user);
+                var createdTask = await _taskManger.CreateAndSaveTaskFromTemplateAsync(taskTemplate.Id, projectEH, org, user);
             }
 
             var newProject = await _projectManager.GetProjectAsync(project.Id, org, user);
