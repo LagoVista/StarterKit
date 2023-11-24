@@ -501,7 +501,6 @@ namespace LagoVista.IoT.StarterKit.Services
                             case "projecttemplate":
                                 var projectTemplate = await CreateNuvIoTObject<ProjectTemplate>(dateStamp, org, usr, childItem as Dictionary<object, object>);
                                 return InvokeResult<Object>.Create(projectTemplate);
-                                break;
                             default:
                                 return InvokeResult<Object>.FromError($"object type: [{recordType}] not supported.");
                         }

@@ -340,7 +340,6 @@ namespace LagoVista.IoT.StarterKit.Managers
             route.Name = "Motion Message Handler";
             route.Key = EXAMPLE_MOTION_KEY;
             AddId(route);
-            AddAuditProperties(route, createTimestamp, org, user);
             route.MessageDefinition = new EntityHeader<DeviceMessageDefinition>()
             {
                 Id = msg.Id,
