@@ -405,9 +405,9 @@ namespace LagoVista.IoT.StarterKit.Managers
             {
                 Name = "Sample Planner",
                 Key = "sampleplanner",
-                MessageTypeIdParsers = new List<DeviceMessaging.Admin.Models.DeviceField>()
+                MessageTypeIdParsers = new List<DeviceMessaging.Admin.Models.MessageAttributeParser>()
                 {messageIdParser1, messageIdParser2},
-                DeviceIdParsers = new List<DeviceMessaging.Admin.Models.DeviceField>()
+                DeviceIdParsers = new List<DeviceMessaging.Admin.Models.MessageAttributeParser>()
                 {deviceIdParser1, deviceIdParser2}
             };
             AddId(planner);
