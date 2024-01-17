@@ -30,6 +30,7 @@ using LagoVista.ProjectManagement.Core;
 using LagoVista.ProjectManagement.Models;
 using LagoVista.UserAdmin.Interfaces.Managers;
 using LagoVista.UserAdmin.Interfaces.Repos.Orgs;
+using LagoVista.UserAdmin.Models.Security;
 using YamlDotNet.Serialization;
 
 namespace LagoVista.IoT.StarterKit.Services
@@ -206,25 +207,28 @@ namespace LagoVista.IoT.StarterKit.Services
                         else if (yaml[key] is Dictionary<object, object>)
                         {
                             var props = yaml[key] as Dictionary<object, object>;
-                            Console.WriteLine($"found dictionary for {key}");
-                            foreach (var childProp in props)
+                            if (props != null)
                             {
-                                Console.WriteLine($"\t {childProp.Key} - {childProp.Value}");
-                                if (childProp.Key as string == "ehReference")
+                                Console.WriteLine($"found dictionary for {key}");
+                                foreach (var childProp in props)
                                 {
-                                    var childPropDict = childProp.Value as Dictionary<object, object>;
-                                    var ehName = childPropDict["name"] as string;
-                                    var ehKey = childPropDict["key"] as string;
-                                    var ehType = childPropDict["type"] as string;
-                                    Console.Write($" {ehName} - {ehKey} - {ehType}");
-
-                                    var record = await _storageUtils.FindWithKeyAsync(ehKey, ehKey, org);
-                                    prop.SetValue(obj, new EntityHeader()
+                                    Console.WriteLine($"\t {childProp.Key} - {childProp.Value}");
+                                    if (childProp.Key as string == "ehReference")
                                     {
-                                        Id = record.Id,
-                                        Key = record.Key,
-                                        Text = record.Name
-                                    });
+                                        var childPropDict = childProp.Value as Dictionary<object, object>;
+                                        var ehName = childPropDict["name"] as string;
+                                        var ehKey = childPropDict["key"] as string;
+                                        var ehType = childPropDict["type"] as string;
+                                        Console.Write($" {ehName} - {ehKey} - {ehType}");
+
+                                        var record = await _storageUtils.FindWithKeyAsync(ehKey, ehKey, org);
+                                        prop.SetValue(obj, new EntityHeader()
+                                        {
+                                            Id = record.Id,
+                                            Key = record.Key,
+                                            Text = record.Name
+                                        });
+                                    }
                                 }
                             }
                         }
@@ -311,6 +315,8 @@ namespace LagoVista.IoT.StarterKit.Services
                     bldr.AppendLine($"{indent}  name: {taskType.Name}");
                     bldr.AppendLine($"{indent}  key: {taskType.Key}");
 
+                    break;
+                case nameof(UiCategory):
                     break;
                 default:
                     bldr.AppendLine($"{indent}  Don't know how to process {propName}");
@@ -610,6 +616,8 @@ namespace LagoVista.IoT.StarterKit.Services
                     await GenerateYaml(bldr, role, 1);
                     recordKey = role.Key;
                     break;
+                case nameof(UiCategory):
+                        break;
 
                 default:
                     return InvokeResult<Tuple<string, string>>.FromError($"Don't know how to handle object of type [{recordType}]");
