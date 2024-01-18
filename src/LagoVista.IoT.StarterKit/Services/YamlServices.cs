@@ -221,13 +221,29 @@ namespace LagoVista.IoT.StarterKit.Services
                                         var ehType = childPropDict["type"] as string;
                                         Console.Write($" {ehName} - {ehKey} - {ehType}");
 
-                                        var record = await _storageUtils.FindWithKeyAsync(ehKey, ehKey, org);
-                                        prop.SetValue(obj, new EntityHeader()
+                                        switch(ehType)
                                         {
-                                            Id = record.Id,
-                                            Key = record.Key,
-                                            Text = record.Name
-                                        });
+                                            case "uiCategory":
+                                                prop.SetValue(obj, new EntityHeader()
+                                                {
+                                                    Id = childPropDict["id"] as string,
+                                                    Key = ehKey,
+                                                    Text = ehName
+                                                });
+                                                break;
+                                            default:
+                                                var record = await _storageUtils.FindWithKeyAsync(ehType, ehKey, org);
+                                                if (record == null)
+                                                    throw new InvalidDataException($"could not find record: {ehKey} of type {ehType}");
+
+                                                prop.SetValue(obj, new EntityHeader()
+                                                {
+                                                    Id = record.Id,
+                                                    Key = record.Key,
+                                                    Text = record.Name
+                                                });
+                                                break;
+                                        }
                                     }
                                 }
                             }
@@ -317,6 +333,10 @@ namespace LagoVista.IoT.StarterKit.Services
 
                     break;
                 case nameof(UiCategory):
+                    bldr.AppendLine($"{indent}  type: uiCategory");
+                    bldr.AppendLine($"{indent}  name: {eh.Text}");
+                    bldr.AppendLine($"{indent}  key: {eh.Key}");
+                    bldr.AppendLine($"{indent}  id: {eh.Id}");
                     break;
                 default:
                     bldr.AppendLine($"{indent}  Don't know how to process {propName}");
@@ -616,8 +636,6 @@ namespace LagoVista.IoT.StarterKit.Services
                     await GenerateYaml(bldr, role, 1);
                     recordKey = role.Key;
                     break;
-                case nameof(UiCategory):
-                        break;
 
                 default:
                     return InvokeResult<Tuple<string, string>>.FromError($"Don't know how to handle object of type [{recordType}]");
