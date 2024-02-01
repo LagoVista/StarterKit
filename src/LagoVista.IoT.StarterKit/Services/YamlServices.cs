@@ -338,6 +338,14 @@ namespace LagoVista.IoT.StarterKit.Services
                     bldr.AppendLine($"{indent}  key: {eh.Key}");
                     bldr.AppendLine($"{indent}  id: {eh.Id}");
                     break;
+                case nameof(LagoVista.ProjectManagement.Models.GlossaryTerm.Related):
+                    bldr.AppendLine($"{indent}  type: related:");
+                    bldr.AppendLine($"{indent}  text: {eh.Text}");
+                    bldr.AppendLine($"{indent}  key: {eh.Key}");
+                    bldr.AppendLine($"{indent}  id: {eh.Id}");
+                    
+
+                break;
                 default:
                     bldr.AppendLine($"{indent}  Don't know how to process {propName}");
                     break;
@@ -357,7 +365,9 @@ namespace LagoVista.IoT.StarterKit.Services
         public async Task ApplyProperty(PropertyInfo prop, StringBuilder bldr, string indent, Object model, Object value, int level)
         {
 
-            //Console.WriteLine(model.GetType().Name + "." + prop.Name + " " + prop.PropertyType.Name);
+            Console.WriteLine(model.GetType().Name + "." + prop.Name + " " + prop.PropertyType.Name);
+
+
 
             switch (prop.PropertyType.Name)
             {
@@ -422,11 +432,14 @@ namespace LagoVista.IoT.StarterKit.Services
                 foreach (var child in list)
                 {
                     bldr.Append($"{indent}  - ");
+                    
 
                     if (child.GetType().Name.StartsWith("EntityHeader"))
                     {
                         var eh = child as EntityHeader;
                         bldr.AppendLine($"ehReference:");
+
+                        Console.WriteLine("PROCeSSING " + child.GetType().Name + " eh " + eh.Text);
                         await ApplyReferenceEntityHeader(prop.Name, bldr, indent + "    ", eh);
                     }
                     else
@@ -459,12 +472,16 @@ namespace LagoVista.IoT.StarterKit.Services
                         continue;
                     }
 
+
                     if (value is System.Collections.IEnumerable list && !(value is String))
                     {
+                        Console.WriteLine("Processing List: " + prop.Name);
                         await ProcessList(bldr, prop, list, level);
                     }
                     else
                     {
+                        Console.WriteLine("Processing Standard Properties: " + prop.Name);
+
                         if (!_ignoredProperties.Contains(prop.Name))
                         {
                             await ApplyProperty(prop, bldr, first && isList ? String.Empty : indent, obj, value, level);
