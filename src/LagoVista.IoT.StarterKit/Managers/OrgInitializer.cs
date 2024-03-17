@@ -188,6 +188,8 @@ namespace LagoVista.IoT.StarterKit.Managers
 
         private async Task CreateOrgSetupToDoAsync(EntityHeader org, EntityHeader user, DateTime createTimeStamp)
         {
+            _todoManager.IsForInitialization = true;
+
             await _todoManager.AddToDoAsync(new ProjectManagement.Models.ToDo()
             {
                 OwnerOrganization = org,
@@ -195,6 +197,8 @@ namespace LagoVista.IoT.StarterKit.Managers
                 AssignedToUser = user,
                 CreatedBy = user,
                 LastUpdatedBy = user,
+                DueDate = DateTime.UtcNow.AddDays(7).ToDateOnly(),
+                Priority = EntityHeader<ProjectManagement.Models.ToDo_Priority>.Create(ProjectManagement.Models.ToDo_Priority.Normal),
                 CreationDate = createTimeStamp.ToJSONString(),
                 LastUpdatedDate = createTimeStamp.ToJSONString(),
                 Name = "Build your Team.",
@@ -208,6 +212,8 @@ namespace LagoVista.IoT.StarterKit.Managers
                 AssignedByUser = user,
                 AssignedToUser = user,
                 CreatedBy = user,
+                DueDate = DateTime.UtcNow.AddDays(7).ToDateOnly(),
+                Priority = EntityHeader<ProjectManagement.Models.ToDo_Priority>.Create(ProjectManagement.Models.ToDo_Priority.Normal),
                 LastUpdatedBy = user,
                 CreationDate = createTimeStamp.ToJSONString(),
                 LastUpdatedDate = createTimeStamp.ToJSONString(),
@@ -215,6 +221,8 @@ namespace LagoVista.IoT.StarterKit.Managers
                 Instructions = "User our Quick Start Template to create your first IoT application with NuvIoT.",
                 WebLink = "/project/fromtemplate"
             }, org, user);
+
+            _todoManager.IsForInitialization = false;
         }
 
         public async Task<Subscription> AddTrialSubscriptionAsync(EntityHeader org, EntityHeader user, DateTime createTimeStamp)
@@ -763,7 +771,6 @@ function onSet(value /* String */) {
             _deviceAdminMgr.IsForInitialization = true;
             await _deviceAdminMgr.AddDeviceWorkflowAsync(wf, org, user);
             _deviceAdminMgr.IsForInitialization = false;
-
 
             return wf;
         }
