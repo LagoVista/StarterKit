@@ -197,14 +197,31 @@ namespace LagoVista.IoT.StarterKit.Managers
                 AssignedToUser = user,
                 CreatedBy = user,
                 LastUpdatedBy = user,
-                DueDate = DateTime.UtcNow.AddDays(7).ToDateOnly(),
+                DueDate = DateTime.UtcNow.AddDays(3).ToDateOnly(),
                 Priority = EntityHeader<ProjectManagement.Models.ToDo_Priority>.Create(ProjectManagement.Models.ToDo_Priority.Normal),
                 CreationDate = createTimeStamp.ToJSONString(),
                 LastUpdatedDate = createTimeStamp.ToJSONString(),
                 Name = "Build your Team.",
-                Instructions = "Add your team members and assign them the appropriate roles",
+                Instructions = "Add your team members and assign them the appropriate roles.",
                 WebLink = "/organization/users/manage"
             }, org, user);
+
+            await _todoManager.AddToDoAsync(new ProjectManagement.Models.ToDo()
+            {
+                OwnerOrganization = org,
+                AssignedByUser = user,
+                AssignedToUser = user,
+                CreatedBy = user,
+                LastUpdatedBy = user,
+                DueDate = DateTime.UtcNow.AddDays(5).ToDateOnly(),
+                Priority = EntityHeader<ProjectManagement.Models.ToDo_Priority>.Create(ProjectManagement.Models.ToDo_Priority.Normal),
+                CreationDate = createTimeStamp.ToJSONString(),
+                LastUpdatedDate = createTimeStamp.ToJSONString(),
+                Name = "Watch Getting started Video",
+                Instructions = "To better understand the concepts and how to build IoT applications with NuvIoT, watch our getting started video.",
+                WebLink = "/organization/users/manage"
+            }, org, user);
+
 
             await _todoManager.AddToDoAsync(new ProjectManagement.Models.ToDo()
             {
