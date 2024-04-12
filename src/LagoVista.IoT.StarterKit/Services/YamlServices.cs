@@ -235,6 +235,15 @@ namespace LagoVista.IoT.StarterKit.Services
 
                                             switch (ehType)
                                             {
+                                                case "category":
+                                                    prop.SetValue(obj, new EntityHeader()
+                                                    {
+                                                        Id = childPropDict["id"] as string,
+                                                        Key = ehKey,
+                                                        Text = ehName
+                                                    });
+
+                                                    break;
                                                 case "uiCategory":
                                                     prop.SetValue(obj, new EntityHeader()
                                                     {
@@ -356,9 +365,15 @@ namespace LagoVista.IoT.StarterKit.Services
                     bldr.AppendLine($"{indent}  text: {eh.Text}");
                     bldr.AppendLine($"{indent}  key: {eh.Key}");
                     bldr.AppendLine($"{indent}  id: {eh.Id}");
-                    
+                    break;
+                case nameof(Category):
+                    bldr.AppendLine($"{indent}  type: category");
+                    bldr.AppendLine($"{indent}  text: {eh.Text}");
+                    bldr.AppendLine($"{indent}  key: {eh.Key}");
+                    bldr.AppendLine($"{indent}  id: {eh.Id}");
 
-                break;
+
+                    break;
                 default:
                     bldr.AppendLine($"{indent}  Don't know how to process {propName}");
                     break;
