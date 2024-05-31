@@ -219,7 +219,7 @@ namespace LagoVista.IoT.StarterKit.Managers
                 LastUpdatedDate = createTimeStamp.ToJSONString(),
                 Name = "Watch Getting started Video",
                 Instructions = "To better understand the concepts and how to build IoT applications with NuvIoT, watch our getting started video.",
-                WebLink = "/organization/users/manage"
+                WebLink = "/home/welcome"
             }, org, user);
 
 
