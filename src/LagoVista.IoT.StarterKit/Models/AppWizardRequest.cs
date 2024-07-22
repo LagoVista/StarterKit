@@ -18,8 +18,7 @@ namespace LagoVista.IoT.StarterKit.Models
             EntityHeaderPickerUrl: "/api/project/templates", ResourceType: typeof(StarterKitResources), IsRequired: true, IsUserEditable: true)]
         public EntityHeader ProjectTemplate { get; set; }
 
-        [FormField(LabelResource: StarterKitResources.Names.AppWizard_ProjectName, FieldType: FieldTypes.Text,
-            ResourceType: typeof(StarterKitResources), IsRequired: true, IsUserEditable: true)]
+        [FormField(LabelResource: StarterKitResources.Names.AppWizard_ProjectName, FieldType: FieldTypes.Text, ResourceType: typeof(StarterKitResources), IsRequired: true, IsUserEditable: true)]
         public string ProjectName { get; set; }
 
         [FormField(LabelResource: PMResources.Names.Project_ProjectCode, ValidationRegEx: @"^[A-Z]{3,20}$", RegExValidationMessageResource: PMResources.Names.Project_ProjectCode_HelpValidation, HelpResource: PMResources.Names.Project_ProjectCode_Help,

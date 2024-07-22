@@ -158,5 +158,7 @@ namespace LagoVista.IoT.StarterKit.Tests
         IConnectionSettings _settings = new ConnectionSettings();
 
         public IConnectionSettings StarterKitStorage => _settings;
+
+        public bool ShouldConsolidateCollections => true;
     }
 }

@@ -2,28 +2,28 @@
 <package>
   <metadata>
     <id>LagoVista.IoT.StarterKit.Rest</id>
-    <version>3.0.1963.1145</version>
+    <version>3.0.2623.1505</version>
     <authors>Software Logistics, LLC</authors>
     <owners>Software Logistics, LLC</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <projectUrl>https://www.nuviot.com</projectUrl>
     <iconUrl>http://bytemaster.blob.core.windows.net/icons/LagoVistaIcon.png</iconUrl>
     <description>Provides REST Services for Adminstering Simulators for the LagoVista Devices, IoT and Home Automation Frameworks</description>
-    <copyright>Copyright Software Logistics - 2022</copyright>
+    <copyright>Copyright Software Logistics - 2024</copyright>
     <tags>HomeAutomation IoT Cloud LagoVista</tags>
     <icon>LagoVistaIcon.png</icon>
-    <releaseNotes>Build Date: 10/1/2022 3:45:22 PM UTC</releaseNotes>
+    <releaseNotes>Build Date: 7/22/2024 7:05:14 PM UTC</releaseNotes>
     <repository url="https://www.github.com/lagovista" type="git" branch="master"></repository>
     <dependencies>
       <group targetFramework="net6.0">
-        <dependency id="LagoVista.Core" version="3.0.1963.1145" />
-        <dependency id="LagoVista.IoT.Pipeline.Admin" version="3.0.1963.1145" />
-        <dependency id="LagoVista.IoT.Logging" version="3.0.1963.1145" />
-        <dependency id="LagoVista.IoT.Runtime.Core" version="3.0.1963.1145" />
-        <dependency id="LagoVista.IoT.Web.Common" version="3.0.1963.1145" />
-        <dependency id="LagoVista.UserAdmin" version="3.0.1963.1145" />
+        <dependency id="LagoVista.Core" version="3.0.2623.1505" />
+        <dependency id="LagoVista.IoT.Pipeline.Admin" version="3.0.2623.1505" />
+        <dependency id="LagoVista.IoT.Logging" version="3.0.2623.1505" />
+        <dependency id="LagoVista.IoT.Runtime.Core" version="3.0.2623.1505" />
+        <dependency id="LagoVista.IoT.Web.Common" version="3.0.2623.1505" />
+        <dependency id="LagoVista.UserAdmin" version="3.0.2623.1505" />
         <dependency id="Newtonsoft.Json" version="13.0.1" />
-        <dependency id="LagoVista.IoT.StarterKit" version="3.0.1963.1145" />
+        <dependency id="LagoVista.IoT.StarterKit" version="3.0.2623.1505" />
       </group>
     </dependencies>
   </metadata>

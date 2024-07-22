@@ -141,4 +141,70 @@
   <data name="AppWizard_TItle" xml:space="preserve">
     <value>App Wizard</value>
   </data>
+  <data name="Common_Description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="Common_Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="Common_Summary" xml:space="preserve">
+    <value>Summary</value>
+  </data>
+  <data name="ProductLineObjectType_ObjectType" xml:space="preserve">
+    <value>Object Type</value>
+  </data>
+  <data name="ProductLineObject_Help" xml:space="preserve">
+    <value>Product Line Objects are specific NuvIoT objects that need to be included to make the application work</value>
+  </data>
+  <data name="ProductLineObject_Object" xml:space="preserve">
+    <value>Object</value>
+  </data>
+  <data name="ProductLineObject_Title" xml:space="preserve">
+    <value>Product Line Object</value>
+  </data>
+  <data name="ProductLines_Name" xml:space="preserve">
+    <value>Products</value>
+  </data>
+  <data name="ProductLine_Description" xml:space="preserve">
+    <value>A Product is a collectoin of objects that make up the components for an IoT application.</value>
+  </data>
+  <data name="ProductLine_Name" xml:space="preserve">
+    <value>Product</value>
+  </data>
+  <data name="ProductLine_Objects" xml:space="preserve">
+    <value>Objects</value>
+  </data>
+  <data name="ProductLine_Objects_Help" xml:space="preserve">
+    <value>Objects are NuvIoT objects that are reqired for this Product Line.</value>
+  </data>
+  <data name="ProductLine_ToDoTemplates" xml:space="preserve">
+    <value>ToDo Templates</value>
+  </data>
+  <data name="ProductLine_ToDoTemplate_Help" xml:space="preserve">
+    <value>These ToDo's will be created as part of the new organization.</value>
+  </data>
+  <data name="ToDoTemplate_DueDateDays" xml:space="preserve">
+    <value>Relative Due Date</value>
+  </data>
+  <data name="ToDoTemplate_DueDateDays_Help" xml:space="preserve">
+    <value>Number of days after the org was created the this to do should be completed.</value>
+  </data>
+  <data name="ToDoTemplate_Help" xml:space="preserve">
+    <value>The ToDo template is an action item that will be brought into the new customers organization that provides instructions of what needs to be done to bring the application online.</value>
+  </data>
+  <data name="ToDoTemplate_Instructions" xml:space="preserve">
+    <value>Instructions</value>
+  </data>
+  <data name="ToDoTemplate_Priority" xml:space="preserve">
+    <value>Priority for this ToDo item.</value>
+  </data>
+  <data name="ToDoTemplate_Select_Priority" xml:space="preserve">
+    <value>-select priority-</value>
+  </data>
+  <data name="ToDoTemplate_Title" xml:space="preserve">
+    <value>ToDo Template</value>
+  </data>
+  <data name="ToDoTemplate_WebLink" xml:space="preserve">
+    <value>Web Linlk</value>
+  </data>
 </root>

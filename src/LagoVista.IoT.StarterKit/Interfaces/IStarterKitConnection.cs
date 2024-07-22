@@ -9,5 +9,6 @@ namespace LagoVista.IoT.StarterKit
     public interface IStarterKitConnection
     {
         IConnectionSettings StarterKitStorage { get; }
+        bool ShouldConsolidateCollections { get; }
     }
 }
