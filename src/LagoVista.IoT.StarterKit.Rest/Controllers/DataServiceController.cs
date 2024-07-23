@@ -14,6 +14,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.Http;
+using LagoVista.Core.Models.UIMetaData;
+using LagoVista.Core.Models;
+using LagoVista.IoT.StarterKit.Interfaces;
 
 namespace LagoVista.IoT.StarterKit.Rest.Controllers
 {
@@ -26,6 +29,7 @@ namespace LagoVista.IoT.StarterKit.Rest.Controllers
     {
         readonly IYamlServices _yamlServices;
         readonly IWebHostEnvironment _env;
+        readonly IDataServicesManager _dataServicesManager;
 
 		/// <summary>
 		/// Constructor for controller that creates sample projects.
@@ -34,10 +38,11 @@ namespace LagoVista.IoT.StarterKit.Rest.Controllers
 		/// <param name="userManager"></param>
 		/// <param name="logger"></param>
 		/// <param name="env"></param>
-		public DataServiceController(IYamlServices orgInitializer, UserManager<AppUser> userManager, IAdminLogger logger, IWebHostEnvironment env) : base(userManager, logger)
+		public DataServiceController(IYamlServices orgInitializer, IDataServicesManager dataServicesManager, UserManager<AppUser> userManager, IAdminLogger logger, IWebHostEnvironment env) : base(userManager, logger)
         {
             this._yamlServices = orgInitializer ?? throw new ArgumentNullException(nameof(orgInitializer));
             this._env = env ?? throw new ArgumentNullException(nameof(env));
+            this._dataServicesManager = dataServicesManager ?? throw new ArgumentNullException(nameof(dataServicesManager));
 		}
 
 
@@ -72,6 +77,17 @@ namespace LagoVista.IoT.StarterKit.Rest.Controllers
             }
         }
 
+        /// <summary>
+        /// Get all objects of a certain type for this organization.
+        /// </summary>
+        /// <param name="objectType"></param>
+        /// <returns></returns>
+        [HttpGet("/api/dataservices/objects/{objectType}")]
+        public async Task<ListResponse<EntityHeader>> GetObjectsOfType(string objectType)
+        {
+            var objects = await _dataServicesManager.GetAllObjectsOfType(objectType, OrgEntityHeader, UserEntityHeader);
+            return ListResponse<EntityHeader>.Create(objects);
+        }
 
         ///// <summary>
         ///// Import YAML objct

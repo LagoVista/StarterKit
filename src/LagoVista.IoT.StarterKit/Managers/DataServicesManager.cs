@@ -1,6 +1,7 @@
 ﻿using LagoVista.CloudStorage.Storage;
 using LagoVista.Core.Interfaces;
 using LagoVista.Core.Managers;
+using LagoVista.Core.Models;
 using LagoVista.Core.PlatformSupport;
 using LagoVista.IoT.Billing;
 using LagoVista.IoT.Deployment.Admin;
@@ -10,16 +11,19 @@ using LagoVista.IoT.DeviceMessaging.Admin.Managers;
 using LagoVista.IoT.Logging.Loggers;
 using LagoVista.IoT.Pipeline.Admin.Managers;
 using LagoVista.IoT.Simulator.Admin.Managers;
+using LagoVista.IoT.StarterKit.Interfaces;
 using LagoVista.IoT.Verifiers.Managers;
 using LagoVista.UserAdmin.Interfaces.Managers;
 using LagoVista.UserAdmin.Interfaces.Repos.Orgs;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace LagoVista.IoT.StarterKit.Managers
 {
-    public class DataServicesManager : ManagerBase
+    public class DataServicesManager : ManagerBase, IDataServicesManager
     {
         IDeviceAdminManager _deviceAdminMgr;
         ISubscriptionManager _subscriptionMgr;
@@ -67,6 +71,12 @@ namespace LagoVista.IoT.StarterKit.Managers
             _storageUtils = new StorageUtils(new Uri(starterKitConnection.StarterKitStorage.Uri), starterKitConnection.StarterKitStorage.AccessKey,
                 starterKitConnection.StarterKitStorage.ResourceName, logger);
 
+        }
+
+        public async Task<List<EntityHeader>> GetAllObjectsOfType(string typeName, EntityHeader org, EntityHeader user)
+        {
+            var results = await _storageUtils.FindByTypeAsync<EntityBase>(typeName, org);
+            return results.Select(res => res.ToEntityHeader()).ToList();
         }
     }
 }

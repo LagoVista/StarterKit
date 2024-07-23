@@ -94,13 +94,21 @@ namespace LagoVista.IoT.StarterKit.Models
 
         public string Id { get; set; }
 
-        [FormField(LabelResource: StarterKitResources.Names.Common_Summary, FieldType: FieldTypes.EntityHeaderPicker, ResourceType: typeof(StarterKitResources), IsRequired: true, IsUserEditable: true)]
+        [FormField(LabelResource: StarterKitResources.Names.Common_Summary, FieldType: FieldTypes.EntityHeaderPicker,
+           EntityHeaderPickerUrl: "/metadata/dox/entities/all", ResourceType: typeof(StarterKitResources), IsRequired: true, IsUserEditable: true)]
         public EntityHeader ObjectType { get; set; }
 
-        [FormField(LabelResource: StarterKitResources.Names.Common_Summary, FieldType: FieldTypes.EntityHeaderPicker, ResourceType: typeof(StarterKitResources), IsRequired: true, IsUserEditable: true)]
+        [FormField(LabelResource: StarterKitResources.Names.Common_Summary, FieldType: FieldTypes.EntityHeaderPicker, 
+           EntityHeaderPickerUrl: "/api/dataservices/objects/{objectType}", ResourceType: typeof(StarterKitResources), IsRequired: true, IsUserEditable: true)]
         public EntityHeader Object { get; set; }
 
+        [FormField(LabelResource: StarterKitResources.Names.ProductLineObject_CustomizationInstructions, FieldType: FieldTypes.Text, ResourceType: typeof(StarterKitResources), IsRequired: true, IsUserEditable: true)]
         public string CustomizationInstructions { get; set; }
+
+
+        [FormField(LabelResource: StarterKitResources.Names.ProductLine_ToDoTemplates, HelpResource: StarterKitResources.Names.ProductLine_ToDoTemplate_Help, FieldType: FieldTypes.ChildListInline, ResourceType: typeof(StarterKitResources),
+            FactoryUrl: "/api/productline/todotemplate/factory")]
+        public List<ToDoTemplate> ToDoTemplates { get; set; } = new List<ToDoTemplate>();
 
         public FormConditionals GetConditionalFields()
         {
@@ -125,17 +133,16 @@ namespace LagoVista.IoT.StarterKit.Models
                 nameof(ObjectType),
                 nameof(Object),
                 nameof(CustomizationInstructions),
+                nameof(ToDoTemplates),
             };
         }
     }
-
 
     [EntityDescription(StarterKitDomain.StarterKit, StarterKitResources.Names.ToDoTemplate_Title, StarterKitResources.Names.ToDoTemplate_Help,
         StarterKitResources.Names.ToDoTemplate_Help, EntityDescriptionAttribute.EntityTypes.SimpleModel, typeof(StarterKitResources),
         FactoryUrl:"/api/productline/todotemplate/factory"  )]
     public class ToDoTemplate : IFormDescriptor
     {
-
         public ToDoTemplate()
         {
             Id = Guid.NewGuid().ToId();
@@ -152,7 +159,6 @@ namespace LagoVista.IoT.StarterKit.Models
         [FormField(LabelResource: StarterKitResources.Names.ToDoTemplate_Priority, FieldType: FieldTypes.Picker, EnumType: typeof(ToDo_Priority),
             WaterMark: StarterKitResources.Names.ToDoTemplate_Select_Priority, ResourceType: typeof(StarterKitResources), IsRequired: true, IsUserEditable: true)]
         public EntityHeader<ToDo_Priority> Priority { get; set; }
-
 
         [FormField(LabelResource: StarterKitResources.Names.Common_Name, FieldType: FieldTypes.EntityHeaderPicker, ResourceType: typeof(StarterKitResources), IsRequired: true, IsUserEditable: true)]
         public string Name { get; set; }
@@ -175,31 +181,6 @@ namespace LagoVista.IoT.StarterKit.Models
             };
         }
     }
-
-
-    /*
-     * 
-     * 
-     
-            await _todoManager.AddToDoAsync(new ProjectManagement.Models.ToDo()
-            {
-                OwnerOrganization = org,
-                AssignedByUser = user,
-                AssignedToUser = user,
-                CreatedBy = user,
-                DueDate = DateTime.UtcNow.AddDays(7).ToDateOnly(),
-                Priority = EntityHeader<ProjectManagement.Models.ToDo_Priority>.Create(ProjectManagement.Models.ToDo_Priority.Normal),
-                LastUpdatedBy = user,
-                CreationDate = createTimeStamp.ToJSONString(),
-                LastUpdatedDate = createTimeStamp.ToJSONString(),
-                Name = "Create your First IoT Application.",
-                Instructions = "User our Quick Start Template to create your first IoT application with NuvIoT.",
-                WebLink = "/project/fromtemplate"
-            }, org, user);
-
-     * 
-     */
-
 }
 
 

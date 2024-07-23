@@ -153,6 +153,9 @@
   <data name="ProductLineObjectType_ObjectType" xml:space="preserve">
     <value>Object Type</value>
   </data>
+  <data name="ProductLineObject_CustomizationInstructions" xml:space="preserve">
+    <value>Customization Instructions</value>
+  </data>
   <data name="ProductLineObject_Help" xml:space="preserve">
     <value>Product Line Objects are specific NuvIoT objects that need to be included to make the application work</value>
   </data>

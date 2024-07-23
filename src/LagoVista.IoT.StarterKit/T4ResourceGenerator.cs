@@ -1,4 +1,4 @@
-﻿/*7/22/2024 6:03:25 PM*/
+﻿/*7/23/2024 8:00:44 AM*/
 using System.Globalization;
 using System.Reflection;
 
@@ -105,6 +105,9 @@ namespace LagoVista.IoT.StarterKit.Resources
 //Resources:StarterKitResources:ProductLine_ToDoTemplates
 
 		public static string ProductLine_ToDoTemplates { get { return GetResourceString("ProductLine_ToDoTemplates"); } }
+//Resources:StarterKitResources:ProductLineObject_CustomizationInstructions
+
+		public static string ProductLineObject_CustomizationInstructions { get { return GetResourceString("ProductLineObject_CustomizationInstructions"); } }
 //Resources:StarterKitResources:ProductLineObject_Help
 
 		public static string ProductLineObject_Help { get { return GetResourceString("ProductLineObject_Help"); } }
@@ -164,6 +167,7 @@ namespace LagoVista.IoT.StarterKit.Resources
 			public const string ProductLine_Objects_Help = "ProductLine_Objects_Help";
 			public const string ProductLine_ToDoTemplate_Help = "ProductLine_ToDoTemplate_Help";
 			public const string ProductLine_ToDoTemplates = "ProductLine_ToDoTemplates";
+			public const string ProductLineObject_CustomizationInstructions = "ProductLineObject_CustomizationInstructions";
 			public const string ProductLineObject_Help = "ProductLineObject_Help";
 			public const string ProductLineObject_Object = "ProductLineObject_Object";
 			public const string ProductLineObject_Title = "ProductLineObject_Title";
