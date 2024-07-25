@@ -75,13 +75,13 @@ namespace LagoVista.IoT.StarterKit.Rest.Controllers
 
        
         [HttpGet("/api/productlines")]
-        public Task<ListResponse<ProductLineSummary>> GetErrorCodesForOrg()
+        public Task<ListResponse<ProductLineSummary>> GetProductLinesForFor()
         {
             return _productLineManager.GetProductLinesAsync(GetListRequestFromHeader(), OrgEntityHeader, UserEntityHeader);
         }
 
         [HttpDelete("/api/productline/{id}")]
-        public async Task<InvokeResult> DeleteErrorCodeAsync(string id)
+        public async Task<InvokeResult> DeleteProductLineAsync(string id)
         {
             return await _productLineManager.DeleteProductLineAsync(id, OrgEntityHeader, UserEntityHeader);
         }

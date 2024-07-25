@@ -162,6 +162,12 @@
   <data name="ProductLineObject_Object" xml:space="preserve">
     <value>Object</value>
   </data>
+  <data name="ProductLineObject_ObjectType_Select" xml:space="preserve">
+    <value>-select object type-</value>
+  </data>
+  <data name="ProductLineObject_Object_Select" xml:space="preserve">
+    <value>-select object-</value>
+  </data>
   <data name="ProductLineObject_Title" xml:space="preserve">
     <value>Product Line Object</value>
   </data>

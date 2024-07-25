@@ -1,4 +1,4 @@
-﻿/*7/23/2024 8:00:44 AM*/
+﻿/*7/25/2024 8:15:43 AM*/
 using System.Globalization;
 using System.Reflection;
 
@@ -114,6 +114,12 @@ namespace LagoVista.IoT.StarterKit.Resources
 //Resources:StarterKitResources:ProductLineObject_Object
 
 		public static string ProductLineObject_Object { get { return GetResourceString("ProductLineObject_Object"); } }
+//Resources:StarterKitResources:ProductLineObject_Object_Select
+
+		public static string ProductLineObject_Object_Select { get { return GetResourceString("ProductLineObject_Object_Select"); } }
+//Resources:StarterKitResources:ProductLineObject_ObjectType_Select
+
+		public static string ProductLineObject_ObjectType_Select { get { return GetResourceString("ProductLineObject_ObjectType_Select"); } }
 //Resources:StarterKitResources:ProductLineObject_Title
 
 		public static string ProductLineObject_Title { get { return GetResourceString("ProductLineObject_Title"); } }
@@ -170,6 +176,8 @@ namespace LagoVista.IoT.StarterKit.Resources
 			public const string ProductLineObject_CustomizationInstructions = "ProductLineObject_CustomizationInstructions";
 			public const string ProductLineObject_Help = "ProductLineObject_Help";
 			public const string ProductLineObject_Object = "ProductLineObject_Object";
+			public const string ProductLineObject_Object_Select = "ProductLineObject_Object_Select";
+			public const string ProductLineObject_ObjectType_Select = "ProductLineObject_ObjectType_Select";
 			public const string ProductLineObject_Title = "ProductLineObject_Title";
 			public const string ProductLineObjectType_ObjectType = "ProductLineObjectType_ObjectType";
 			public const string ProductLines_Name = "ProductLines_Name";

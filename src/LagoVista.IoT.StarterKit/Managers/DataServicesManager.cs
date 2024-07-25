@@ -2,10 +2,10 @@
 using LagoVista.Core.Interfaces;
 using LagoVista.Core.Managers;
 using LagoVista.Core.Models;
-using LagoVista.Core.PlatformSupport;
 using LagoVista.IoT.Billing;
 using LagoVista.IoT.Deployment.Admin;
 using LagoVista.IoT.DeviceAdmin.Interfaces.Managers;
+using LagoVista.IoT.DeviceManagement.Core;
 using LagoVista.IoT.DeviceManagement.Core.Managers;
 using LagoVista.IoT.DeviceMessaging.Admin.Managers;
 using LagoVista.IoT.Logging.Loggers;

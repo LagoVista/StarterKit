@@ -1,28 +1,29 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package>
   <metadata>
-    <id>LagoVista.IoT.Verifiers.CloudRepos</id>
-    <version>3.0.2623.1505</version>
+    <id>LagoVista.IoT.StarterKits.CloudRepos</id>
+    <version>3.0.2626.0800</version>
     <authors>Software Logistics, LLC</authors>
     <owners>Software Logistics, LLC</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <projectUrl>https://www.nuviot.com</projectUrl>
     <iconUrl>http://bytemaster.blob.core.windows.net/icons/LagoVistaIcon.png</iconUrl>
-    <description>Provides Cloud Based Repositories to store Verifiers and results of their test runs to cloud based storage.</description>
+    <description>Provides Cloud Based Repositories to store information included in starter kits to cloud based storage.</description>
     <copyright>Copyright Software Logistics - 2024</copyright>
     <tags>LagoVista HomeAutomation IoT</tags>
     <icon>LagoVistaIcon.png</icon>
-    <releaseNotes>Build Date: 7/22/2024 7:05:13 PM UTC</releaseNotes>
+    <releaseNotes>Build Date: 7/25/2024 12:00:23 PM UTC</releaseNotes>
     <repository url="https://www.github.com/lagovista" type="git" branch="master"></repository>
     <dependencies>
-      <group targetFramework="netstandard2.1">
-        <dependency id="LagoVista.CloudStorage" version="3.0.2623.1505" />
+      <group targetFramework="net6.0">
+        <dependency id="LagoVista.CloudStorage" version="3.0.2626.0750" />
+        <dependency id="LagoVista.IoT.StarterKit" version="3.0.2626.0800" />
       </group>
     </dependencies>
   </metadata>
   <files>
     <file src="LagoVistaIcon.png" target="LagoVistaIcon.png" />
-    <file src="bin\release\netstandard2.1\LagoVista.IoT.StarterKits.CloudRepos.dll" target="lib\netstandard2.1\LagoVista.IoT.StarterKits.CloudRepos.dll" />
-    <file src="bin\release\netstandard2.1\LagoVista.IoT.StarterKits.CloudRepos.pdb" target="lib\netstandard2.1\LagoVista.IoT.StarterKits.CloudRepos.pdb" />
+    <file src="bin\release\net6.0\LagoVista.IoT.StarterKits.CloudRepos.dll" target="lib\net6.0\LagoVista.IoT.StarterKits.CloudRepos.dll" />
+    <file src="bin\release\net6.0\LagoVista.IoT.StarterKits.CloudRepos.pdb" target="lib\net6.0\LagoVista.IoT.StarterKits.CloudRepos.pdb" />
   </files>
 </package>

@@ -11,7 +11,6 @@ using System.Collections.Generic;
 
 namespace LagoVista.IoT.StarterKit.Models
 {
-
     [EntityDescription(StarterKitDomain.StarterKit, StarterKitResources.Names.ProductLine_Name, StarterKitResources.Names.ProductLineObject_Help,        
         StarterKitResources.Names.ProductLineObject_Help, EntityDescriptionAttribute.EntityTypes.SimpleModel, typeof(StarterKitResources),
         FactoryUrl: "/api/productline/factory", GetListUrl:"/api/productlines", GetUrl:"/api/productline/{id}", DeleteUrl: "/api/productline/{id}", SaveUrl:"/api/productline" )]
@@ -25,10 +24,10 @@ namespace LagoVista.IoT.StarterKit.Models
             FactoryUrl: "/api/productline/todotemplate/factory")]
         public List<ToDoTemplate> ToDoTemplates { get; set; } = new List<ToDoTemplate>();
 
-        [FormField(LabelResource: StarterKitResources.Names.Common_Summary, FieldType: FieldTypes.Text, ResourceType: typeof(StarterKitResources), IsRequired: true, IsUserEditable: true)]
+        [FormField(LabelResource: StarterKitResources.Names.Common_Summary, FieldType: FieldTypes.MultiLineText, ResourceType: typeof(StarterKitResources), IsRequired: true, IsUserEditable: true)]
         public string Summary { get; set; }
 
-        [FormField(LabelResource: StarterKitResources.Names.Common_Description, FieldType: FieldTypes.Text, ResourceType: typeof(StarterKitResources), IsRequired: true, IsUserEditable: true)]
+        [FormField(LabelResource: StarterKitResources.Names.Common_Description, FieldType: FieldTypes.HtmlEditor, ResourceType: typeof(StarterKitResources), IsRequired: false, IsUserEditable: true)]
         public string Description { get; set; }
 
 
@@ -73,8 +72,9 @@ namespace LagoVista.IoT.StarterKit.Models
     }
 
 
-    [EntityDescription(StarterKitDomain.StarterKit, StarterKitResources.Names.AppWizard_TItle, StarterKitResources.Names.AppWizard_Help,
-        StarterKitResources.Names.AppWizard_Help, EntityDescriptionAttribute.EntityTypes.SimpleModel, typeof(StarterKitResources))]
+    [EntityDescription(StarterKitDomain.StarterKit, StarterKitResources.Names.ProductLines_Name, StarterKitResources.Names.ProductLineObject_Help,
+        StarterKitResources.Names.ProductLineObject_Help, EntityDescriptionAttribute.EntityTypes.SimpleModel, typeof(StarterKitResources),
+        FactoryUrl: "/api/productline/factory", GetListUrl: "/api/productlines", GetUrl: "/api/productline/{id}", DeleteUrl: "/api/productline/{id}", SaveUrl: "/api/productline")]
     public class ProductLineSummary : SummaryData
     {
 
@@ -94,15 +94,16 @@ namespace LagoVista.IoT.StarterKit.Models
 
         public string Id { get; set; }
 
-        [FormField(LabelResource: StarterKitResources.Names.Common_Summary, FieldType: FieldTypes.EntityHeaderPicker,
-           EntityHeaderPickerUrl: "/metadata/dox/entities/all", ResourceType: typeof(StarterKitResources), IsRequired: true, IsUserEditable: true)]
+        [FormField(LabelResource: StarterKitResources.Names.ProductLineObjectType_ObjectType, WaterMark: StarterKitResources.Names.ProductLineObject_ObjectType_Select, 
+            FieldType: FieldTypes.EntityHeaderPicker,
+           EntityHeaderPickerUrl: "/api/starterkit/objects/all", ResourceType: typeof(StarterKitResources), IsRequired: true, IsUserEditable: true)]
         public EntityHeader ObjectType { get; set; }
 
-        [FormField(LabelResource: StarterKitResources.Names.Common_Summary, FieldType: FieldTypes.EntityHeaderPicker, 
+        [FormField(LabelResource: StarterKitResources.Names.ProductLineObject_Object, WaterMark: StarterKitResources.Names.ProductLineObject_Object_Select,  FieldType: FieldTypes.EntityHeaderPicker, 
            EntityHeaderPickerUrl: "/api/dataservices/objects/{objectType}", ResourceType: typeof(StarterKitResources), IsRequired: true, IsUserEditable: true)]
         public EntityHeader Object { get; set; }
 
-        [FormField(LabelResource: StarterKitResources.Names.ProductLineObject_CustomizationInstructions, FieldType: FieldTypes.Text, ResourceType: typeof(StarterKitResources), IsRequired: true, IsUserEditable: true)]
+        [FormField(LabelResource: StarterKitResources.Names.ProductLineObject_CustomizationInstructions, FieldType: FieldTypes.HtmlEditor, ResourceType: typeof(StarterKitResources), IsRequired: true, IsUserEditable: true)]
         public string CustomizationInstructions { get; set; }
 
 
@@ -153,20 +154,20 @@ namespace LagoVista.IoT.StarterKit.Models
         public string Id { get; set; }
 
         [FormField(LabelResource: StarterKitResources.Names.ToDoTemplate_DueDateDays, HelpResource: StarterKitResources.Names.ToDoTemplate_DueDateDays_Help, 
-            FieldType: FieldTypes.EntityHeaderPicker, ResourceType: typeof(StarterKitResources), IsRequired: true, IsUserEditable: true)]
+            FieldType: FieldTypes.Integer, ResourceType: typeof(StarterKitResources), IsRequired: true, IsUserEditable: true)]
         public int DueDateDays { get; set; }
 
         [FormField(LabelResource: StarterKitResources.Names.ToDoTemplate_Priority, FieldType: FieldTypes.Picker, EnumType: typeof(ToDo_Priority),
             WaterMark: StarterKitResources.Names.ToDoTemplate_Select_Priority, ResourceType: typeof(StarterKitResources), IsRequired: true, IsUserEditable: true)]
         public EntityHeader<ToDo_Priority> Priority { get; set; }
 
-        [FormField(LabelResource: StarterKitResources.Names.Common_Name, FieldType: FieldTypes.EntityHeaderPicker, ResourceType: typeof(StarterKitResources), IsRequired: true, IsUserEditable: true)]
+        [FormField(LabelResource: StarterKitResources.Names.Common_Name, FieldType: FieldTypes.Text, ResourceType: typeof(StarterKitResources), IsRequired: true, IsUserEditable: true)]
         public string Name { get; set; }
 
         [FormField(LabelResource: StarterKitResources.Names.ToDoTemplate_Instructions, FieldType: FieldTypes.HtmlEditor, ResourceType: typeof(StarterKitResources), IsRequired: true, IsUserEditable: true)]
         public string Instructions { get; set; }
 
-        [FormField(LabelResource: StarterKitResources.Names.ToDoTemplate_WebLink, FieldType: FieldTypes.Text, ResourceType: typeof(StarterKitResources), IsRequired: true, IsUserEditable: true)]
+        [FormField(LabelResource: StarterKitResources.Names.ToDoTemplate_WebLink, FieldType: FieldTypes.Text, ResourceType: typeof(StarterKitResources), IsRequired: false, IsUserEditable: true)]
         public string WebLink { get; set; }
 
         public List<string> GetFormFields()
