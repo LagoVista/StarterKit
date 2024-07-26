@@ -8,6 +8,7 @@ using LagoVista.IoT.StarterKit.Resources;
 using LagoVista.ProjectManagement.Models;
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace LagoVista.IoT.StarterKit.Models
 {
@@ -16,6 +17,10 @@ namespace LagoVista.IoT.StarterKit.Models
         FactoryUrl: "/api/productline/factory", GetListUrl:"/api/productlines", GetUrl:"/api/productline/{id}", DeleteUrl: "/api/productline/{id}", SaveUrl:"/api/productline" )]
     public class ProductLine : EntityBase, IFormDescriptor, IFormDescriptorCol2, ISummaryFactory, IValidateable
     {
+
+        [FormField(LabelResource: StarterKitResources.Names.ProductLine_Products, FieldType: FieldTypes.ProductPickerList, ResourceType: typeof(StarterKitResources))]
+        public List<EntityHeader> Products { get; set; } = new List<EntityHeader>();
+
         [FormField(LabelResource: StarterKitResources.Names.ProductLine_Objects, HelpResource:StarterKitResources.Names.ProductLine_Objects_Help, FieldType: FieldTypes.ChildListInline, ResourceType: typeof(StarterKitResources),
             FactoryUrl: "/api/productline/object/factory" )]
         public List<ProductLineObject> Objects { get; set; } = new List<ProductLineObject>();
@@ -23,6 +28,7 @@ namespace LagoVista.IoT.StarterKit.Models
         [FormField(LabelResource: StarterKitResources.Names.ProductLine_ToDoTemplates, HelpResource: StarterKitResources.Names.ProductLine_ToDoTemplate_Help,  FieldType: FieldTypes.ChildListInline, ResourceType: typeof(StarterKitResources),
             FactoryUrl: "/api/productline/todotemplate/factory")]
         public List<ToDoTemplate> ToDoTemplates { get; set; } = new List<ToDoTemplate>();
+
 
         [FormField(LabelResource: StarterKitResources.Names.Common_Summary, FieldType: FieldTypes.MultiLineText, ResourceType: typeof(StarterKitResources), IsRequired: true, IsUserEditable: true)]
         public string Summary { get; set; }
@@ -47,19 +53,18 @@ namespace LagoVista.IoT.StarterKit.Models
         {
             return new List<string>()
             {
-                nameof(Name),
+                nameof(Name),                
                 nameof(Key),
                 nameof(Summary),
-                nameof(Description)
-               
+                nameof(Description)               
             };
         }
 
         public List<string> GetFormFieldsCol2()
         {
-
             return new List<string>()
             {
+                nameof(Products),
                 nameof(Objects),
                 nameof(ToDoTemplates)
             };
@@ -86,7 +91,6 @@ namespace LagoVista.IoT.StarterKit.Models
         FactoryUrl: "/api/productline/object/factory")]
     public class ProductLineObject : IFormDescriptor, IFormConditionalFields
     {
-
         public ProductLineObject()
         {
             Id = Guid.NewGuid().ToId();
@@ -94,18 +98,22 @@ namespace LagoVista.IoT.StarterKit.Models
 
         public string Id { get; set; }
 
+
+        [FormField(LabelResource: StarterKitResources.Names.Common_Name, FieldType: FieldTypes.Text, ResourceType: typeof(StarterKitResources), IsRequired: true, IsUserEditable: true)]
+        public string Name { get; set; }
+
         [FormField(LabelResource: StarterKitResources.Names.ProductLineObjectType_ObjectType, WaterMark: StarterKitResources.Names.ProductLineObject_ObjectType_Select, 
             FieldType: FieldTypes.EntityHeaderPicker,
-           EntityHeaderPickerUrl: "/api/starterkit/objects/all", ResourceType: typeof(StarterKitResources), IsRequired: true, IsUserEditable: true)]
+           EntityHeaderPickerUrl: "/api/objects/cloneable", ResourceType: typeof(StarterKitResources), IsRequired: true, IsUserEditable: true)]
         public EntityHeader ObjectType { get; set; }
 
         [FormField(LabelResource: StarterKitResources.Names.ProductLineObject_Object, WaterMark: StarterKitResources.Names.ProductLineObject_Object_Select,  FieldType: FieldTypes.EntityHeaderPicker, 
-           EntityHeaderPickerUrl: "/api/dataservices/objects/{objectType}", ResourceType: typeof(StarterKitResources), IsRequired: true, IsUserEditable: true)]
+           EntityHeaderPickerUrl: "/api/dataservices/objects/{ObjectType.Id}", ResourceType: typeof(StarterKitResources), IsRequired: true, IsUserEditable: true)]
         public EntityHeader Object { get; set; }
 
-        [FormField(LabelResource: StarterKitResources.Names.ProductLineObject_CustomizationInstructions, FieldType: FieldTypes.HtmlEditor, ResourceType: typeof(StarterKitResources), IsRequired: true, IsUserEditable: true)]
+        [FormField(LabelResource: StarterKitResources.Names.ProductLineObject_CustomizationInstructions, FieldType: FieldTypes.HtmlEditor, ResourceType: typeof(StarterKitResources), IsRequired: false, IsUserEditable: true)]
         public string CustomizationInstructions { get; set; }
-
+        
 
         [FormField(LabelResource: StarterKitResources.Names.ProductLine_ToDoTemplates, HelpResource: StarterKitResources.Names.ProductLine_ToDoTemplate_Help, FieldType: FieldTypes.ChildListInline, ResourceType: typeof(StarterKitResources),
             FactoryUrl: "/api/productline/todotemplate/factory")]
@@ -120,8 +128,10 @@ namespace LagoVista.IoT.StarterKit.Models
                  {
                     new FormConditional()
                     {
-                        RequiredFields = new List<string>() {nameof(ObjectType) },
-                        VisibleFields = new List<string>() {nameof(Object )}
+                        RequiredFields = new List<string>() {nameof(ObjectType), nameof(Object) },
+                        VisibleFields = new List<string>() {nameof(Object )},
+                        Field = nameof(ObjectType),
+                        Value = "*"
                     }
                  }
             };
@@ -131,6 +141,7 @@ namespace LagoVista.IoT.StarterKit.Models
         {
             return new List<string>()
             {
+                nameof(Name),
                 nameof(ObjectType),
                 nameof(Object),
                 nameof(CustomizationInstructions),

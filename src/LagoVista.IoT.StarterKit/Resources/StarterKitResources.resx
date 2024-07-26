@@ -186,6 +186,9 @@
   <data name="ProductLine_Objects_Help" xml:space="preserve">
     <value>Objects are NuvIoT objects that are reqired for this Product Line.</value>
   </data>
+  <data name="ProductLine_Products" xml:space="preserve">
+    <value>Products</value>
+  </data>
   <data name="ProductLine_ToDoTemplates" xml:space="preserve">
     <value>ToDo Templates</value>
   </data>
