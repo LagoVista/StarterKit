@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using DocumentFormat.OpenXml.Bibliography;
 using LagoVista.CloudStorage.Storage;
 using LagoVista.Core;
 using LagoVista.Core.Exceptions;
@@ -421,7 +422,7 @@ namespace LagoVista.IoT.StarterKit.Services
                     bldr.AppendLine($"{indent}{prop.Name}:");
                     await ApplyEntityHeader(prop, bldr, indent + "  ", model, value);
                     return true;
-        
+
                 case "EntityHeader`1":
                     if (_referenceProperties.Contains(prop.Name))
                     {
@@ -433,7 +434,7 @@ namespace LagoVista.IoT.StarterKit.Services
                         var objValue = value as EntityHeader;
                         var valueProp = objValue.GetType().GetProperties().Where(prp => prp.Name == "Value").First();
                         var enumValue = valueProp.GetValue(objValue);
-                        bldr.AppendLine($"{indent}{prop.Name}: {enumValue ?? "UKNOWN"}");
+                        bldr.AppendLine($"{indent}{prop.Name}: {enumValue ?? "UNKNOWN"}");
                     }
                     return true;
                 default:
@@ -480,8 +481,6 @@ namespace LagoVista.IoT.StarterKit.Services
 
         private async Task GenerateYaml(StringBuilder bldr, Object objectToSerializeIsNull, int level, bool isList = false)
         {
-            Console.WriteLine($"Generate YAJL => level {level}");
-          
             if (objectToSerializeIsNull == null)
             {
                 throw new ArgumentNullException(nameof(objectToSerializeIsNull));
@@ -490,44 +489,69 @@ namespace LagoVista.IoT.StarterKit.Services
             var indent = level.GetIndent();
 
             var props = objectToSerializeIsNull.GetType().GetProperties();
-            Console.WriteLine($"Generate YAJL => Found {props.Length.ToString()} to process on level {level}");
-            var first = true;
-            foreach (var prop in props.Where(prp => !prp.GetAccessors(true).First().IsStatic))
+            Console.WriteLine($"Generate YAML => Found {props.Length.ToString()} to process on level {level} of type {objectToSerializeIsNull.GetType().Name}");
+
+            if (objectToSerializeIsNull.GetType().Name.StartsWith("KeyValuePair"))
             {
-                try
+                Console.WriteLine($"Generate YAML => Processing Key Value Pair Property {objectToSerializeIsNull.GetType().Name}");
+
+                var propertyValue = (KeyValuePair<string, object>)objectToSerializeIsNull;
+                bldr.AppendLine($"kvp:");
+                bldr.AppendLine($"{indent}   key: {propertyValue.Key}");
+                bldr.AppendLine($"{indent}   value:");
+
+                Console.WriteLine($"CONTENT ON KVP: {propertyValue.Value.GetType().Name}");
+                Console.WriteLine($"CONTENT ON KVP: {propertyValue.Value}");
+
+                if (propertyValue.Value.GetType().Name == "JObject" || propertyValue.Value.GetType().Name == "String")
                 {
-                    Console.WriteLine("Generate YAJL => Processing Property: " + prop.Name);
-
-                    var value = prop.GetValue(objectToSerializeIsNull);
-                    if (value == null)
+                    var lines = propertyValue.Value.ToString().Split('\n');
+                    foreach (var line in lines)
                     {
-                        continue;
-                    }
-
-                    if (value is System.Collections.IEnumerable list && !(value is String))
-                    {
-                        Console.WriteLine("Generate YAJL => Processing List: " + prop.Name);
-                        await ProcessList(bldr, prop, list, level);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Generate YAJL => Processing Standard Properties: " + prop.Name);
-
-                        if (!_ignoredProperties.Contains(prop.Name))
-                        {
-                            var applied = await ApplyProperty(prop, bldr, first && isList ? String.Empty : indent, objectToSerializeIsNull, value, level);
-                            first = !applied;
-                        }
+                        if (line.Trim() != String.Empty)
+                            bldr.AppendLine($"{indent}     {line}");
                     }
                 }
-                catch (Exception)
+                else
+                    await GenerateYaml(bldr, propertyValue.Value, level + 2);
+            }
+            else
+            {
+                var first = true;
+                foreach (var prop in props.Where(prp => !prp.GetAccessors(true).First().IsStatic))
                 {
-                    Console.WriteLine($"!!! Generate YAJL => Error attempting to get value of {prop.Name} of type {prop.PropertyType.Name}");
-                    throw;
+                    try
+                    {
+                        var p = prop.GetIndexParameters();
+                        var value = prop.GetValue(objectToSerializeIsNull);
+                        if (value == null)
+                        {
+                            continue;
+                        }
+                        if (value is System.Collections.IEnumerable list && !(value is String))
+                        {
+                            Console.WriteLine("Generate YAML => Processing List: " + prop.Name);
+                            await ProcessList(bldr, prop, list, level);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Generate YAML => Processing Standard Properties: " + prop.Name);
+
+                            if (!_ignoredProperties.Contains(prop.Name))
+                            {
+                                var applied = await ApplyProperty(prop, bldr, first && isList ? String.Empty : indent, objectToSerializeIsNull, value, level);
+                                first = !applied;
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"!!! Generate YAML => Error attempting to get value of {prop.Name} of type {prop.PropertyType.Name} {ex.Message}");
+                        throw;
+                    }
                 }
             }
         }
-
 
         public async Task<InvokeResult<Object>> DeserializeFromYamlAsync(string recordType, Stream strm, EntityHeader org, EntityHeader usr)
         {
@@ -578,6 +602,9 @@ namespace LagoVista.IoT.StarterKit.Services
                             case "systemtest":
                                 var systemTest = await CreateNuvIoTObject<SystemTest>(dateStamp, org, usr, childItem as Dictionary<object, object>);
                                 return InvokeResult<Object>.Create(systemTest);
+                            case "deviceconfiguration":
+                                var deviceConfig = await CreateNuvIoTObject<DeviceConfiguration>(dateStamp, org, usr, childItem as Dictionary<object, object>);
+                                return InvokeResult<Object>.Create(deviceConfig);
 
                             default:
                                 return InvokeResult<Object>.FromError($"object type: [{recordType}] not supported.");
@@ -691,14 +718,11 @@ namespace LagoVista.IoT.StarterKit.Services
                 case nameof(SystemTest):
                     Console.WriteLine("Get System test:");
                     var systemTest = await _storageUtils.FindWithIdAsync<SystemTest>(id, org.Id);
-                    if(systemTest == null)
-                    {
-                        throw new RecordNotFoundException(nameof(systemTest), id);
-                    }
-
+                    if(systemTest == null) throw new RecordNotFoundException(nameof(systemTest), id);
                     Console.WriteLine("System tesat: " + systemTest.Name);
                     await GenerateYaml(bldr, systemTest, 1);
-                    recordKey = systemTest.Key; break;
+                    recordKey = systemTest.Key; 
+                    break;
                 case nameof(DeviceErrorCode):
                     break;
                 case nameof(DeviceNotification):
