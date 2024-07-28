@@ -7,12 +7,14 @@ using System.Text;
 using System.Threading.Tasks;
 using LagoVista.CloudStorage.Storage;
 using LagoVista.Core;
+using LagoVista.Core.Exceptions;
 using LagoVista.Core.Interfaces;
 using LagoVista.Core.Models;
 using LagoVista.Core.Validation;
 using LagoVista.IoT.Billing;
 using LagoVista.IoT.Deployment.Admin;
 using LagoVista.IoT.Deployment.Admin.Models;
+using LagoVista.IoT.Deployment.Models;
 using LagoVista.IoT.DeviceAdmin.Interfaces.Managers;
 using LagoVista.IoT.DeviceAdmin.Models;
 using LagoVista.IoT.DeviceManagement.Core;
@@ -255,7 +257,7 @@ namespace LagoVista.IoT.StarterKit.Services
                                                 default:
                                                     var record = await _storageUtils.FindWithKeyAsync(ehType, ehKey, org);
                                                     if (record == null)
-                                                        throw new InvalidDataException($"could not find record: {ehKey} of type {ehType}");
+                                                        throw new Core.Exceptions.InvalidDataException($"could not find record: {ehKey} of type {ehType}");
 
                                                     prop.SetValue(obj, new EntityHeader()
                                                     {
@@ -476,22 +478,27 @@ namespace LagoVista.IoT.StarterKit.Services
             }
         }
 
-        private async Task GenerateYaml(StringBuilder bldr, Object obj, int level, bool isList = false)
+        private async Task GenerateYaml(StringBuilder bldr, Object objectToSerializeIsNull, int level, bool isList = false)
         {
-            if (obj == null)
+            Console.WriteLine($"Generate YAJL => level {level}");
+          
+            if (objectToSerializeIsNull == null)
             {
-                return;
+                throw new ArgumentNullException(nameof(objectToSerializeIsNull));
             }
 
             var indent = level.GetIndent();
 
-            var props = obj.GetType().GetProperties();
+            var props = objectToSerializeIsNull.GetType().GetProperties();
+            Console.WriteLine($"Generate YAJL => Found {props.Length.ToString()} to process on level {level}");
             var first = true;
             foreach (var prop in props.Where(prp => !prp.GetAccessors(true).First().IsStatic))
             {
                 try
                 {
-                    var value = prop.GetValue(obj);
+                    Console.WriteLine("Generate YAJL => Processing Property: " + prop.Name);
+
+                    var value = prop.GetValue(objectToSerializeIsNull);
                     if (value == null)
                     {
                         continue;
@@ -499,23 +506,23 @@ namespace LagoVista.IoT.StarterKit.Services
 
                     if (value is System.Collections.IEnumerable list && !(value is String))
                     {
-                        Console.WriteLine("Processing List: " + prop.Name);
+                        Console.WriteLine("Generate YAJL => Processing List: " + prop.Name);
                         await ProcessList(bldr, prop, list, level);
                     }
                     else
                     {
-                        Console.WriteLine("Processing Standard Properties: " + prop.Name);
+                        Console.WriteLine("Generate YAJL => Processing Standard Properties: " + prop.Name);
 
                         if (!_ignoredProperties.Contains(prop.Name))
                         {
-                            var applied = await ApplyProperty(prop, bldr, first && isList ? String.Empty : indent, obj, value, level);
+                            var applied = await ApplyProperty(prop, bldr, first && isList ? String.Empty : indent, objectToSerializeIsNull, value, level);
                             first = !applied;
                         }
                     }
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine($"!!! Error attempting to get value of {prop.Name} of type {prop.PropertyType.Name}");
+                    Console.WriteLine($"!!! Generate YAJL => Error attempting to get value of {prop.Name} of type {prop.PropertyType.Name}");
                     throw;
                 }
             }
@@ -677,7 +684,23 @@ namespace LagoVista.IoT.StarterKit.Services
                     await GenerateYaml(bldr, role, 1);
                     recordKey = role.Key;
                     break;
+                case nameof(SystemTest):
+                    Console.WriteLine("Get System test:");
+                    var systemTest = await _storageUtils.FindWithIdAsync<SystemTest>(id, org.Id);
+                    if(systemTest == null)
+                    {
+                        throw new RecordNotFoundException(nameof(systemTest), id);
+                    }
 
+                    Console.WriteLine("System tesat: " + systemTest.Name);
+                    await GenerateYaml(bldr, systemTest, 1);
+                    recordKey = systemTest.Key; break;
+                case nameof(DeviceErrorCode):
+                    break;
+                case nameof(DeviceNotification):
+                    break;
+                case nameof(IncidentProtocol):
+                    break;
                 default:
                     return InvokeResult<Tuple<string, string>>.FromError($"Don't know how to handle object of type [{recordType}]");
             }
