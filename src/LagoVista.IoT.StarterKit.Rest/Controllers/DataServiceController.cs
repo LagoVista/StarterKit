@@ -56,19 +56,25 @@ namespace LagoVista.IoT.StarterKit.Rest.Controllers
         public async Task<IActionResult> GetYAMLAsync(String recordtype, string recordid)
         {
             var result = await _yamlServices.SerilizeToYamlAsync(recordtype, recordid, OrgEntityHeader, UserEntityHeader);
+            if (result.Successful)
+            {
+                var buffer = System.Text.ASCIIEncoding.ASCII.GetBytes(result.Result.Item1);
 
-            var buffer = System.Text.ASCIIEncoding.ASCII.GetBytes(result.Result.Item1);
+                return File(buffer, "text/yaml", result.Result.Item2);
+            }
+            else
+            {
+                throw new Exception(result.ErrorMessage);
+            }
+         }
 
-            return File(buffer, "text/yaml", result.Result.Item2);
-        }
-
-		/// <summary>
-		/// YAML upload a new Object.
-		/// </summary>
-		/// <param name="recordType"></param>
-		/// <param name="file"></param>
-		/// <returns></returns>
-		[HttpPost("/api/dataservices/yaml/{recordType}/import")]
+            /// <summary>
+            /// YAML upload a new Object.
+            /// </summary>
+            /// <param name="recordType"></param>
+            /// <param name="file"></param>
+            /// <returns></returns>
+            [HttpPost("/api/dataservices/yaml/{recordType}/import")]
         public async Task<InvokeResult<object>> ApplyYamlAsync(string recordType, [FromForm] IFormFile file)
         {
             using (var strm = file.OpenReadStream())

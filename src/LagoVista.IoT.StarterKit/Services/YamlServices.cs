@@ -461,8 +461,7 @@ namespace LagoVista.IoT.StarterKit.Services
 
                 foreach (var child in list)
                 {
-                    bldr.Append($"{indent}  - ");
-                    
+                    bldr.Append($"{indent}  - ");                    
 
                     if (child.GetType().Name.StartsWith("EntityHeader"))
                     {
