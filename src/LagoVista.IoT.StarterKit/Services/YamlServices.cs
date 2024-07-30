@@ -55,12 +55,11 @@ namespace LagoVista.IoT.StarterKit.Services
         readonly IDeviceAdminManager _deviceAdminMgr;
         readonly ISubscriptionManager _subscriptionMgr;
         readonly IPipelineModuleManager _pipelineMgr;
-        readonly IDeviceTypeManager _deviceTypeMgr;
+
         readonly IDeviceMessageDefinitionManager _deviceMsgMgr;
         readonly IDeploymentInstanceManager _instanceMgr;
         readonly IDeploymentHostManager _hostManager;
         readonly ISolutionManager _solutionMgr;
-        readonly IDeviceConfigurationManager _deviceCfgMgr;
         readonly IDeviceRepositoryManager _deviceRepoMgr;
         readonly IProductManager _productManager;
         readonly IVerifierManager _verifierMgr;
@@ -84,8 +83,8 @@ namespace LagoVista.IoT.StarterKit.Services
         private EntityHeader _org;
         private EntityHeader _user;
 
-        public YamlServices(IAdminLogger logger, IStarterKitConnection starterKitConnection, IDeviceAdminManager deviceAdminMgr, ISubscriptionManager subscriptionMgr, IPipelineModuleManager pipelineMgr, IDeviceTypeManager deviceTypeMgr, IDeviceRepositoryManager deviceRepoMgr,
-                          IUserManager userManager, IModuleManager moduleManager, IProductManager productManager, IDeviceTypeManager deviceTypeManager, IDeviceConfigurationManager deviceCfgMgr, IDeviceMessageDefinitionManager deviceMsgMgr, IDeploymentInstanceManager instanceMgr,
+        public YamlServices(IAdminLogger logger, IStarterKitConnection starterKitConnection, IDeviceAdminManager deviceAdminMgr, ISubscriptionManager subscriptionMgr, IPipelineModuleManager pipelineMgr,  IDeviceRepositoryManager deviceRepoMgr,
+                          IUserManager userManager, IModuleManager moduleManager, IProductManager productManager, IDeviceTypeManager deviceTypeManager,  IDeviceMessageDefinitionManager deviceMsgMgr, IDeploymentInstanceManager instanceMgr,
                           IDeploymentHostManager hostMgr, IRoleManager roleManager, IDeviceManager deviceManager, IContainerRepositoryManager containerMgr, ISolutionManager solutionMgr, IOrganizationRepo orgMgr, ISimulatorManager simMgr, IVerifierManager verifierMgr,
                           ISurveyManager surveyManager, ISurveyResponseManager surveyResponseManager, ISiteContentManager siteContentManager, IGuideManager guideManager, IGlossaryManager glossaryManager, IWorkTaskTypeManager workTaskTypeManager, ITaskTemplateManager taskTemplateManager,
                           IStatusConfigurationManager statusConfigurationManager, IProjectTemplateManager projectTemplateManager)
@@ -94,13 +93,10 @@ namespace LagoVista.IoT.StarterKit.Services
             _deviceAdminMgr = deviceAdminMgr;
             _subscriptionMgr = subscriptionMgr;
             _pipelineMgr = pipelineMgr;
-            _deviceTypeMgr = deviceTypeMgr;
             _deviceMsgMgr = deviceMsgMgr;
-            _deviceCfgMgr = deviceCfgMgr;
             _deviceRepoMgr = deviceRepoMgr;
             _productManager = productManager;
             _verifierMgr = verifierMgr;
-            _deviceTypeMgr = deviceTypeManager;
             _simulatorMgr = simMgr;
             _orgRepo = orgMgr;
             _deviceManager = deviceManager;
@@ -167,14 +163,12 @@ namespace LagoVista.IoT.StarterKit.Services
                         else
                         {
                             var prop = objType.GetProperties().Where(p => p.Name == keyStr).FirstOrDefault();
-                            Console.WriteLine("0.1");
                             if (prop == null)
                             {
                                 throw new Exception($"Unknown Property {keyStr}");
                             }
                             else if (prop.PropertyType.Name == "EntityHeader`1")
                             {
-                                Console.WriteLine("0.11");
                                 var enumType = prop.PropertyType.GetGenericArguments().First();
                                 var enumValue = Enum.Parse(enumType, yaml[key] as string);
                                 var createMethod = prop.PropertyType.GetMethod("Create", new Type[] { enumType });
@@ -196,7 +190,6 @@ namespace LagoVista.IoT.StarterKit.Services
                             }
                             else if (yaml[key] is String value)
                             {
-                                Console.WriteLine("1");
                                 if (prop.GetAccessors().Where(acc => acc.Name == $"set_{prop.Name}").Any())
                                 {
                                     if (prop.PropertyType == typeof(bool))
@@ -217,25 +210,21 @@ namespace LagoVista.IoT.StarterKit.Services
                                         prop.SetValue(obj, value);
                                     }
                                 }
-                                Console.WriteLine("2");
                             }
                             else if (yaml[key] is Dictionary<object, object>)
                             {
                                 var props = yaml[key] as Dictionary<object, object>;
                                 if (props != null)
                                 {
-                                    Console.WriteLine($"found dictionary for {key}");
                                     foreach (var childProp in props)
                                     {
-                                        Console.WriteLine($"\t {childProp.Key} - {childProp.Value}");
                                         if (childProp.Key as string == "ehReference")
                                         {
                                             var childPropDict = childProp.Value as Dictionary<object, object>;
                                             var ehName = childPropDict["name"] as string;
                                             var ehKey = childPropDict["key"] as string;
                                             var ehType = childPropDict["type"] as string;
-                                            Console.Write($" {ehName} - {ehKey} - {ehType}");
-
+                                  
                                             switch (ehType)
                                             {
                                                 case "category":
@@ -332,7 +321,7 @@ namespace LagoVista.IoT.StarterKit.Services
                     break;
                 case nameof(DeviceType.DefaultDeviceConfiguration):
                 case "DeviceConfigurations":
-                    var config = await _deviceCfgMgr.GetDeviceConfigurationAsync(eh.Id, _org, _user);
+                    var config = await _storageUtils.FindWithIdAsync<DeviceConfiguration>(eh.Id, _org.Id);
                     bldr.AppendLine($"{indent}  type: DeviceConfiguration");
                     bldr.AppendLine($"{indent}  name: {config.Name}");
                     bldr.AppendLine($"{indent}  key: {config.Key}");
@@ -374,8 +363,6 @@ namespace LagoVista.IoT.StarterKit.Services
                     bldr.AppendLine($"{indent}  text: {eh.Text}");
                     bldr.AppendLine($"{indent}  key: {eh.Key}");
                     bldr.AppendLine($"{indent}  id: {eh.Id}");
-
-
                     break;
                 default:
                     bldr.AppendLine($"{indent}  Don't know how to process {propName}");
@@ -478,6 +465,11 @@ namespace LagoVista.IoT.StarterKit.Services
             }
         }
 
+        private void VerboseLog(string message)
+        {
+            //Console.WriteLine(message);
+        }
+
         private async Task GenerateYaml(StringBuilder bldr, Object objectToSerializeIsNull, int level, bool isList = false)
         {
             if (objectToSerializeIsNull == null)
@@ -488,19 +480,19 @@ namespace LagoVista.IoT.StarterKit.Services
             var indent = level.GetIndent();
 
             var props = objectToSerializeIsNull.GetType().GetProperties();
-            Console.WriteLine($"Generate YAML => Found {props.Length.ToString()} to process on level {level} of type {objectToSerializeIsNull.GetType().Name}");
+            VerboseLog($"Generate YAML => Found {props.Length.ToString()} to process on level {level} of type {objectToSerializeIsNull.GetType().Name}");
 
             if (objectToSerializeIsNull.GetType().Name.StartsWith("KeyValuePair"))
             {
-                Console.WriteLine($"Generate YAML => Processing Key Value Pair Property {objectToSerializeIsNull.GetType().Name}");
+                VerboseLog($"Generate YAML => Processing Key Value Pair Property {objectToSerializeIsNull.GetType().Name}");
 
                 var propertyValue = (KeyValuePair<string, object>)objectToSerializeIsNull;
                 bldr.AppendLine($"kvp:");
                 bldr.AppendLine($"{indent}   key: {propertyValue.Key}");
                 bldr.AppendLine($"{indent}   value:");
 
-                Console.WriteLine($"CONTENT ON KVP: {propertyValue.Value.GetType().Name}");
-                Console.WriteLine($"CONTENT ON KVP: {propertyValue.Value}");
+                VerboseLog($"CONTENT ON KVP: {propertyValue.Value.GetType().Name}");
+                VerboseLog($"CONTENT ON KVP: {propertyValue.Value}");
 
                 if (propertyValue.Value.GetType().Name == "JObject" || propertyValue.Value.GetType().Name == "String")
                 {
@@ -529,12 +521,12 @@ namespace LagoVista.IoT.StarterKit.Services
                         }
                         if (value is System.Collections.IEnumerable list && !(value is String))
                         {
-                            Console.WriteLine("Generate YAML => Processing List: " + prop.Name);
+                            VerboseLog("Generate YAML => Processing List: " + prop.Name);
                             await ProcessList(bldr, prop, list, level);
                         }
                         else
                         {
-                            Console.WriteLine("Generate YAML => Processing Standard Properties: " + prop.Name);
+                            VerboseLog("Generate YAML => Processing Standard Properties: " + prop.Name);
 
                             if (!_ignoredProperties.Contains(prop.Name))
                             {
@@ -640,17 +632,17 @@ namespace LagoVista.IoT.StarterKit.Services
 
                     break;
                 case nameof(DeviceConfiguration):
-                    var deviceConfig = await _deviceCfgMgr.GetDeviceConfigurationAsync(id, org, usr);
+                    var deviceConfig = await _storageUtils.FindWithIdAsync<DeviceConfiguration>(id, org.Id);
                     await GenerateYaml(bldr, deviceConfig, 1);
                     recordKey = deviceConfig.Key;
                     break;
                 case nameof(DeviceType):
-                    var deviceType = await _deviceTypeMgr.GetDeviceTypeAsync(id, org, usr);
+                    var deviceType = await _storageUtils.FindWithIdAsync<DeviceType>(id, org.Id);
                     await GenerateYaml(bldr, deviceType, 1);
                     recordKey = deviceType.Key;
                     break;
                 case nameof(ListenerConfiguration):
-                    var listener = await _pipelineMgr.GetListenerConfigurationAsync(id, org, usr);
+                    var listener = await _storageUtils.FindWithIdAsync<ListenerConfiguration>(id, org.Id);
                     await GenerateYaml(bldr, listener, 1);
                     recordKey = listener.Key;
                     break;
@@ -715,10 +707,8 @@ namespace LagoVista.IoT.StarterKit.Services
                     recordKey = role.Key;
                     break;
                 case nameof(SystemTest):
-                    Console.WriteLine("Get System test:");
                     var systemTest = await _storageUtils.FindWithIdAsync<SystemTest>(id, org.Id);
                     if(systemTest == null) throw new RecordNotFoundException(nameof(systemTest), id);
-                    Console.WriteLine("System tesat: " + systemTest.Name);
                     await GenerateYaml(bldr, systemTest, 1);
                     recordKey = systemTest.Key; 
                     break;

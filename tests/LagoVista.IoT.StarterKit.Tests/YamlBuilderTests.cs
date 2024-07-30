@@ -1,4 +1,5 @@
-﻿using LagoVista.Core;
+﻿using LagoVista.CloudStorage.Storage;
+using LagoVista.Core;
 using LagoVista.Core.Interfaces;
 using LagoVista.Core.Models;
 using LagoVista.Core.PlatformSupport;
@@ -7,6 +8,7 @@ using LagoVista.IoT.StarterKit.Services;
 using LagoVista.ProjectManagement;
 using LagoVista.ProjectManagement.Models;
 using LagoVista.UserAdmin.Interfaces.Repos.Orgs;
+using Microsoft.Azure.Cosmos.Serialization.HybridRow;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
@@ -24,29 +26,51 @@ namespace LagoVista.IoT.StarterKit.Tests
         IYamlServices _yamlSerivces;
         Mock<ISurveyManager> _surveyManager = new Mock<ISurveyManager>();
 
+        IStorageUtils _storageUtils;
+
         IStarterKitConnection _starterKitConnection = new StarterKitConnection();
         Mock<IOrganizationRepo> _orgRepo = new Mock<IOrganizationRepo>();
 
         const string ORIG_SURVEY_ID = "12345678";
         const string CHILD_SURVEY_ID = "91011121314";
         const string CHILD_SURVEY_KEY = "childsurveykey";
-        EntityHeader _org = new EntityHeader();
+        EntityHeader _org = new EntityHeader() { Id = "AA2C78499D0140A5A9CE4B7581EF9691" };
         EntityHeader _user = new EntityHeader();
 
         [TestInitialize]
         public void Init()
         {
-            _starterKitConnection.StarterKitStorage.Uri = "http://dontcare";
-            _starterKitConnection.StarterKitStorage.AccessKey = "http://dontcare";
-            _starterKitConnection.StarterKitStorage.ResourceName = "http://dontcare";
+            var prodConection = LagoVista.CloudStorage.Utils.TestConnections.ProductionDocDB;
+
+            _starterKitConnection.StarterKitStorage.Uri = prodConection.Uri;
+            _starterKitConnection.StarterKitStorage.AccessKey = prodConection.AccessKey;
+            _starterKitConnection.StarterKitStorage.ResourceName = prodConection.ResourceName;
+
+            _storageUtils = new StorageUtils(new Uri(prodConection.Uri), prodConection.AccessKey, prodConection.ResourceName, new AdminLogger(new ConsoleWriter()));
 
             _orgRepo.Setup(orr => orr.GetOrganizationAsync(It.IsAny<string>())).ReturnsAsync(new UserAdmin.Models.Orgs.Organization()
             {
                 Namespace = "ORGNS"
             });
 
-            _yamlSerivces = new YamlServices(new Mock<IAdminLogger>().Object, _starterKitConnection, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+            _yamlSerivces = new YamlServices(new Mock<IAdminLogger>().Object, _starterKitConnection, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
                  _orgRepo.Object, null, null, _surveyManager.Object, null, null, null, null, null, null, null,null);
+        }
+
+        [TestMethod]
+        public async Task GetYAMLForSystemTest()
+        {
+           var result = await  _yamlSerivces.SerilizeToYamlAsync("SystemTest", "6A057F1C67474B889BE877D08B41AABB", _org, _user);
+            Console.WriteLine(result.Result.Item1);
+            Console.WriteLine(result.Result.Item2);
+        }
+
+        [TestMethod]
+        public async Task GetYAMLForDeviceConfiguration()
+        {
+           var result = await _yamlSerivces.SerilizeToYamlAsync("DeviceConfiguration", "34071490383B40EAAE7FBD0E59271233", _org, _user);
+           Console.WriteLine(result.Result.Item1);
+           Console.WriteLine(result.Result.Item2);
         }
 
         [TestMethod]
