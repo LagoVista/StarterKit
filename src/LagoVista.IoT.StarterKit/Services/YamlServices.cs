@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using DocumentFormat.OpenXml.Bibliography;
 using LagoVista.CloudStorage.Storage;
 using LagoVista.Core;
+using LagoVista.Core.Attributes;
 using LagoVista.Core.Exceptions;
 using LagoVista.Core.Interfaces;
 using LagoVista.Core.Models;
@@ -50,6 +51,7 @@ namespace LagoVista.IoT.StarterKit.Services
             "Planner",
             "DeviceConfigurations",
             "ChildSurveyType",
+            "MessageDefinition",
             nameof(DeviceType.DefaultDeviceConfiguration) };
 
         readonly IDeviceAdminManager _deviceAdminMgr;
@@ -337,14 +339,12 @@ namespace LagoVista.IoT.StarterKit.Services
                     bldr.AppendLine($"{indent}  type: Survey");
                     bldr.AppendLine($"{indent}  name: {survey.Name}");
                     bldr.AppendLine($"{indent}  key: {survey.Key}");
-
                     break;
                 case nameof(TaskTemplate.WorkTaskType):
                     var taskType = await _workTaskTypeManager.GetWorkTaskTypeAsync(eh.Id, _org, _user);
                     bldr.AppendLine($"{indent}  type: {nameof(TaskTemplate.WorkTaskType)}");
                     bldr.AppendLine($"{indent}  name: {taskType.Name}");
                     bldr.AppendLine($"{indent}  key: {taskType.Key}");
-
                     break;
                 case nameof(UiCategory):
                     bldr.AppendLine($"{indent}  type: uiCategory");
@@ -411,6 +411,8 @@ namespace LagoVista.IoT.StarterKit.Services
                     return true;
 
                 case "EntityHeader`1":
+                    var attr = prop.GetCustomAttribute<FKeyPropertyAttribute>();
+
                     if (_referenceProperties.Contains(prop.Name))
                     {
                         bldr.AppendLine($"{indent}{prop.Name}:");
