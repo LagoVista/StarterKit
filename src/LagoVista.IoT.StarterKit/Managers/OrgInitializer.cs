@@ -242,15 +242,15 @@ namespace LagoVista.IoT.StarterKit.Managers
             _todoManager.IsForInitialization = false;
         }
 
-        public async Task<Subscription> AddTrialSubscriptionAsync(EntityHeader org, EntityHeader user, DateTime createTimeStamp)
+        public async Task<SubscriptionDTO> AddTrialSubscriptionAsync(EntityHeader org, EntityHeader user, DateTime createTimeStamp)
         {
-            var subscription = new Subscription()
+            var subscription = new SubscriptionDTO()
             {
                 Id = Guid.NewGuid(),
                 OrgId = org.Id,
                 Name = "Trial Subscription",
-                Key = Subscription.SubscriptionKey_Trial,
-                Status = Subscription.Status_OK,
+                Key = SubscriptionDTO.SubscriptionKey_Trial,
+                Status = SubscriptionDTO.Status_OK,
                 CreatedById = user.Id,
                 LastUpdatedById = user.Id,
                 CreationDate = createTimeStamp,
@@ -678,7 +678,7 @@ function onSet(value /* String */) {
             return planner;
         }
 
-        public async Task<DeviceRepository> AddTrialRepository(string name, string key, Subscription subscription, EntityHeader org, EntityHeader user, DateTime createTimestamp)
+        public async Task<DeviceRepository> AddTrialRepository(string name, string key, SubscriptionDTO subscription, EntityHeader org, EntityHeader user, DateTime createTimestamp)
         {
             await _storageUtils.DeleteByKeyIfExistsAsync<DeviceRepository>(key, org);
 
@@ -810,7 +810,7 @@ function onSet(value /* String */) {
             return outputTranslator;
         }
 
-        public async Task<DeploymentInstance> CreateInstanceAsync(Subscription subscription, Solution solution, DeviceRepository repo, string name, string key,
+        public async Task<DeploymentInstance> CreateInstanceAsync(SubscriptionDTO subscription, Solution solution, DeviceRepository repo, string name, string key,
             string environmentName, EntityHeader org, EntityHeader user, DateTime createTimestamp)
         {
             if (subscription == null) throw new ArgumentNullException(nameof(subscription));

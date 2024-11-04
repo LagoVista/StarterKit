@@ -76,15 +76,15 @@ namespace LagoVista.IoT.StarterKit.Managers
             entity.Id = Guid.NewGuid().ToId();
         }
 
-        public Subscription CreateFreeSubscription(EntityHeader org, EntityHeader user, DateTime createTimeStamp)
+        public SubscriptionDTO CreateFreeSubscription(EntityHeader org, EntityHeader user, DateTime createTimeStamp)
         {
-            var subscription = new Subscription()
+            var subscription = new SubscriptionDTO()
             {
                 Id = Guid.NewGuid(),
                 OrgId = org.Id,
                 Name = "Free Subscription",
                 Key = "freesubscription",
-                Status = Subscription.Status_FreeAccount,
+                Status = SubscriptionDTO.Status_FreeAccount,
                 CreatedById = user.Id,
                 CreationDate = createTimeStamp,
                 LastUpdatedById = user.Id,
@@ -94,7 +94,7 @@ namespace LagoVista.IoT.StarterKit.Managers
             return subscription;
         }
 
-        public DeviceRepository CreateDevice(Subscription subscription, EntityHeader org, EntityHeader user, DateTime createTimeStamp)
+        public DeviceRepository CreateDevice(SubscriptionDTO subscription, EntityHeader org, EntityHeader user, DateTime createTimeStamp)
         {
             /* Create Device Configurations */
             var deviceRepository = new DeviceRepository()
