@@ -29,6 +29,7 @@ using LagoVista.IoT.Pipeline.Admin.Models;
 using LagoVista.IoT.Runtime.Core.Models.Verifiers;
 using LagoVista.IoT.Simulator.Admin.Managers;
 using LagoVista.IoT.Verifiers.Managers;
+using LagoVista.Manufacturing.Models;
 using LagoVista.ProjectManagement;
 using LagoVista.ProjectManagement.Core;
 using LagoVista.ProjectManagement.Models;
@@ -715,10 +716,9 @@ namespace LagoVista.IoT.StarterKit.Services
                     recordKey = systemTest.Key; 
                     break;
                 case nameof(DeviceErrorCode):
-                    break;
                 case nameof(DeviceNotification):
-                    break;
                 case nameof(IncidentProtocol):
+                case nameof(ComponentPackage):
                     break;
                 default:
                     return InvokeResult<Tuple<string, string>>.FromError($"Don't know how to handle object of type [{recordType}]");
