@@ -4,16 +4,17 @@
     <OutputType>Library</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="LagoVista.CloudStorage" Version="3.0.2623.1505" />
-    <PackageReference Include="LagoVista.IoT.Billing.Managers" Version="3.0.2623.1505" />
-    <PackageReference Include="LagoVista.IoT.DeviceAdmin" Version="3.0.2623.1505" />
-    <PackageReference Include="LagoVista.IoT.DeviceManagement.Core" Version="3.0.2623.1505" />
-    <PackageReference Include="LagoVista.IoT.DeviceMessaging.Admin" Version="3.0.2623.1505" />
-    <PackageReference Include="LagoVista.IoT.Verifiers" Version="3.0.2623.1505" />
-    <PackageReference Include="LagoVista.IoT.Runtime.Core" Version="3.0.2623.1505" />
-    <PackageReference Include="LagoVista.IoT.Pipeline.Admin" Version="3.0.2623.1505" />
-    <PackageReference Include="LagoVista.IoT.Deployment.Admin" Version="3.0.2623.1505" />
-    <PackageReference Include="LagoVista.IoT.Simulator.Admin" Version="3.0.2623.1505" />
+    <PackageReference Include="LagoVista.CloudStorage" Version="3.0.2756.0645" />
+    <PackageReference Include="LagoVista.IoT.Billing.Managers" Version="3.0.2756.0645" />
+    <PackageReference Include="LagoVista.IoT.DeviceAdmin" Version="3.0.2756.0645" />
+    <PackageReference Include="LagoVista.IoT.DeviceManagement.Core" Version="3.0.2756.0645" />
+    <PackageReference Include="LagoVista.IoT.DeviceMessaging.Admin" Version="3.0.2756.0645" />
+    <PackageReference Include="LagoVista.IoT.Verifiers" Version="3.0.2756.0645" />
+    <PackageReference Include="LagoVista.Manufacturing" Version="3.0.2756.0645" />
+    <PackageReference Include="LagoVista.IoT.Runtime.Core" Version="3.0.2756.0645" />
+    <PackageReference Include="LagoVista.IoT.Pipeline.Admin" Version="3.0.2756.0645" />
+    <PackageReference Include="LagoVista.IoT.Deployment.Admin" Version="3.0.2756.0645" />
+    <PackageReference Include="LagoVista.IoT.Simulator.Admin" Version="3.0.2756.0645" />
     <PackageReference Include="YamlDotNet" Version="12.0.1" />
   </ItemGroup>
   <ItemGroup>
