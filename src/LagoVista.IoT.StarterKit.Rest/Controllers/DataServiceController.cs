@@ -75,7 +75,7 @@ namespace LagoVista.IoT.StarterKit.Rest.Controllers
             /// <param name="file"></param>
             /// <returns></returns>
             [HttpPost("/api/dataservices/yaml/{recordType}/import")]
-        public async Task<InvokeResult<object>> ApplyYamlAsync(string recordType, [FromForm] IFormFile file)
+        public async Task<InvokeResult<object>> ApplyYamlAsync(string recordType, IFormFile file)
         {
             using (var strm = file.OpenReadStream())
             {
