@@ -387,13 +387,17 @@ namespace LagoVista.IoT.StarterKit.Services
             {
                 case "Bool":
                 case "Boolean":
-                    bldr.AppendLine($"{indent}{prop.Name}: {prop.GetValue(model)}");
+                    var boolValue = prop.GetValue(model);
+                    if(boolValue != null)
+                        bldr.AppendLine($"{indent}{prop.Name}: {prop.GetValue(model)}");
                     return true;
                 case "Int32":
                 case "int":
                 case "double":
                 case "Double":
-                    bldr.AppendLine($"{indent}{prop.Name}: {prop.GetValue(model)}");
+                    var numberValue = prop.GetValue(model);
+                    if(numberValue != null)
+                        bldr.AppendLine($"{indent}{prop.Name}: {prop.GetValue(model)}");
                     return true;
                 case "String":
                 case "string":
