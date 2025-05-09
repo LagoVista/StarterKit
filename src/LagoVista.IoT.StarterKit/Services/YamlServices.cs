@@ -385,7 +385,7 @@ namespace LagoVista.IoT.StarterKit.Services
         {
             switch (prop.PropertyType.Name)
             {
-                case "Bool":
+                case "bool":
                 case "Boolean":
                     var boolValue = prop.GetValue(model);
                     if(boolValue != null)
