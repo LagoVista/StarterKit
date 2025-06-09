@@ -8,6 +8,7 @@ using LagoVista.IoT.StarterKit.Services;
 using LagoVista.ProjectManagement;
 using LagoVista.ProjectManagement.Models;
 using LagoVista.UserAdmin.Interfaces.Repos.Orgs;
+using LagoVista.UserAdmin.Models.Security;
 using Microsoft.Azure.Cosmos.Serialization.HybridRow;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -23,7 +24,7 @@ namespace LagoVista.IoT.StarterKit.Tests
     [TestClass]
     public class YamlBuilderTests
     {
-        IYamlServices _yamlSerivces;
+        YamlServices _yamlSerivces;
         Mock<ISurveyManager> _surveyManager = new Mock<ISurveyManager>();
 
         IStorageUtils _storageUtils;
@@ -36,6 +37,16 @@ namespace LagoVista.IoT.StarterKit.Tests
         const string CHILD_SURVEY_KEY = "childsurveykey";
         EntityHeader _org = new EntityHeader() { Id = "AA2C78499D0140A5A9CE4B7581EF9691" };
         EntityHeader _user = new EntityHeader();
+
+        public class TestSer
+        {
+            public string Id { get; set; }
+            public string Name { get; set; }
+            public string Key { get; set; }
+        
+            public bool? IsDeleted { get; set; }
+        }
+
 
         [TestInitialize]
         public void Init()
@@ -55,6 +66,22 @@ namespace LagoVista.IoT.StarterKit.Tests
 
             _yamlSerivces = new YamlServices(new Mock<IAdminLogger>().Object, _starterKitConnection, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
                  _orgRepo.Object, null, null, _surveyManager.Object, null, null, null, null, null, null, null,null);
+        }
+
+        [TestMethod]
+        public async Task GetYAMLForTest()
+        {
+            var bldr = new StringBuilder();
+
+            var mod = new Module()
+            {
+                Id = Guid.NewGuid().ToId(),
+                Name = "Name of Object",
+                Key = "nameofobject"
+            };
+
+            await _yamlSerivces.GenerateYaml(bldr, mod , 1, false);
+            Console.WriteLine(bldr.ToString());
         }
 
         [TestMethod]

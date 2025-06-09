@@ -14,6 +14,7 @@ using LagoVista.Core.Interfaces;
 using LagoVista.Core.Models;
 using LagoVista.Core.Validation;
 using LagoVista.IoT.Billing;
+using LagoVista.IoT.Billing.Models;
 using LagoVista.IoT.Deployment.Admin;
 using LagoVista.IoT.Deployment.Admin.Models;
 using LagoVista.IoT.Deployment.Models;
@@ -193,17 +194,22 @@ namespace LagoVista.IoT.StarterKit.Services
                             }
                             else if (yaml[key] is String value)
                             {
+                                var propType = prop.PropertyType;
+                                var nullablePropType = Nullable.GetUnderlyingType(prop.PropertyType);
+                                if (nullablePropType != null)
+                                    propType = nullablePropType;
+
                                 if (prop.GetAccessors().Where(acc => acc.Name == $"set_{prop.Name}").Any())
                                 {
-                                    if (prop.PropertyType == typeof(bool))
+                                    if (propType == typeof(bool))
                                     {
                                         prop.SetValue(obj, bool.Parse(value));
                                     }
-                                    else if (prop.PropertyType == typeof(double))
+                                    else if (propType == typeof(double))
                                     {
                                         prop.SetValue(obj, double.Parse(value));
                                     }
-                                    else if (prop.PropertyType == typeof(int))
+                                    else if (propType == typeof(int))
                                     {
                                         prop.SetValue(obj, int.Parse(value));
                                     }
@@ -381,9 +387,28 @@ namespace LagoVista.IoT.StarterKit.Services
             }
         }
 
+        public bool IsNullable(Type type)
+        {
+            return Nullable.GetUnderlyingType(type) != null;
+        }
+
         public async Task<bool> ApplyProperty(PropertyInfo prop, StringBuilder bldr, string indent, Object model, Object value, int level)
         {
-            switch (prop.PropertyType.Name)
+            var propValue = prop.GetValue(model);
+            if(propValue == null && !IsNullable(prop.PropertyType))
+            {
+                return false;
+            }
+
+            var propType = prop.PropertyType.Name;
+
+            var nullableType = Nullable.GetUnderlyingType(prop.PropertyType);
+            if(nullableType != null)
+            {
+                propType = nullableType.Name;
+            }
+
+            switch (propType)
             {
                 case "bool":
                 case "Boolean":
@@ -456,7 +481,7 @@ namespace LagoVista.IoT.StarterKit.Services
                 foreach (var child in list)
                 {
                     bldr.Append($"{indent}  - ");                    
-
+                    
                     if (child.GetType().Name.StartsWith("EntityHeader"))
                     {
                         var eh = child as EntityHeader;
@@ -477,7 +502,7 @@ namespace LagoVista.IoT.StarterKit.Services
             //Console.WriteLine(message);
         }
 
-        private async Task GenerateYaml(StringBuilder bldr, Object objectToSerializeIsNull, int level, bool isList = false)
+        public async Task GenerateYaml(StringBuilder bldr, Object objectToSerializeIsNull, int level, bool isList = false)
         {
             if (objectToSerializeIsNull == null)
             {
@@ -570,6 +595,12 @@ namespace LagoVista.IoT.StarterKit.Services
                     if (key is String keyStr)
                         switch (recordType.ToLower())
                         {
+                            case "landingpagelayout":
+                                var lpl = await CreateNuvIoTObject<LandingPageLayout>(dateStamp, org, usr, childItem as Dictionary<object, object>);
+                                return InvokeResult<Object>.Create(lpl);
+                            case "emailtemplatelayout":
+                                var emt = await CreateNuvIoTObject<EmailTemplateLayout>(dateStamp, org, usr, childItem as Dictionary<object, object>);
+                                return InvokeResult<Object>.Create(emt);
                             case "module":
                                 var module = await CreateNuvIoTObject<LagoVista.UserAdmin.Models.Security.Module>(dateStamp, org, usr, childItem as Dictionary<object, object>);
                                 return InvokeResult<Object>.Create(module);
@@ -613,6 +644,8 @@ namespace LagoVista.IoT.StarterKit.Services
             return InvokeResult<Object>.FromError("could not create object");
         }
 
+
+
         public async Task<InvokeResult<Tuple<string, string>>> SerilizeToYamlAsync(string recordType, string id, EntityHeader org, EntityHeader usr)
         {
             _org = org;
@@ -638,6 +671,17 @@ namespace LagoVista.IoT.StarterKit.Services
                     }
 
                     break;
+                case nameof(LandingPageLayout):
+                    var lpLayout = await _storageUtils.FindWithIdAsync<LandingPageLayout>(id, org.Id);
+                    await GenerateYaml(bldr, lpLayout, 1);
+                    recordKey = lpLayout.Key;
+                    break;
+                case nameof(EmailTemplateLayout):
+                    var emailTemplateLayout = await _storageUtils.FindWithIdAsync<EmailTemplateLayout>(id, org.Id);
+                    await GenerateYaml(bldr, emailTemplateLayout, 1);
+                    recordKey = emailTemplateLayout.Key;
+                    break;
+
                 case nameof(DeviceConfiguration):
                     var deviceConfig = await _storageUtils.FindWithIdAsync<DeviceConfiguration>(id, org.Id);
                     await GenerateYaml(bldr, deviceConfig, 1);
