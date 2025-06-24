@@ -601,6 +601,9 @@ namespace LagoVista.IoT.StarterKit.Services
                             case "emailtemplatelayout":
                                 var emt = await CreateNuvIoTObject<EmailTemplateLayout>(dateStamp, org, usr, childItem as Dictionary<object, object>);
                                 return InvokeResult<Object>.Create(emt);
+                            case "emailtemplate":
+                                var et = await CreateNuvIoTObject<EmailTemplate>(dateStamp, org, usr, childItem as Dictionary<object, object>);
+                                return InvokeResult<Object>.Create(et);
                             case "module":
                                 var module = await CreateNuvIoTObject<LagoVista.UserAdmin.Models.Security.Module>(dateStamp, org, usr, childItem as Dictionary<object, object>);
                                 return InvokeResult<Object>.Create(module);
@@ -634,6 +637,7 @@ namespace LagoVista.IoT.StarterKit.Services
                             case "deviceconfiguration":
                                 var deviceConfig = await CreateNuvIoTObject<DeviceConfiguration>(dateStamp, org, usr, childItem as Dictionary<object, object>);
                                 return InvokeResult<Object>.Create(deviceConfig);
+
 
                             default:
                                 return InvokeResult<Object>.FromError($"object type: [{recordType}] not supported.");
