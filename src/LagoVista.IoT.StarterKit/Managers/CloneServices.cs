@@ -176,7 +176,7 @@ namespace LagoVista.IoT.StarterKit.Managers
                 task.CreationDate = timeStamp;
                 task.LastUpdatedDate = timeStamp;
                 task.OwnerOrganization = org;
-                task.Discussions = new List<WorkTaskDiscussion>();
+                task.Discussions = new List<Discussion>();
                 task.Issues = new List<WorkTaskIssue>();
                 task.DueDate = null;
                 task.TaskCode = $"{project.ProjectCode}-{project.CurrentTaskIndex++:00000}";
@@ -221,7 +221,7 @@ namespace LagoVista.IoT.StarterKit.Managers
                     subtask.SubTaskCode = $"{task.TaskCode}-ST-{idx++}";
                     subtask.CreationDate = timeStamp;
                     subtask.Issues = new List<WorkTaskIssue>();
-                    subtask.Discussions = new List<WorkTaskDiscussion>();
+                    subtask.Discussions = new List<Discussion>();
                     subtask.AssignedToUser = cloneRequest.DefaultPrimaryContributor;
                     subtask.AssignedByUser = user;
                 }
