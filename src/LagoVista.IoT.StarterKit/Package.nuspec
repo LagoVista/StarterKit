@@ -2,30 +2,31 @@
 <package>
   <metadata>
     <id>LagoVista.IoT.StarterKit</id>
-    <version>3.0.2623.1505</version>
+    <version>3.0.3044.0759</version>
     <authors>Software Logistics, LLC</authors>
     <owners>Software Logistics, LLC</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <projectUrl>https://www.nuviot.com</projectUrl>
     <iconUrl>http://bytemaster.blob.core.windows.net/icons/LagoVistaIcon.png</iconUrl>
     <description>Provides REST Services for Adminstering Simulators for the LagoVista Devices, IoT and Home Automation Frameworks</description>
-    <copyright>Copyright Software Logistics - 2024</copyright>
+    <copyright>Copyright Software Logistics - 2025</copyright>
     <tags>HomeAutomation IoT Cloud LagoVista</tags>
     <icon>LagoVistaIcon.png</icon>
-    <releaseNotes>Build Date: 7/22/2024 7:05:14 PM UTC</releaseNotes>
+    <releaseNotes>Build Date: 9/16/2025 11:59:29 AM UTC</releaseNotes>
     <repository url="https://www.github.com/lagovista" type="git" branch="master"></repository>
     <dependencies>
       <group targetFramework="net6.0">
-        <dependency id="LagoVista.CloudStorage" version="3.0.2623.1505" />
-        <dependency id="LagoVista.IoT.Billing.Managers" version="3.0.2623.1505" />
-        <dependency id="LagoVista.IoT.DeviceAdmin" version="3.0.2623.1505" />
-        <dependency id="LagoVista.IoT.DeviceManagement.Core" version="3.0.2623.1505" />
-        <dependency id="LagoVista.IoT.DeviceMessaging.Admin" version="3.0.2623.1505" />
-        <dependency id="LagoVista.IoT.Verifiers" version="3.0.2623.1505" />
-        <dependency id="LagoVista.IoT.Runtime.Core" version="3.0.2623.1505" />
-        <dependency id="LagoVista.IoT.Pipeline.Admin" version="3.0.2623.1505" />
-        <dependency id="LagoVista.IoT.Deployment.Admin" version="3.0.2623.1505" />
-        <dependency id="LagoVista.IoT.Simulator.Admin" version="3.0.2623.1505" />
+        <dependency id="LagoVista.CloudStorage" version="3.0.3044.0759" />
+        <dependency id="LagoVista.IoT.Billing.Managers" version="3.0.3044.0759" />
+        <dependency id="LagoVista.IoT.DeviceAdmin" version="3.0.3044.0759" />
+        <dependency id="LagoVista.IoT.DeviceManagement.Core" version="3.0.3044.0759" />
+        <dependency id="LagoVista.IoT.DeviceMessaging.Admin" version="3.0.3044.0759" />
+        <dependency id="LagoVista.IoT.Verifiers" version="3.0.3044.0759" />
+        <dependency id="LagoVista.Manufacturing" version="3.0.3044.0759" />
+        <dependency id="LagoVista.IoT.Runtime.Core" version="3.0.3044.0759" />
+        <dependency id="LagoVista.IoT.Pipeline.Admin" version="3.0.3044.0759" />
+        <dependency id="LagoVista.IoT.Deployment.Admin" version="3.0.3044.0759" />
+        <dependency id="LagoVista.IoT.Simulator.Admin" version="3.0.3044.0759" />
         <dependency id="YamlDotNet" version="12.0.1" />
       </group>
     </dependencies>

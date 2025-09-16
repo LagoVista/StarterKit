@@ -2,22 +2,22 @@
 <package>
   <metadata>
     <id>LagoVista.IoT.StarterKits.CloudRepos</id>
-    <version>3.0.2626.0800</version>
+    <version>3.0.3044.0759</version>
     <authors>Software Logistics, LLC</authors>
     <owners>Software Logistics, LLC</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <projectUrl>https://www.nuviot.com</projectUrl>
     <iconUrl>http://bytemaster.blob.core.windows.net/icons/LagoVistaIcon.png</iconUrl>
     <description>Provides Cloud Based Repositories to store information included in starter kits to cloud based storage.</description>
-    <copyright>Copyright Software Logistics - 2024</copyright>
+    <copyright>Copyright Software Logistics - 2025</copyright>
     <tags>LagoVista HomeAutomation IoT</tags>
     <icon>LagoVistaIcon.png</icon>
-    <releaseNotes>Build Date: 7/25/2024 12:00:23 PM UTC</releaseNotes>
+    <releaseNotes>Build Date: 9/16/2025 11:59:29 AM UTC</releaseNotes>
     <repository url="https://www.github.com/lagovista" type="git" branch="master"></repository>
     <dependencies>
       <group targetFramework="net6.0">
-        <dependency id="LagoVista.CloudStorage" version="3.0.2626.0750" />
-        <dependency id="LagoVista.IoT.StarterKit" version="3.0.2626.0800" />
+        <dependency id="LagoVista.CloudStorage" version="3.0.3044.0759" />
+        <dependency id="LagoVista.IoT.StarterKit" version="3.0.3044.0759" />
       </group>
     </dependencies>
   </metadata>

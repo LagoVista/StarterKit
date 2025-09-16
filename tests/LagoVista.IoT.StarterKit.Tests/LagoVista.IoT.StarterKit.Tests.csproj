@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <DebugType>portable</DebugType>
     <AssemblyName>LagoVista.IoT.StarterKit.Tests</AssemblyName>
     <PackageId>LagoVista.IoT.StarterKit.Tests</PackageId>
@@ -19,11 +19,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
-    <PackageReference Include="Moq" Version="4.18.2" />
-    <PackageReference Include="MSTest.TestAdapter" Version="2.2.10" />
-    <PackageReference Include="MSTest.TestFramework" Version="2.2.10" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="LagoVista.Core.TestBase" Version="3.0.3043.1839" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\LagoVista.IoT.StarterKit\LagoVista.IoT.StarterKit.csproj" />
