@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>LagoVista.IoT.StarterKits.CloudRepos</id>
-    <version>3.0.3044.0759</version>
+    <version>3.0.3044.0804</version>
     <authors>Software Logistics, LLC</authors>
     <owners>Software Logistics, LLC</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -12,12 +12,12 @@
     <copyright>Copyright Software Logistics - 2025</copyright>
     <tags>LagoVista HomeAutomation IoT</tags>
     <icon>LagoVistaIcon.png</icon>
-    <releaseNotes>Build Date: 9/16/2025 11:59:29 AM UTC</releaseNotes>
+    <releaseNotes>Build Date: 9/16/2025 12:04:45 PM UTC</releaseNotes>
     <repository url="https://www.github.com/lagovista" type="git" branch="master"></repository>
     <dependencies>
       <group targetFramework="net6.0">
-        <dependency id="LagoVista.CloudStorage" version="3.0.3044.0759" />
-        <dependency id="LagoVista.IoT.StarterKit" version="3.0.3044.0759" />
+        <dependency id="LagoVista.CloudStorage" version="3.0.3044.0804" />
+        <dependency id="LagoVista.IoT.StarterKit" version="3.0.3044.0804" />
       </group>
     </dependencies>
   </metadata>
