@@ -1,4 +1,8 @@
-﻿using System;
+// --- BEGIN CODE INDEX META (do not edit) ---
+// ContentHash: 6b50510f41a92b9ddd0bb55a6a6cab971217cbef7c7427eb9e831e0efc463708
+// IndexVersion: 2
+// --- END CODE INDEX META ---
+using System;
 using System.Collections.Generic;
 using System.Text;
 using LagoVista.IoT.DeviceAdmin.Interfaces.Managers;

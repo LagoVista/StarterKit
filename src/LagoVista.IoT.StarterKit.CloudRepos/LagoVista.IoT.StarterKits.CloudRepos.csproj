@@ -3,7 +3,7 @@
     <TargetFramework>net9.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="LagoVista.CloudStorage" Version="3.0.3044.0804" />
+    <PackageReference Include="LagoVista.CloudStorage" Version="3.0.3099.1426" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LagoVista.IoT.StarterKit\LagoVista.IoT.StarterKit.csproj" />

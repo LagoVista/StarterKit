@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>LagoVista.IoT.StarterKit</id>
-    <version>3.0.3044.0804</version>
+    <version>3.0.3099.1426</version>
     <authors>Software Logistics, LLC</authors>
     <owners>Software Logistics, LLC</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -12,21 +12,21 @@
     <copyright>Copyright Software Logistics - 2025</copyright>
     <tags>HomeAutomation IoT Cloud LagoVista</tags>
     <icon>LagoVistaIcon.png</icon>
-    <releaseNotes>Build Date: 9/16/2025 12:04:45 PM UTC</releaseNotes>
+    <releaseNotes>Build Date: 11/10/2025 7:26:05 PM UTC</releaseNotes>
     <repository url="https://www.github.com/lagovista" type="git" branch="master"></repository>
     <dependencies>
       <group targetFramework="net9.0">
-        <dependency id="LagoVista.CloudStorage" version="3.0.3044.0804" />
-        <dependency id="LagoVista.IoT.Billing.Managers" version="3.0.3044.0804" />
-        <dependency id="LagoVista.IoT.DeviceAdmin" version="3.0.3044.0804" />
-        <dependency id="LagoVista.IoT.DeviceManagement.Core" version="3.0.3044.0804" />
-        <dependency id="LagoVista.IoT.DeviceMessaging.Admin" version="3.0.3044.0804" />
-        <dependency id="LagoVista.IoT.Verifiers" version="3.0.3044.0804" />
-        <dependency id="LagoVista.Manufacturing" version="3.0.3044.0804" />
-        <dependency id="LagoVista.IoT.Runtime.Core" version="3.0.3044.0804" />
-        <dependency id="LagoVista.IoT.Pipeline.Admin" version="3.0.3044.0804" />
-        <dependency id="LagoVista.IoT.Deployment.Admin" version="3.0.3044.0804" />
-        <dependency id="LagoVista.IoT.Simulator.Admin" version="3.0.3044.0804" />
+        <dependency id="LagoVista.CloudStorage" version="3.0.3099.1426" />
+        <dependency id="LagoVista.IoT.Billing.Managers" version="3.0.3099.1426" />
+        <dependency id="LagoVista.IoT.DeviceAdmin" version="3.0.3099.1426" />
+        <dependency id="LagoVista.IoT.DeviceManagement.Core" version="3.0.3099.1426" />
+        <dependency id="LagoVista.IoT.DeviceMessaging.Admin" version="3.0.3099.1426" />
+        <dependency id="LagoVista.IoT.Verifiers" version="3.0.3099.1426" />
+        <dependency id="LagoVista.Manufacturing" version="3.0.3099.1426" />
+        <dependency id="LagoVista.IoT.Runtime.Core" version="3.0.3099.1426" />
+        <dependency id="LagoVista.IoT.Pipeline.Admin" version="3.0.3099.1426" />
+        <dependency id="LagoVista.IoT.Deployment.Admin" version="3.0.3099.1426" />
+        <dependency id="LagoVista.IoT.Simulator.Admin" version="3.0.3099.1426" />
         <dependency id="YamlDotNet" version="16.3.0" />
       </group>
     </dependencies>

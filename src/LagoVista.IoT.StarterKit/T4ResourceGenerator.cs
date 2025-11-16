@@ -1,4 +1,8 @@
-﻿/*7/26/2024 4:30:53 PM*/
+// --- BEGIN CODE INDEX META (do not edit) ---
+// ContentHash: 9b69b67ec5e43e0c68862c6f842d2696183ef07ccfb1c809a8ce02d473b65864
+// IndexVersion: 2
+// --- END CODE INDEX META ---
+/*7/26/2024 4:30:53 PM*/
 using System.Globalization;
 using System.Reflection;
 
