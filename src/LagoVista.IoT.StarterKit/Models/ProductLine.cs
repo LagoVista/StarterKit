@@ -37,8 +37,6 @@ namespace LagoVista.IoT.StarterKit.Models
         [FormField(LabelResource: StarterKitResources.Names.Common_Summary, FieldType: FieldTypes.MultiLineText, ResourceType: typeof(StarterKitResources), IsRequired: true, IsUserEditable: true)]
         public string Summary { get; set; }
 
-        [FormField(LabelResource: StarterKitResources.Names.Common_Description, FieldType: FieldTypes.HtmlEditor, ResourceType: typeof(StarterKitResources), IsRequired: false, IsUserEditable: true)]
-        public string Description { get; set; }
 
 
         public ProductLineSummary CreateSummary()

@@ -24,6 +24,7 @@ using LagoVista.IoT.DeviceManagement.Core.Managers;
 using LagoVista.IoT.Billing;
 using LagoVista.IoT.Verifiers.Managers;
 using LagoVista.IoT.Runtime.Core.Models.Verifiers;
+using LagoVista.IoT.DeviceMessaging.Admin.Models;
 
 namespace LagoVista.IoT.StarterKit.Managers
 {
@@ -179,10 +180,10 @@ namespace LagoVista.IoT.StarterKit.Managers
                         Name = "Example Temperature Message",
                         Key="exmpl001",
                         Payload="98.5,38",
-                        Headers = new System.Collections.ObjectModel.ObservableCollection<DeviceMessaging.Admin.Models.Header>()
+                        Headers = new System.Collections.ObjectModel.ObservableCollection<SampleMessageHeader>()
                         {
-                            new DeviceMessaging.Admin.Models.Header() { Name="x-deviceid", Value="device001"},
-                            new DeviceMessaging.Admin.Models.Header() { Name = "x-messageid", Value="tmpmsg001"}
+                            new SampleMessageHeader() { Name="x-deviceid", Value="device001"},
+                            new SampleMessageHeader() { Name = "x-messageid", Value="tmpmsg001"}
                         }
                     }
                 },
@@ -327,9 +328,9 @@ namespace LagoVista.IoT.StarterKit.Managers
                 Name = "Find Device Id in Header",
                 Key = "msgidheader",
                 Description = "Validates that the Device Id can be extracted from the header",
-                Headers = new System.Collections.ObjectModel.ObservableCollection<DeviceMessaging.Admin.Models.Header>()
+                Headers = new System.Collections.ObjectModel.ObservableCollection<SampleMessageHeader>()
                 {
-                     new DeviceMessaging.Admin.Models.Header() { Name = "x-messageid", Value="device001"}
+                     new SampleMessageHeader() { Name = "x-messageid", Value="device001"}
                 },
                 ShouldSucceed = true,
                 VerifierType = EntityHeader<VerifierTypes>.Create(VerifierTypes.MessageFieldParser)
@@ -372,9 +373,9 @@ namespace LagoVista.IoT.StarterKit.Managers
                 Name = "Finds Message id in Header",
                 Key = "msgidheader",
                 Description = "Validates that the message id can be extracted from the header",
-                Headers = new System.Collections.ObjectModel.ObservableCollection<DeviceMessaging.Admin.Models.Header>()
+                Headers = new System.Collections.ObjectModel.ObservableCollection<SampleMessageHeader>()
                 {
-                     new DeviceMessaging.Admin.Models.Header() { Name = "x-messageid", Value="smplmsg001"}
+                     new SampleMessageHeader() { Name = "x-messageid", Value="smplmsg001"}
                 },
                 ShouldSucceed = true,
                 VerifierType = EntityHeader<VerifierTypes>.Create(VerifierTypes.MessageFieldParser)

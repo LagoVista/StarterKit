@@ -503,7 +503,7 @@ namespace LagoVista.IoT.StarterKit.Managers
                 Key = key,
             };
 
-            wf.Pages.Add(new Page()
+            wf.Pages.Add(new DiagramPage()
             {
                 PageNumber = 1,
                 Name = DeviceLibraryResources.Common_PageNumberOne
@@ -776,7 +776,7 @@ function onSet(value /* String */) {
         public async Task<DeviceWorkflow> AddDefaultWorkflowAsync(EntityHeader org, EntityHeader user, DateTime createTimestamp)
         {
             var wf = new DeviceWorkflow();
-            wf.Pages.Add(new Page()
+            wf.Pages.Add(new DiagramPage()
             {
                 PageNumber = 1,
                 Name = DeviceLibraryResources.Common_PageNumberOne
