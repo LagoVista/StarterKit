@@ -12,8 +12,6 @@ namespace LagoVista.IoT.StarterKit
     public class StarterKitDomain
     {
         public const string StarterKit = "StarterKit";
-
-
         [DomainDescription(StarterKit)]
         public static DomainDescription StarterKitDomainDescription
         {
@@ -21,7 +19,7 @@ namespace LagoVista.IoT.StarterKit
             {
                 return new DomainDescription()
                 {
-                    Description = "Utilities and methods to make creating IoT applications a little easier.",
+                    Description = "Tools and utilities to help you quickly set up and configure new IoT applications.",
                     DomainType = DomainDescription.DomainTypes.BusinessObject,
                     Name = "Starter Kit",
                     CurrentVersion = new LagoVista.Core.Models.VersionInfo()

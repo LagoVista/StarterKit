@@ -121,7 +121,7 @@
     <value>Project Description</value>
   </data>
   <data name="AppWizard_Help" xml:space="preserve">
-    <value>The App Wizard will take the output of a survey and create a project and potentially and IoT project.</value>
+    <value>Use the App Wizard to turn survey responses into a new project. You can also choose to create a linked IoT project as part of the same process.</value>
   </data>
   <data name="AppWizard_ProjectDescription" xml:space="preserve">
     <value>Project Description</value>
@@ -157,7 +157,7 @@
     <value>Customization Instructions</value>
   </data>
   <data name="ProductLineObject_Help" xml:space="preserve">
-    <value>Product Line Objects are specific NuvIoT objects that need to be included to make the application work</value>
+    <value>Create and manage the product line records needed for the NuvIoT application to function correctly.</value>
   </data>
   <data name="ProductLineObject_Object" xml:space="preserve">
     <value>Object</value>
@@ -172,13 +172,13 @@
     <value>Product Line Object</value>
   </data>
   <data name="ProductLines_Name" xml:space="preserve">
-    <value>Products</value>
+    <value>Product Lines</value>
   </data>
   <data name="ProductLine_Description" xml:space="preserve">
     <value>A Product is a collectoin of objects that make up the components for an IoT application.</value>
   </data>
   <data name="ProductLine_Name" xml:space="preserve">
-    <value>Product</value>
+    <value>Product Line</value>
   </data>
   <data name="ProductLine_Objects" xml:space="preserve">
     <value>Objects</value>
@@ -202,7 +202,7 @@
     <value>Number of days after the org was created the this to do should be completed.</value>
   </data>
   <data name="ToDoTemplate_Help" xml:space="preserve">
-    <value>The ToDo template is an action item that will be brought into the new customers organization that provides instructions of what needs to be done to bring the application online.</value>
+    <value>Use templates to define standard to-do items for new customer organizations so onboarding steps, timelines, and expectations are clear and the application can be brought online successfully.</value>
   </data>
   <data name="ToDoTemplate_Instructions" xml:space="preserve">
     <value>Instructions</value>
@@ -214,7 +214,7 @@
     <value>-select priority-</value>
   </data>
   <data name="ToDoTemplate_Title" xml:space="preserve">
-    <value>ToDo Template</value>
+    <value>To-Do Template</value>
   </data>
   <data name="ToDoTemplate_WebLink" xml:space="preserve">
     <value>Web Linlk</value>
