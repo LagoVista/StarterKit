@@ -4,7 +4,6 @@
 // --- END CODE INDEX META ---
 using System;
 using System.Collections.Generic;
-using System.Text;
 using LagoVista.IoT.DeviceAdmin.Interfaces.Managers;
 using LagoVista.IoT.DeviceAdmin.Models;
 using LagoVista.UserAdmin.Interfaces.Managers;
@@ -20,8 +19,6 @@ using LagoVista.IoT.Pipeline.Admin.Models;
 using LagoVista.IoT.Deployment.Admin.Models;
 using LagoVista.IoT.DeviceManagement.Core.Models;
 using LagoVista.UserAdmin.Models.Orgs;
-using LagoVista.IoT.DeviceManagement.Core.Managers;
-using LagoVista.IoT.Billing;
 using LagoVista.IoT.Verifiers.Managers;
 using LagoVista.IoT.Runtime.Core.Models.Verifiers;
 using LagoVista.IoT.DeviceMessaging.Admin.Models;
@@ -35,17 +32,13 @@ namespace LagoVista.IoT.StarterKit.Managers
         IPipelineModuleManager _pipelineMgr;
         IDeviceTypeManager _deviceTypeMgr;
         IDeviceMessageDefinitionManager _deviceMsgMgr;
-        IDeploymentHostManager _hostMgr;
-        IDeploymentInstanceManager _instanceMgr;
         ISolutionManager _solutionMgr;
         IDeviceConfigurationManager _deviceCfgMgr;
-        IDeviceRepositoryManager _deviceRepoMgr;
-        IProductManager _productManager;
+        
         IVerifierManager _verifierMgr;
 
-        public AppFactory(IDeviceAdminManager deviceAdminMgr, ISubscriptionManager subscriptionMgr, IPipelineModuleManager pipelineMgr, IDeviceTypeManager deviceTypeMgr, IDeviceRepositoryManager deviceRepoMgr,
-           IProductManager productManager, IDeviceConfigurationManager deviceCfgMgr, IDeviceMessageDefinitionManager deviceMsgMgr, IDeploymentHostManager hostMgr, IDeploymentInstanceManager instanceMgr,
-           ISolutionManager solutionMgr, IVerifierManager verifierMgr)
+        public AppFactory(IDeviceAdminManager deviceAdminMgr, ISubscriptionManager subscriptionMgr, IPipelineModuleManager pipelineMgr, IDeviceTypeManager deviceTypeMgr, 
+            IDeviceConfigurationManager deviceCfgMgr, IDeviceMessageDefinitionManager deviceMsgMgr, ISolutionManager solutionMgr, IVerifierManager verifierMgr)
         {
             _deviceAdminMgr = deviceAdminMgr;
             _subscriptionMgr = subscriptionMgr;
@@ -53,12 +46,8 @@ namespace LagoVista.IoT.StarterKit.Managers
             _deviceTypeMgr = deviceTypeMgr;
             _deviceMsgMgr = deviceMsgMgr;
             _deviceCfgMgr = deviceCfgMgr;
-            _deviceRepoMgr = deviceRepoMgr;
-            _productManager = productManager;
             _verifierMgr = verifierMgr;
 
-            _hostMgr = hostMgr;
-            _instanceMgr = instanceMgr;
             _solutionMgr = solutionMgr;
         }
 
@@ -81,25 +70,31 @@ namespace LagoVista.IoT.StarterKit.Managers
             entity.Id = Guid.NewGuid().ToId();
         }
 
-        public SubscriptionDTO CreateFreeSubscription(EntityHeader org, EntityHeader user, DateTime createTimeStamp)
+        public Subscription CreateFreeSubscription(EntityHeader org, EntityHeader user, DateTime createTimeStamp)
         {
-            var subscription = new SubscriptionDTO()
+            var timeStamp = UtcTimestamp.Factory();
+
+            var subscription = new Subscription()
             {
-                Id = Guid.NewGuid(),
-                OrgId = org.Id,
+                Id = GuidString36.Factory(),
+                OwnerOrganization = org,
                 Name = "Free Subscription",
                 Key = "freesubscription",
-                Status = SubscriptionDTO.Status_FreeAccount,
-                CreatedById = user.Id,
-                CreationDate = createTimeStamp,
-                LastUpdatedById = user.Id,
-                LastUpdatedDate = createTimeStamp,
+                Status = Subscription.Status_TrialAccount,
+                IsTrial = true,
+                Start = CalendarDate.Today(),
+                IsActive = true,
+                ActiveDate = CalendarDate.Today(),
+                CreatedBy = user,
+                CreationDate = UtcTimestamp.Factory(),
+                LastUpdatedBy = user,
+                LastUpdatedDate = timeStamp,
             };
 
             return subscription;
         }
 
-        public DeviceRepository CreateDevice(SubscriptionDTO subscription, EntityHeader org, EntityHeader user, DateTime createTimeStamp)
+        public DeviceRepository CreateDevice(Subscription subscription, EntityHeader org, EntityHeader user, DateTime createTimeStamp)
         {
             /* Create Device Configurations */
             var deviceRepository = new DeviceRepository()
@@ -724,6 +719,8 @@ namespace LagoVista.IoT.StarterKit.Managers
             var subscription = CreateFreeSubscription(org, user, creationDate);
             var createSolutionResult = await CreateSimpleSolutionAsync(org, user, creationDate);
             var deviceRepo = CreateDevice(subscription, org, user, creationDate);
+
+            await _subscriptionMgr.AddSubscriptionAsync(subscription, org, user);
 
             await _solutionMgr.AddSolutionsAsync(createSolutionResult.Result, org, user);
 

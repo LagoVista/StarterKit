@@ -39,7 +39,6 @@ namespace LagoVista.IoT.StarterKit.Managers
         ISolutionManager _solutionMgr;
         IDeviceConfigurationManager _deviceCfgMgr;
         IDeviceRepositoryManager _deviceRepoMgr;
-        IProductManager _productManager;
         IVerifierManager _verifierMgr;
         ISimulatorManager _simulatorMgr;
         IDeviceManager _deviceManager;
@@ -48,7 +47,7 @@ namespace LagoVista.IoT.StarterKit.Managers
         StorageUtils _storageUtils;
 
         public DataServicesManager(IAdminLogger logger, IStarterKitConnection starterKitConnection, IDeviceAdminManager deviceAdminMgr, ISubscriptionManager subscriptionMgr, IPipelineModuleManager pipelineMgr, IDeviceTypeManager deviceTypeMgr, IDeviceRepositoryManager deviceRepoMgr,
-                          IUserManager userManager, IProductManager productManager, IDeviceTypeManager deviceTypeManager, IDeviceConfigurationManager deviceCfgMgr, IDeviceMessageDefinitionManager deviceMsgMgr, IDeploymentInstanceManager instanceMgr,
+                          IUserManager userManager, IDeviceTypeManager deviceTypeManager, IDeviceConfigurationManager deviceCfgMgr, IDeviceMessageDefinitionManager deviceMsgMgr, IDeploymentInstanceManager instanceMgr,
                           IDeploymentHostManager hostMgr, IDeviceManager deviceManager, IContainerRepositoryManager containerMgr, ISolutionManager solutionMgr, IOrganizationRepo orgMgr, ISimulatorManager simMgr, IVerifierManager verifierMgr,
                           IAppConfig appConfig, IDependencyManager dependencyManager, ISecurity security) 
             : base(logger, appConfig, dependencyManager, security)
@@ -61,7 +60,6 @@ namespace LagoVista.IoT.StarterKit.Managers
             _deviceMsgMgr = deviceMsgMgr;
             _deviceCfgMgr = deviceCfgMgr;
             _deviceRepoMgr = deviceRepoMgr;
-            _productManager = productManager;
             _verifierMgr = verifierMgr;
             _deviceTypeMgr = deviceTypeManager;
             _simulatorMgr = simMgr;

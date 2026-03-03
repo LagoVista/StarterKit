@@ -6,64 +6,31 @@ using LagoVista.Core;
 using LagoVista.Core.Exceptions;
 using LagoVista.Core.Models;
 using LagoVista.Core.Models.UIMetaData;
-using LagoVista.IoT.Billing;
-using LagoVista.IoT.Deployment.Admin;
 using LagoVista.IoT.Deployment.Admin.Models;
-using LagoVista.IoT.DeviceAdmin.Interfaces.Managers;
 using LagoVista.IoT.DeviceAdmin.Models;
-using LagoVista.IoT.DeviceManagement.Core.Managers;
 using LagoVista.IoT.DeviceManagement.Core.Models;
 using LagoVista.IoT.DeviceMessaging.Admin.Managers;
 using LagoVista.IoT.DeviceMessaging.Admin.Models;
-using LagoVista.IoT.Pipeline.Admin.Managers;
 using LagoVista.IoT.Pipeline.Admin.Models;
-using LagoVista.IoT.Verifiers.Managers;
 using LagoVista.ProjectManagement;
 using LagoVista.ProjectManagement.Models;
-using LagoVista.UserAdmin.Interfaces.Managers;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace LagoVista.IoT.StarterKit.Managers
 {
     public class CloneServices : ICloneServices
     {
-        IDeviceAdminManager _deviceAdminMgr;
-        ISubscriptionManager _subscriptionMgr;
-        IPipelineModuleManager _pipelineMgr;
-        IDeviceTypeManager _deviceTypeMgr;
         IDeviceMessageDefinitionManager _deviceMsgMgr;
-        IDeploymentHostManager _hostMgr;
-        IDeploymentInstanceManager _instanceMgr;
-        ISolutionManager _solutionMgr;
-        IDeviceConfigurationManager _deviceCfgMgr;
-        IDeviceRepositoryManager _deviceRepoMgr;
-        IProductManager _productManager;
-        IVerifierManager _verifierMgr;
         IProjectRepo _projectRepo;
         IWorkTaskRepo _taskRepo;
 
 
-        public CloneServices(IDeviceAdminManager deviceAdminMgr, ISubscriptionManager subscriptionMgr, IPipelineModuleManager pipelineMgr, IDeviceTypeManager deviceTypeMgr, IDeviceRepositoryManager deviceRepoMgr,
-           IProductManager productManager, IDeviceConfigurationManager deviceCfgMgr, IDeviceMessageDefinitionManager deviceMsgMgr, IDeploymentHostManager hostMgr, IDeploymentInstanceManager instanceMgr,
-           ISolutionManager solutionMgr, IVerifierManager verifierMgr, IProjectRepo projectRepo, IWorkTaskRepo taskRepo)
+        public CloneServices(IDeviceMessageDefinitionManager deviceMsgMgr, IProjectRepo projectRepo, IWorkTaskRepo taskRepo)
         {
-            _deviceAdminMgr = deviceAdminMgr;
-            _subscriptionMgr = subscriptionMgr;
-            _pipelineMgr = pipelineMgr;
-            _deviceTypeMgr = deviceTypeMgr;
             _deviceMsgMgr = deviceMsgMgr;
-            _deviceCfgMgr = deviceCfgMgr;
-            _deviceRepoMgr = deviceRepoMgr;
-            _productManager = productManager;
-            _verifierMgr = verifierMgr;
-
-            _hostMgr = hostMgr;
-            _instanceMgr = instanceMgr;
-            _solutionMgr = solutionMgr;
-
+     
             _projectRepo = projectRepo;
             _taskRepo = taskRepo;
         }

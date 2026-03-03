@@ -36,6 +36,7 @@ using LagoVista.IoT.DeviceManagement.Core;
 using LagoVista.IoT.Runtime.Core.Models.Verifiers;
 using LagoVista.IoT.Billing.Managers;
 using LagoVista.ProjectManagement;
+using LagoVista.Core.Product;
 
 namespace LagoVista.IoT.StarterKit.Managers
 {
@@ -51,22 +52,20 @@ namespace LagoVista.IoT.StarterKit.Managers
         ISolutionManager _solutionMgr;
         IDeviceConfigurationManager _deviceCfgMgr;
         IDeviceRepositoryManager _deviceRepoMgr;
-        IProductManager _productManager;
         IVerifierManager _verifierMgr;
         ISimulatorManager _simulatorMgr;
         IDeviceManager _deviceManager;
         IOrganizationRepo _orgRepo;
         IUserManager _userManager;
-        ICustomerManager _customerManager;
-        IBillingManager _billingManager;
         IToDoManager _todoManager;
+        IPublicProductStore _productStoreRepo;
 
         StorageUtils _storageUtils;
 
         public OrgInitializer(IAdminLogger logger, IStarterKitConnection starterKitConnection, IDeviceAdminManager deviceAdminMgr, ISubscriptionManager subscriptionMgr, IPipelineModuleManager pipelineMgr, IDeviceTypeManager deviceTypeMgr, IDeviceRepositoryManager deviceRepoMgr,
-                          IUserManager userManager, IProductManager productManager, IDeviceTypeManager deviceTypeManager, IDeviceConfigurationManager deviceCfgMgr, IDeviceMessageDefinitionManager deviceMsgMgr, IDeploymentInstanceManager instanceMgr,
-                          IDeploymentHostManager hostMgr, IDeviceManager deviceManager, IContainerRepositoryManager containerMgr, ISolutionManager solutionMgr, IOrganizationRepo orgMgr, ISimulatorManager simMgr, IVerifierManager verifierMgr, ICustomerManager customerManager, 
-                          IBillingManager billingManager, IToDoManager toDoManager)
+                          IUserManager userManager, IDeviceTypeManager deviceTypeManager, IDeviceConfigurationManager deviceCfgMgr, IDeviceMessageDefinitionManager deviceMsgMgr, IDeploymentInstanceManager instanceMgr, IPublicProductStore productStore,
+                          IDeploymentHostManager hostMgr, IDeviceManager deviceManager, IContainerRepositoryManager containerMgr, ISolutionManager solutionMgr, IOrganizationRepo orgMgr, ISimulatorManager simMgr, IVerifierManager verifierMgr,
+                          IToDoManager toDoManager)
         {
             _userManager = userManager;
             _deviceAdminMgr = deviceAdminMgr;
@@ -76,22 +75,19 @@ namespace LagoVista.IoT.StarterKit.Managers
             _deviceMsgMgr = deviceMsgMgr;
             _deviceCfgMgr = deviceCfgMgr;
             _deviceRepoMgr = deviceRepoMgr;
-            _productManager = productManager;
             _verifierMgr = verifierMgr;
             _deviceTypeMgr = deviceTypeManager;
             _simulatorMgr = simMgr;
             _orgRepo = orgMgr;
             _deviceManager = deviceManager;
             _hostManager = hostMgr;
-            _customerManager = customerManager;
-            _billingManager = billingManager;
             _instanceMgr = instanceMgr;
             _solutionMgr = solutionMgr;
             _todoManager = toDoManager;
+            _productStoreRepo = productStore;
 
             _storageUtils = new StorageUtils(new Uri(starterKitConnection.StarterKitStorage.Uri), starterKitConnection.StarterKitStorage.AccessKey,
                 starterKitConnection.StarterKitStorage.ResourceName, logger);
-            _billingManager = billingManager;
         }
 
         private const string EXAMPLE_MOTION_KEY = "examplemotion";
@@ -246,21 +242,26 @@ namespace LagoVista.IoT.StarterKit.Managers
             _todoManager.IsForInitialization = false;
         }
 
-        public async Task<SubscriptionDTO> AddTrialSubscriptionAsync(EntityHeader org, EntityHeader user, DateTime createTimeStamp)
+        public async Task<Subscription> AddTrialSubscriptionAsync(EntityHeader org, EntityHeader user, DateTime createTimeStamp)
         {
-            var subscription = new SubscriptionDTO()
-            {
-                Id = Guid.NewGuid(),
-                OrgId = org.Id,
-                Name = "Trial Subscription",
-                Key = SubscriptionDTO.SubscriptionKey_Trial,
-                Status = SubscriptionDTO.Status_OK,
-                CreatedById = user.Id,
-                LastUpdatedById = user.Id,
-                CreationDate = createTimeStamp,
-                LastUpdatedDate = createTimeStamp,                
-            };
+            var timeStamp = UtcTimestamp.Factory();
 
+            var subscription = new Subscription()
+            {
+                Id = GuidString36.Factory(),
+                OwnerOrganization = org,
+                Name = "Free Subscription",
+                Key = "freesubscription",
+                Status = Subscription.Status_TrialAccount,
+                IsTrial = true,
+                Start = CalendarDate.Today(),
+                IsActive = true,
+                ActiveDate = CalendarDate.Today(),
+                CreatedBy = user,
+                CreationDate = UtcTimestamp.Factory(),
+                LastUpdatedBy = user,
+                LastUpdatedDate = timeStamp,
+            };
 
             _subscriptionMgr.IsForInitialization = true;
             await this._subscriptionMgr.AddSubscriptionAsync(subscription, org, user);
@@ -682,7 +683,7 @@ function onSet(value /* String */) {
             return planner;
         }
 
-        public async Task<DeviceRepository> AddTrialRepository(string name, string key, SubscriptionDTO subscription, EntityHeader org, EntityHeader user, DateTime createTimestamp)
+        public async Task<DeviceRepository> AddTrialRepository(string name, string key, Subscription subscription, EntityHeader org, EntityHeader user, DateTime createTimestamp)
         {
             await _storageUtils.DeleteByKeyIfExistsAsync<DeviceRepository>(key, org);
 
@@ -814,7 +815,7 @@ function onSet(value /* String */) {
             return outputTranslator;
         }
 
-        public async Task<DeploymentInstance> CreateInstanceAsync(SubscriptionDTO subscription, Solution solution, DeviceRepository repo, string name, string key,
+        public async Task<DeploymentInstance> CreateInstanceAsync(Subscription subscription, Solution solution, DeviceRepository repo, string name, string key,
             string environmentName, EntityHeader org, EntityHeader user, DateTime createTimestamp)
         {
             if (subscription == null) throw new ArgumentNullException(nameof(subscription));
@@ -832,7 +833,7 @@ function onSet(value /* String */) {
                 Key = key,
             };
 
-            var freeVMInstance = await _productManager.GetProductByKeyAsync("vms", "freetrial", org, user);
+            var freeVMInstance = await _productStoreRepo.GetSystemProductAsync("vms", "freetrial");
             if (freeVMInstance == null)
             {
                 throw new ArgumentNullException(nameof(freeVMInstance));

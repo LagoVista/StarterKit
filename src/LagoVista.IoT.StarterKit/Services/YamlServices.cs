@@ -69,7 +69,6 @@ namespace LagoVista.IoT.StarterKit.Services
         readonly IDeploymentHostManager _hostManager;
         readonly ISolutionManager _solutionMgr;
         readonly IDeviceRepositoryManager _deviceRepoMgr;
-        readonly IProductManager _productManager;
         readonly IVerifierManager _verifierMgr;
         readonly ISimulatorManager _simulatorMgr;
         readonly IDeviceManager _deviceManager;
@@ -92,7 +91,7 @@ namespace LagoVista.IoT.StarterKit.Services
         private EntityHeader _user;
 
         public YamlServices(IAdminLogger logger, IStarterKitConnection starterKitConnection, IDeviceAdminManager deviceAdminMgr, ISubscriptionManager subscriptionMgr, IPipelineModuleManager pipelineMgr,  IDeviceRepositoryManager deviceRepoMgr,
-                          IUserManager userManager, IModuleManager moduleManager, IProductManager productManager, IDeviceTypeManager deviceTypeManager,  IDeviceMessageDefinitionManager deviceMsgMgr, IDeploymentInstanceManager instanceMgr,
+                          IUserManager userManager, IModuleManager moduleManager, IDeviceTypeManager deviceTypeManager,  IDeviceMessageDefinitionManager deviceMsgMgr, IDeploymentInstanceManager instanceMgr,
                           IDeploymentHostManager hostMgr, IRoleManager roleManager, IDeviceManager deviceManager, IContainerRepositoryManager containerMgr, ISolutionManager solutionMgr, IOrganizationRepo orgMgr, ISimulatorManager simMgr, IVerifierManager verifierMgr,
                           ISurveyManager surveyManager, ISurveyResponseManager surveyResponseManager, ISiteContentManager siteContentManager, IGuideManager guideManager, IGlossaryManager glossaryManager, IWorkTaskTypeManager workTaskTypeManager, ITaskTemplateManager taskTemplateManager,
                           IStatusConfigurationManager statusConfigurationManager, IProjectTemplateManager projectTemplateManager)
@@ -103,7 +102,6 @@ namespace LagoVista.IoT.StarterKit.Services
             _pipelineMgr = pipelineMgr;
             _deviceMsgMgr = deviceMsgMgr;
             _deviceRepoMgr = deviceRepoMgr;
-            _productManager = productManager;
             _verifierMgr = verifierMgr;
             _simulatorMgr = simMgr;
             _orgRepo = orgMgr;

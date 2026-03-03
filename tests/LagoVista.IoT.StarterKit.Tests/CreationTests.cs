@@ -32,7 +32,6 @@ namespace LagoVista.IoT.StarterKit.Tests
     public class CreationTests
     {
         AppFactory _factory;
-        Mock<IProductManager> _productManager = new Mock<IProductManager>();
         Mock<IVerifierManager> _verifierManager = new Mock<IVerifierManager>();
         List<Verifier> _verifier = new List<Verifier>();
 
@@ -57,8 +56,7 @@ namespace LagoVista.IoT.StarterKit.Tests
             _verifierManager.Setup(vrm => vrm.AddVerifierAsync(It.IsAny<Verifier>(), It.IsAny<EntityHeader>(), It.IsAny<EntityHeader>())).Returns(addVerifier);
 
             _factory = new AppFactory(new Mock<IDeviceAdminManager>().Object, new Mock<ISubscriptionManager>().Object, new Mock<IPipelineModuleManager>().Object, new Mock<IDeviceTypeManager>().Object,
-                new Mock<IDeviceRepositoryManager>().Object, _productManager.Object, new Mock<IDeviceConfigurationManager>().Object, new Mock<IDeviceMessageDefinitionManager>().Object,
-                new Mock<IDeploymentHostManager>().Object, new Mock<IDeploymentInstanceManager>().Object, new Mock<ISolutionManager>().Object, _verifierManager.Object);
+                new Mock<IDeviceConfigurationManager>().Object, new Mock<IDeviceMessageDefinitionManager>().Object, new Mock<ISolutionManager>().Object, _verifierManager.Object);
         }
 
         [TestMethod]
