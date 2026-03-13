@@ -35,6 +35,7 @@ using LagoVista.IoT.Runtime.Core.Models.Verifiers;
 using LagoVista.IoT.Simulator.Admin.Managers;
 using LagoVista.IoT.Verifiers.Managers;
 using LagoVista.Manufacturing.Models;
+using LagoVista.Marketing.Models;
 using LagoVista.ProjectManagement;
 using LagoVista.ProjectManagement.Core;
 using LagoVista.ProjectManagement.Models;

@@ -244,7 +244,7 @@ namespace LagoVista.IoT.StarterKit.Managers
 
         public async Task<Subscription> AddTrialSubscriptionAsync(EntityHeader org, EntityHeader user, DateTime createTimeStamp)
         {
-            var timeStamp = UtcTimestamp.Factory();
+            var timeStamp = UtcTimestamp.Now;
 
             var subscription = new Subscription()
             {
@@ -258,7 +258,7 @@ namespace LagoVista.IoT.StarterKit.Managers
                 IsActive = true,
                 ActiveDate = CalendarDate.Today(),
                 CreatedBy = user,
-                CreationDate = UtcTimestamp.Factory(),
+                CreationDate = timeStamp,
                 LastUpdatedBy = user,
                 LastUpdatedDate = timeStamp,
             };
