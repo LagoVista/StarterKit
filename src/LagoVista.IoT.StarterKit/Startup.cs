@@ -7,6 +7,7 @@ using LagoVista.IoT.StarterKit.Interfaces;
 using LagoVista.IoT.StarterKit.Managers;
 using LagoVista.IoT.StarterKit.Services;
 using LagoVista.UserAdmin;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace LagoVista.IoT.StarterKit
 {

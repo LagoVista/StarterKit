@@ -51,10 +51,10 @@ namespace LagoVista.IoT.StarterKit.Managers
             _solutionMgr = solutionMgr;
         }
 
-        private void AddAuditProperties(IAuditableEntity entity, DateTime creationTimeStamp, EntityHeader org, EntityHeader user)
+        private void AddAuditProperties(IAuditableEntity entity, UtcTimestamp creationTimeStamp, EntityHeader org, EntityHeader user)
         {
-            entity.CreationDate = creationTimeStamp.ToJSONString();
-            entity.LastUpdatedDate = creationTimeStamp.ToJSONString();
+            entity.CreationDate = creationTimeStamp;
+            entity.LastUpdatedDate = creationTimeStamp;
             entity.CreatedBy = user;
             entity.LastUpdatedBy = user;
         }
@@ -70,7 +70,7 @@ namespace LagoVista.IoT.StarterKit.Managers
             entity.Id = Guid.NewGuid().ToId();
         }
 
-        public Subscription CreateFreeSubscription(EntityHeader org, EntityHeader user, DateTime createTimeStamp)
+        public Subscription CreateFreeSubscription(EntityHeader org, EntityHeader user, UtcTimestamp createTimeStamp)
         {
             var timeStamp = UtcTimestamp.Now;
 
@@ -94,7 +94,7 @@ namespace LagoVista.IoT.StarterKit.Managers
             return subscription;
         }
 
-        public DeviceRepository CreateDevice(Subscription subscription, EntityHeader org, EntityHeader user, DateTime createTimeStamp)
+        public DeviceRepository CreateDevice(Subscription subscription, EntityHeader org, EntityHeader user, UtcTimestamp createTimeStamp)
         {
             /* Create Device Configurations */
             var deviceRepository = new DeviceRepository()
@@ -112,7 +112,7 @@ namespace LagoVista.IoT.StarterKit.Managers
         }
 
 
-        public async Task<InvokeResult<Solution>> CreateSimpleSolutionAsync(EntityHeader org, EntityHeader user, DateTime createTimeStamp)
+        public async Task<InvokeResult<Solution>> CreateSimpleSolutionAsync(EntityHeader org, EntityHeader user, UtcTimestamp createTimeStamp)
         {
             /* Create unit/state sets */
             var stateSet = new StateSet()
@@ -611,7 +611,7 @@ namespace LagoVista.IoT.StarterKit.Managers
             return InvokeResult<Solution>.Create(solution);
         }
 
-        public Simulator.Admin.Models.Simulator CreateSimulator(DeploymentInstance instance, EntityHeader org, EntityHeader user, DateTime creationTimeStamp)
+        public Simulator.Admin.Models.Simulator CreateSimulator(DeploymentInstance instance, EntityHeader org, EntityHeader user, UtcTimestamp creationTimeStamp)
         {
             var simulator = new Simulator.Admin.Models.Simulator()
             {
@@ -696,7 +696,7 @@ namespace LagoVista.IoT.StarterKit.Managers
             return simulator;
         }
 
-        public DeploymentInstance CreateInstance(Solution solution, DeviceRepository deviceRepo, EntityHeader org, EntityHeader user, DateTime creationTimeStamp)
+        public DeploymentInstance CreateInstance(Solution solution, DeviceRepository deviceRepo, EntityHeader org, EntityHeader user, UtcTimestamp creationTimeStamp)
         {
             var instance = new DeploymentInstance()
             {
@@ -714,7 +714,7 @@ namespace LagoVista.IoT.StarterKit.Managers
 
         public async Task<InvokeResult> CreateDeployableApp(EntityHeader org, EntityHeader user)
         {
-            var creationDate = DateTime.UtcNow;
+            var creationDate = UtcTimestamp.Now;
 
             var subscription = CreateFreeSubscription(org, user, creationDate);
             var createSolutionResult = await CreateSimpleSolutionAsync(org, user, creationDate);

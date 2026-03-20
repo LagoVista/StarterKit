@@ -12,7 +12,6 @@ using LagoVista.IoT.StarterKit.Resources;
 using LagoVista.ProjectManagement.Models;
 using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 
 namespace LagoVista.IoT.StarterKit.Models
 {

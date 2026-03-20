@@ -2,6 +2,7 @@
 // ContentHash: 61c9c084f8eed40e2acb4d437e87c18afc964abefec1ab0e6419dc7810dcd3a9
 // IndexVersion: 2
 // --- END CODE INDEX META ---
+using LagoVista.Core;
 using LagoVista.Core.Interfaces;
 using LagoVista.Core.Models;
 using LagoVista.Core.Validation;
@@ -65,7 +66,7 @@ namespace LagoVista.IoT.StarterKit.Tests
             var orgEh = new EntityHeader() { Id = "53D96B22822945DB8FFDF0BF6FBCB00D", Text = "The Orgs Name" };
             var usrEh = new EntityHeader() { Id = "6A49E4465E364205AA23D8083D9C3C6D", Text = "The Users Name" };
 
-            var creationDate = DateTime.Now;
+            var creationDate = UtcTimestamp.Now;
 
             var solutionCreationResult = await _factory.CreateSimpleSolutionAsync(orgEh, usrEh, creationDate);
 

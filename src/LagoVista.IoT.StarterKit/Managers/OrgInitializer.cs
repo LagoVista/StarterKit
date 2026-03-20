@@ -97,7 +97,7 @@ namespace LagoVista.IoT.StarterKit.Managers
 
         public async Task Init(EntityHeader org, EntityHeader user, bool populateSampleData)
         {
-            var creationTimeStamp = DateTime.UtcNow;
+            var creationTimeStamp = UtcTimestamp.Now;
             await this.AddTrialSubscriptionAsync(org, user, creationTimeStamp);
 
             await this.AddInputTranslatorAsync(org, user, creationTimeStamp);
@@ -124,7 +124,7 @@ namespace LagoVista.IoT.StarterKit.Managers
                 }
             }
 
-            var creationTimeStamp = DateTime.UtcNow;
+            var creationTimeStamp = UtcTimestamp.Now;
 
             var defaultInputTranslator = await _storageUtils.FindWithKeyAsync<InputTranslatorConfiguration>(DEFAULT, org, false);
             if (defaultInputTranslator == null)
@@ -186,7 +186,7 @@ namespace LagoVista.IoT.StarterKit.Managers
             await _storageUtils.DeleteByKeyIfExistsAsync<DeviceConfiguration>(EXAMPLE_MOTION_KEY, org);
         }
 
-        private async Task CreateOrgSetupToDoAsync(EntityHeader org, EntityHeader user, DateTime createTimeStamp)
+        private async Task CreateOrgSetupToDoAsync(EntityHeader org, EntityHeader user, UtcTimestamp createTimeStamp)
         {
             _todoManager.IsForInitialization = true;
 
@@ -199,8 +199,8 @@ namespace LagoVista.IoT.StarterKit.Managers
                 LastUpdatedBy = user,
                 DueDate = DateTime.UtcNow.AddDays(3).ToDateOnly(),
                 Priority = EntityHeader<ProjectManagement.Models.ToDo_Priority>.Create(ProjectManagement.Models.ToDo_Priority.Normal),
-                CreationDate = createTimeStamp.ToJSONString(),
-                LastUpdatedDate = createTimeStamp.ToJSONString(),
+                CreationDate = createTimeStamp,
+                LastUpdatedDate = createTimeStamp,
                 Name = "Build your Team.",
                 Instructions = "Add your team members and assign them the appropriate roles.",
                 WebLink = "/organization/users/manage"
@@ -215,8 +215,8 @@ namespace LagoVista.IoT.StarterKit.Managers
                 LastUpdatedBy = user,
                 DueDate = DateTime.UtcNow.AddDays(5).ToDateOnly(),
                 Priority = EntityHeader<ProjectManagement.Models.ToDo_Priority>.Create(ProjectManagement.Models.ToDo_Priority.Normal),
-                CreationDate = createTimeStamp.ToJSONString(),
-                LastUpdatedDate = createTimeStamp.ToJSONString(),
+                CreationDate = createTimeStamp,
+                LastUpdatedDate = createTimeStamp,
                 Name = "Watch Getting started Video",
                 Instructions = "To better understand the concepts and how to build IoT applications with NuvIoT, watch our getting started video.",
                 WebLink = "/home/welcome"
@@ -232,8 +232,8 @@ namespace LagoVista.IoT.StarterKit.Managers
                 DueDate = DateTime.UtcNow.AddDays(7).ToDateOnly(),
                 Priority = EntityHeader<ProjectManagement.Models.ToDo_Priority>.Create(ProjectManagement.Models.ToDo_Priority.Normal),
                 LastUpdatedBy = user,
-                CreationDate = createTimeStamp.ToJSONString(),
-                LastUpdatedDate = createTimeStamp.ToJSONString(),
+                CreationDate = createTimeStamp,
+                LastUpdatedDate = createTimeStamp,
                 Name = "Create your First IoT Application.",
                 Instructions = "User our Quick Start Template to create your first IoT application with NuvIoT.",
                 WebLink = "/project/fromtemplate"
@@ -242,7 +242,7 @@ namespace LagoVista.IoT.StarterKit.Managers
             _todoManager.IsForInitialization = false;
         }
 
-        public async Task<Subscription> AddTrialSubscriptionAsync(EntityHeader org, EntityHeader user, DateTime createTimeStamp)
+        public async Task<Subscription> AddTrialSubscriptionAsync(EntityHeader org, EntityHeader user, UtcTimestamp createTimeStamp)
         {
             var timeStamp = UtcTimestamp.Now;
 
@@ -270,7 +270,7 @@ namespace LagoVista.IoT.StarterKit.Managers
             return subscription;
         }
 
-        public async Task<DeviceMessageDefinition> AddDefaultMessage(string name, string key, EntityHeader org, EntityHeader user, DateTime createTimeStamp)
+        public async Task<DeviceMessageDefinition> AddDefaultMessage(string name, string key, EntityHeader org, EntityHeader user, UtcTimestamp createTimeStamp)
         {
             await _storageUtils.DeleteByKeyIfExistsAsync<DeviceMessageDefinition>(key, org);
             await _storageUtils.DeleteByKeyIfExistsAsync<Verifier>("exmplmotgparser", org);
@@ -346,7 +346,7 @@ namespace LagoVista.IoT.StarterKit.Managers
 
         public async Task<DeviceConfiguration> AddDeviceConfigAsync(string name, string key, SentinelConfiguration sentinal,
             InputTranslatorConfiguration input, DeviceWorkflow workflow, OutputTranslatorConfiguration output,
-            DeviceMessageDefinition msg, EntityHeader org, EntityHeader user, DateTime createTimestamp)
+            DeviceMessageDefinition msg, EntityHeader org, EntityHeader user, UtcTimestamp createTimestamp)
         {
             if (sentinal == null) throw new ArgumentNullException(nameof(sentinal));
             if (input == null) throw new ArgumentNullException(nameof(input));
@@ -422,7 +422,7 @@ namespace LagoVista.IoT.StarterKit.Managers
             return deviceConfig;
         }
 
-        public async Task<Solution> CreateSolutionAsync(string name, string key, EntityHeader org, EntityHeader user, DateTime createTimestamp,
+        public async Task<Solution> CreateSolutionAsync(string name, string key, EntityHeader org, EntityHeader user, UtcTimestamp createTimestamp,
             PlannerConfiguration planner, DeviceConfiguration deviceConfig, ListenerConfiguration listener)
         {
             await _storageUtils.DeleteByKeyIfExistsAsync<Solution>(key, org);
@@ -471,7 +471,7 @@ namespace LagoVista.IoT.StarterKit.Managers
             return solution;
         }
 
-        public async Task<DeviceType> AddDeviceType(string name, string key, DeviceConfiguration deviceConfg, EntityHeader org, EntityHeader user, DateTime createTimestamp)
+        public async Task<DeviceType> AddDeviceType(string name, string key, DeviceConfiguration deviceConfg, EntityHeader org, EntityHeader user, UtcTimestamp createTimestamp)
         {
             await _storageUtils.DeleteByKeyIfExistsAsync<DeviceType>(key, org);
 
@@ -491,7 +491,7 @@ namespace LagoVista.IoT.StarterKit.Managers
             return deviceType;
         }
 
-        public async Task<DeviceWorkflow> AddDeviceWorkflow(String name, string key, EntityHeader org, EntityHeader user, DateTime createTimestamp)
+        public async Task<DeviceWorkflow> AddDeviceWorkflow(String name, string key, EntityHeader org, EntityHeader user, UtcTimestamp createTimestamp)
         {
             await _storageUtils.DeleteByKeyIfExistsAsync<DeviceWorkflow>(key, org);
 
@@ -598,7 +598,7 @@ function onSet(value /* String */) {
             return wf;
         }
 
-        public async Task<PlannerConfiguration> AddPlanner(string name, string key, EntityHeader org, EntityHeader user, DateTime createTimestamp)
+        public async Task<PlannerConfiguration> AddPlanner(string name, string key, EntityHeader org, EntityHeader user, UtcTimestamp createTimestamp)
         {
             await _storageUtils.DeleteByKeyIfExistsAsync<PlannerConfiguration>(key, org);
             await _storageUtils.DeleteByKeyIfExistsAsync<Verifier>("explmotmsgidinpath", org);
@@ -683,7 +683,7 @@ function onSet(value /* String */) {
             return planner;
         }
 
-        public async Task<DeviceRepository> AddTrialRepository(string name, string key, Subscription subscription, EntityHeader org, EntityHeader user, DateTime createTimestamp)
+        public async Task<DeviceRepository> AddTrialRepository(string name, string key, Subscription subscription, EntityHeader org, EntityHeader user, UtcTimestamp createTimestamp)
         {
             await _storageUtils.DeleteByKeyIfExistsAsync<DeviceRepository>(key, org);
 
@@ -712,7 +712,7 @@ function onSet(value /* String */) {
             return repo;
         }
 
-        public async Task<ListenerConfiguration> AddPort80Listener(string key, string name, string description, EntityHeader org, EntityHeader user, DateTime createTimestamp)
+        public async Task<ListenerConfiguration> AddPort80Listener(string key, string name, string description, EntityHeader org, EntityHeader user, UtcTimestamp createTimestamp)
         {
             await _storageUtils.DeleteByKeyIfExistsAsync<ListenerConfiguration>(key, org);
 
@@ -739,7 +739,7 @@ function onSet(value /* String */) {
             return port80Listener;
         }
 
-        public async Task<SentinelConfiguration> AddAnonymousSentinelAsync(EntityHeader org, EntityHeader user, DateTime createTimestamp)
+        public async Task<SentinelConfiguration> AddAnonymousSentinelAsync(EntityHeader org, EntityHeader user, UtcTimestamp createTimestamp)
         {
             var sentinal = new SentinelConfiguration();
             sentinal.Name = "Anonymous";
@@ -756,7 +756,7 @@ function onSet(value /* String */) {
             return sentinal;
         }
 
-        public async Task<InputTranslatorConfiguration> AddInputTranslatorAsync(EntityHeader org, EntityHeader user, DateTime createTimestamp)
+        public async Task<InputTranslatorConfiguration> AddInputTranslatorAsync(EntityHeader org, EntityHeader user, UtcTimestamp createTimestamp)
         {
             var inputTranslator = new InputTranslatorConfiguration();
             inputTranslator.Name = "Default Input Translator";
@@ -774,7 +774,7 @@ function onSet(value /* String */) {
             return inputTranslator;
         }
 
-        public async Task<DeviceWorkflow> AddDefaultWorkflowAsync(EntityHeader org, EntityHeader user, DateTime createTimestamp)
+        public async Task<DeviceWorkflow> AddDefaultWorkflowAsync(EntityHeader org, EntityHeader user, UtcTimestamp createTimestamp)
         {
             var wf = new DeviceWorkflow();
             wf.Pages.Add(new DiagramPage()
@@ -797,7 +797,7 @@ function onSet(value /* String */) {
             return wf;
         }
 
-        public async Task<OutputTranslatorConfiguration> AddOutputTranslatorsAsync(EntityHeader org, EntityHeader user, DateTime createTimestamp)
+        public async Task<OutputTranslatorConfiguration> AddOutputTranslatorsAsync(EntityHeader org, EntityHeader user, UtcTimestamp createTimestamp)
         {
             var outputTranslator = new OutputTranslatorConfiguration();
             outputTranslator.Name = "Default Output Translator";
@@ -816,7 +816,7 @@ function onSet(value /* String */) {
         }
 
         public async Task<DeploymentInstance> CreateInstanceAsync(Subscription subscription, Solution solution, DeviceRepository repo, string name, string key,
-            string environmentName, EntityHeader org, EntityHeader user, DateTime createTimestamp)
+            string environmentName, EntityHeader org, EntityHeader user, UtcTimestamp createTimestamp)
         {
             if (subscription == null) throw new ArgumentNullException(nameof(subscription));
             if (solution == null) throw new ArgumentNullException(nameof(solution));
@@ -888,7 +888,7 @@ function onSet(value /* String */) {
         }
 
         public async Task<Device> AddDeviceAsync(string name, string deviceId, DeviceRepository repo, DeviceConfiguration deviceConfig, DeviceType deviceType,
-            EntityHeader org, EntityHeader user, DateTime createTimestamp)
+            EntityHeader org, EntityHeader user, UtcTimestamp createTimestamp)
         {
             if (deviceType == null) throw new ArgumentNullException(nameof(deviceType));
             if (deviceConfig == null) throw new ArgumentNullException(nameof(deviceConfig));
@@ -919,7 +919,7 @@ function onSet(value /* String */) {
         }
 
         public async Task<LagoVista.IoT.Simulator.Admin.Models.Simulator> CreateSimulator(DeploymentInstance instance, Device device, string name, string key,
-            EntityHeader org, EntityHeader user, DateTime createTimestamp)
+            EntityHeader org, EntityHeader user, UtcTimestamp createTimestamp)
         {
             await _storageUtils.DeleteByKeyIfExistsAsync<LagoVista.IoT.Simulator.Admin.Models.Simulator>(key, org);
 

@@ -13,10 +13,10 @@ namespace LagoVista.IoT.StarterKit.Managers
 {
     public abstract class InitializerBase
     {
-        protected void AddAuditProperties(IAuditableEntitySimple entity, DateTime creationTimeStamp, EntityHeader org, EntityHeader user)
+        protected void AddAuditProperties(IAuditableEntitySimple entity, UtcTimestamp creationTimeStamp, EntityHeader org, EntityHeader user)
         {
-            entity.CreationDate = creationTimeStamp.ToJSONString();
-            entity.LastUpdatedDate = creationTimeStamp.ToJSONString();
+            entity.CreationDate = creationTimeStamp;
+            entity.LastUpdatedDate = creationTimeStamp;
             entity.CreatedBy = user;
             entity.LastUpdatedBy = user;
         }

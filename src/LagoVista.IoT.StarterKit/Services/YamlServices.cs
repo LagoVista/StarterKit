@@ -127,10 +127,10 @@ namespace LagoVista.IoT.StarterKit.Services
             
         }
 
-        protected void AddAuditProperties(IAuditableEntity entity, DateTime creationTimeStamp, EntityHeader org, EntityHeader user)
+        protected void AddAuditProperties(IAuditableEntity entity, UtcTimestamp creationTimeStamp, EntityHeader org, EntityHeader user)
         {
-            entity.CreationDate = creationTimeStamp.ToJSONString();
-            entity.LastUpdatedDate = creationTimeStamp.ToJSONString();
+            entity.CreationDate = creationTimeStamp;
+            entity.LastUpdatedDate = creationTimeStamp;
             entity.CreatedBy = user;
             entity.LastUpdatedBy = user;
         }
@@ -147,7 +147,7 @@ namespace LagoVista.IoT.StarterKit.Services
         }
 
 
-        private async Task<Object> CreateNuvIoTObject(Type objType, DateTime createDateStamp, EntityHeader org, EntityHeader user, Dictionary<object, object> yaml)
+        private async Task<Object> CreateNuvIoTObject(Type objType, UtcTimestamp createDateStamp, EntityHeader org, EntityHeader user, Dictionary<object, object> yaml)
         {
             var obj = Activator.CreateInstance(objType);
 
@@ -308,7 +308,7 @@ namespace LagoVista.IoT.StarterKit.Services
             return obj;
         }
 
-        private async Task<T> CreateNuvIoTObject<T>(DateTime createDateStamp, EntityHeader org, EntityHeader user, Dictionary<object, object> yaml) where T : class
+        private async Task<T> CreateNuvIoTObject<T>(UtcTimestamp createDateStamp, EntityHeader org, EntityHeader user, Dictionary<object, object> yaml) where T : class
         {
             return await CreateNuvIoTObject(typeof(T), createDateStamp, org, user, yaml) as T;
         }
@@ -583,7 +583,7 @@ namespace LagoVista.IoT.StarterKit.Services
         {
             _org = org;
             _user = usr;
-            var dateStamp = DateTime.UtcNow;
+            var dateStamp = UtcTimestamp.Now;
 
             using (var rdr = new StreamReader(strm))
             {

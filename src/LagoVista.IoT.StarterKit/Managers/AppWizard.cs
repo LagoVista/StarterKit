@@ -53,7 +53,7 @@ namespace LagoVista.IoT.StarterKit.Managers
 
         private async Task<InvokeResult<Project>> CreateProjectForProjectTemplateAsync(AppWizardRequest appWizardRequest, EntityHeader org, EntityHeader user)
         {
-            var timeStamp = DateTime.UtcNow.ToJSONString();
+            var timeStamp = UtcTimestamp.Now;
 
             var project = new Project()
             {
@@ -96,7 +96,7 @@ namespace LagoVista.IoT.StarterKit.Managers
         private async Task<InvokeResult<Project>> CreateProjectForSurveyAsync(AppWizardRequest appWizardRequest, EntityHeader org, EntityHeader user)
         {
 
-            var timeStamp = DateTime.UtcNow.ToJSONString();
+            var timeStamp = UtcTimestamp.Now;
 
             var project = new Project()
             {

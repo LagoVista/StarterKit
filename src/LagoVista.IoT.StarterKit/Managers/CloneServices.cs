@@ -111,7 +111,7 @@ namespace LagoVista.IoT.StarterKit.Managers
             if (!project.IsPublic && project.OwnerOrganization.Id != org.Id)
                 throw new NotAuthorizedException($"Attempt to clone a non public project that is not owned by the current org.  Current Org: {org.Text}  Owner Org: {project.OwnerOrganization.Text}");
 
-            var timeStamp = DateTime.UtcNow.ToJSONString();
+            var timeStamp = UtcTimestamp.Now;
 
             project.Id = Guid.NewGuid().ToId();
             project.Name = cloneRequest.NewProjectName;

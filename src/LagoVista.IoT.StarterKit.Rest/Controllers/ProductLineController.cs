@@ -18,23 +18,42 @@ using System.Threading.Tasks;
 namespace LagoVista.IoT.StarterKit.Rest.Controllers
 {
 
+    /// <summary>
+    /// Product lines are used to help group products together.  They can be used to drive common objects and to do templates across a set of products.  For example you might have a product line for "Smart Thermostats" that includes multiple products from different manufacturers, but they all share the same set of objects and to do templates.
+    /// </summary>
     [Authorize]
     public class ProductLineController : LagoVistaBaseController
     {
         private readonly IProductLineManager _productLineManager;
 
+        /// <summary>
+        /// Create a product line instance.
+        /// </summary>
+        /// <param name="productLineManager"></param>
+        /// <param name="userManager"></param>
+        /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public ProductLineController(IProductLineManager productLineManager, UserManager<AppUser> userManager, IAdminLogger logger) : base(userManager, logger)
         {
             this._productLineManager = productLineManager ?? throw new ArgumentNullException(nameof(productLineManager));
         }
 
-
+        /// <summary>
+        /// Add a new product line
+        /// </summary>
+        /// <param name="errorCode"></param>
+        /// <returns></returns>
         [HttpPost("/api/productline")]
         public Task<InvokeResult> AddProductLineAsync([FromBody] ProductLine errorCode)
         {
             return _productLineManager.AddProductLineAsync(errorCode, OrgEntityHeader, UserEntityHeader);
         }
 
+        /// <summary>
+        /// Update product line
+        /// </summary>
+        /// <param name="errorCode"></param>
+        /// <returns></returns>
         [HttpPut("/api/productline")]
         public Task<InvokeResult> UpdateProductLineAsync([FromBody] ProductLine errorCode)
         {
@@ -54,6 +73,11 @@ namespace LagoVista.IoT.StarterKit.Rest.Controllers
             return DetailResponse<ProductLine>.Create(productLine);
         }
 
+
+        /// <summary>
+        /// create product line
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("/api/productline/factory")]
         public DetailResponse<ProductLine> ProductLineFactory()
         {
@@ -63,7 +87,10 @@ namespace LagoVista.IoT.StarterKit.Rest.Controllers
             return errorCode;
         }
 
-
+        /// <summary>
+        /// Create product line object
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("/api/productline/object/factory")]
         public DetailResponse<ProductLineObject> ProductLineObjectFactory()
         {
@@ -71,19 +98,31 @@ namespace LagoVista.IoT.StarterKit.Rest.Controllers
         }
 
 
+        /// <summary>
+        /// Create to do template
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("/api/productline/todotemplate/factory")]
         public DetailResponse<ToDoTemplate> CreateToDoTemplate()
         {
             return DetailResponse<ToDoTemplate>.Create();
         }
 
-       
+       /// <summary>
+       /// Get proudct lines for org.
+       /// </summary>
+       /// <returns></returns>
         [HttpGet("/api/productlines")]
         public Task<ListResponse<ProductLineSummary>> GetProductLinesForFor()
         {
             return _productLineManager.GetProductLinesAsync(GetListRequestFromHeader(), OrgEntityHeader, UserEntityHeader);
         }
 
+        /// <summary>
+        /// Delte product line
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete("/api/productline/{id}")]
         public async Task<InvokeResult> DeleteProductLineAsync(string id)
         {
