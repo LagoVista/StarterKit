@@ -23,9 +23,9 @@ namespace LagoVista.IoT.StaterKit.CloudRepos
 
 namespace LagoVista.DependencyInjection
 {
-    public static class BillingModule
+    public static class StarterKitModule
     {
-        public static void AddBillingModule(this IServiceCollection services, IConfigurationRoot configRoot, IAdminLogger logger)
+        public static void AddStarterKitModule(this IServiceCollection services, IConfigurationRoot configRoot, IAdminLogger logger)
         {
             LagoVista.IoT.StarterKit.Startup.ConfigureServices(services);
             LagoVista.IoT.StaterKit.CloudRepos.Startup.ConfigureServices(services);
