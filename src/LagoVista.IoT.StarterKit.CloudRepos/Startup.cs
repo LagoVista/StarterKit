@@ -3,8 +3,10 @@
 // IndexVersion: 2
 // --- END CODE INDEX META ---
 using LagoVista.IoT.Logging.Loggers;
+using LagoVista.IoT.StarterKit;
 using LagoVista.IoT.StarterKit.Interfaces;
 using LagoVista.IoT.StarterKit.Models;
+using LagoVista.IoT.StarterKits.CloudRepos;
 using LagoVista.IoT.StarterKits.CloudRepos.Repos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +18,7 @@ namespace LagoVista.IoT.StaterKit.CloudRepos
         public static void ConfigureServices(IServiceCollection services)
         {
             services.AddTransient<IProductLineRepo, ProductLineRepo>();
+            services.AddTransient<IStarterKitConnection, StarterKitConnection>();
         }
     }
 }

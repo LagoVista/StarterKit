@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>LagoVista.IoT.StarterKit.Rest</id>
-    <version>3.0.3229.0435</version>
+    <version>3.0.3230.1347</version>
     <authors>Software Logistics, LLC</authors>
     <owners>Software Logistics, LLC</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -12,17 +12,17 @@
     <copyright>Copyright Software Logistics - 2026</copyright>
     <tags>HomeAutomation IoT Cloud LagoVista</tags>
     <icon>LagoVistaIcon.png</icon>
-    <releaseNotes>Build Date: 3/20/2026 8:35:55 AM UTC</releaseNotes>
+    <releaseNotes>Build Date: 3/21/2026 5:47:28 PM UTC</releaseNotes>
     <repository url="https://www.github.com/lagovista" type="git" branch="master"></repository>
     <dependencies>
       <group targetFramework="net9.0">
-        <dependency id="LagoVista.Core" version="3.0.3229.0435" />
-        <dependency id="LagoVista.IoT.Pipeline.Admin" version="3.0.3229.0435" />
-        <dependency id="LagoVista.IoT.Logging" version="3.0.3229.0435" />
-        <dependency id="LagoVista.IoT.Runtime.Core" version="3.0.3229.0435" />
-        <dependency id="LagoVista.IoT.Web.Common" version="3.0.3229.0435" />
-        <dependency id="LagoVista.UserAdmin" version="3.0.3229.0435" />
-        <dependency id="LagoVista.IoT.StarterKit" version="3.0.3229.0435" />
+        <dependency id="LagoVista.Core" version="3.0.3230.1347" />
+        <dependency id="LagoVista.IoT.Pipeline.Admin" version="3.0.3230.1347" />
+        <dependency id="LagoVista.IoT.Logging" version="3.0.3230.1347" />
+        <dependency id="LagoVista.IoT.Runtime.Core" version="3.0.3230.1347" />
+        <dependency id="LagoVista.IoT.Web.Common" version="3.0.3230.1347" />
+        <dependency id="LagoVista.UserAdmin" version="3.0.3230.1347" />
+        <dependency id="LagoVista.IoT.StarterKit" version="3.0.3230.1347" />
       </group>
     </dependencies>
   </metadata>
