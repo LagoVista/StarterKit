@@ -87,7 +87,7 @@ namespace LagoVista.IoT.StarterKit.Managers
             _productStoreRepo = productStore;
 
             _storageUtils = new StorageUtils(new Uri(starterKitConnection.StarterKitStorage.Uri), starterKitConnection.StarterKitStorage.AccessKey,
-                starterKitConnection.StarterKitStorage.ResourceName, logger);
+                starterKitConnection.StarterKitStorage.ResourceName, new CosmosClientProvider(), logger);
         }
 
         private const string EXAMPLE_MOTION_KEY = "examplemotion";

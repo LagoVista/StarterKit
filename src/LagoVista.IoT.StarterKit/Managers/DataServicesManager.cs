@@ -71,7 +71,7 @@ namespace LagoVista.IoT.StarterKit.Managers
             _solutionMgr = solutionMgr;
 
             _storageUtils = new StorageUtils(new Uri(starterKitConnection.StarterKitStorage.Uri), starterKitConnection.StarterKitStorage.AccessKey,
-                starterKitConnection.StarterKitStorage.ResourceName, logger);
+                starterKitConnection.StarterKitStorage.ResourceName, new CosmosClientProvider(), logger);
 
         }
 

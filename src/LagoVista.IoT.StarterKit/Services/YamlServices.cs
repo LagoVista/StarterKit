@@ -123,7 +123,7 @@ namespace LagoVista.IoT.StarterKit.Services
             _projectTemplateManager = projectTemplateManager;
 
             _storageUtils = new StorageUtils(new Uri(starterKitConnection.StarterKitStorage.Uri), starterKitConnection.StarterKitStorage.AccessKey,
-                starterKitConnection.StarterKitStorage.ResourceName, logger);
+                starterKitConnection.StarterKitStorage.ResourceName, new CosmosClientProvider(), logger);
             
         }
 
