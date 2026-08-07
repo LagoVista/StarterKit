@@ -19,7 +19,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="LagoVista.Core.TestBase" Version="3.0.3230.1347" />
+    <PackageReference Include="LagoVista.Core.TestBase" Version="3.0.3369.1318" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\LagoVista.IoT.StarterKit\LagoVista.IoT.StarterKit.csproj" />

@@ -2,6 +2,7 @@
 // ContentHash: fa8021ed363a27f2ce97a21ca7adbd4c009278c339ea8772c4e59d3d37919955
 // IndexVersion: 2
 // --- END CODE INDEX META ---
+using LagoVista.CloudStorage.Interfaces;
 using LagoVista.CloudStorage.Storage;
 using LagoVista.Core;
 using LagoVista.Core.Interfaces;
@@ -61,7 +62,7 @@ namespace LagoVista.IoT.StarterKit.Tests
             _starterKitConnection.StarterKitStorage.AccessKey = prodConection.AccessKey;
             _starterKitConnection.StarterKitStorage.ResourceName = prodConection.ResourceName;
 
-            _storageUtils = new StorageUtils(new Uri(prodConection.Uri), prodConection.AccessKey, prodConection.ResourceName, new AdminLogger(new ConsoleWriter()));
+            _storageUtils = new StorageUtils(new Uri(prodConection.Uri), prodConection.AccessKey, prodConection.ResourceName, new CosmosClientProvider(), new AdminLogger(new ConsoleWriter()), Mock.Of<ICacheProvider>());
 
             _orgRepo.Setup(orr => orr.GetOrganizationAsync(It.IsAny<string>())).ReturnsAsync(new UserAdmin.Models.Orgs.Organization()
             {
