@@ -3,6 +3,7 @@
 // IndexVersion: 2
 // --- END CODE INDEX META ---
 using LagoVista.CloudStorage.DocumentDB;
+using LagoVista.CloudStorage.Interfaces;
 using LagoVista.Core.Models.UIMetaData;
 using LagoVista.IoT.Logging.Loggers;
 using LagoVista.IoT.StarterKit;
@@ -14,8 +15,7 @@ namespace LagoVista.IoT.StarterKits.CloudRepos.Repos
 {
     public class ProductLineRepo : DocumentDBRepoBase<ProductLine>, IProductLineRepo
     {
-        public ProductLineRepo(IStarterKitConnection repoSettings, IAdminLogger logger)
-            : base(repoSettings.StarterKitStorage.Uri, repoSettings.StarterKitStorage.AccessKey, repoSettings.StarterKitStorage.ResourceName, logger)
+        public ProductLineRepo(IDocumentCloudCachedServices services) : base(services)
         {
         }
 
