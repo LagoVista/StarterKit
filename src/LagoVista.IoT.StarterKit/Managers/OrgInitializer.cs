@@ -37,6 +37,7 @@ using LagoVista.IoT.Runtime.Core.Models.Verifiers;
 using LagoVista.IoT.Billing.Managers;
 using LagoVista.ProjectManagement;
 using LagoVista.Core.Product;
+using LagoVista.CloudStorage.Utils;
 
 namespace LagoVista.IoT.StarterKit.Managers
 {
