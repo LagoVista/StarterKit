@@ -1,8 +1,8 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <package>
   <metadata>
     <id>LagoVista.IoT.StarterKit</id>
-    <version>3.0.3369.1318</version>
+    <version>6.0.0</version>
     <authors>Software Logistics, LLC</authors>
     <owners>Software Logistics, LLC</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -16,24 +16,24 @@
     <repository url="https://www.github.com/lagovista" type="git" branch="master"></repository>
     <dependencies>
       <group targetFramework="net9.0">
-        <dependency id="LagoVista.CloudStorage" version="3.0.3369.1318" />
-        <dependency id="LagoVista.IoT.Billing.Managers" version="3.0.3369.1318" />
-        <dependency id="LagoVista.IoT.DeviceAdmin" version="3.0.3369.1318" />
-        <dependency id="LagoVista.IoT.DeviceManagement.Core" version="3.0.3369.1318" />
-        <dependency id="LagoVista.IoT.DeviceMessaging.Admin" version="3.0.3369.1318" />
-        <dependency id="LagoVista.IoT.Verifiers" version="3.0.3369.1318" />
-        <dependency id="LagoVista.Manufacturing" version="3.0.3369.1318" />
-        <dependency id="LagoVista.IoT.Runtime.Core" version="3.0.3369.1318" />
-        <dependency id="LagoVista.IoT.Pipeline.Admin" version="3.0.3369.1318" />
-        <dependency id="LagoVista.IoT.Deployment.Admin" version="3.0.3369.1318" />
-        <dependency id="LagoVista.IoT.Simulator.Admin" version="3.0.3369.1318" />
+        <dependency id="LagoVista.CloudStorage" version="6.0.2" />
+        <dependency id="LagoVista.IoT.Billing.Managers" version="6.0.0" />
+        <dependency id="LagoVista.IoT.Deployment.Admin" version="6.0.0" />
+        <dependency id="LagoVista.IoT.DeviceAdmin" version="6.0.0" />
+        <dependency id="LagoVista.IoT.DeviceManagement.Core" version="6.0.0" />
+        <dependency id="LagoVista.IoT.DeviceMessaging.Admin" version="6.0.0" />
+        <dependency id="LagoVista.IoT.Pipeline.Admin" version="6.0.0" />
+        <dependency id="LagoVista.IoT.Runtime.Core" version="6.0.0" />
+        <dependency id="LagoVista.IoT.Simulator.Admin" version="6.0.0" />
+        <dependency id="LagoVista.IoT.Verifiers" version="6.0.0" />
+        <dependency id="LagoVista.Manufacturing" version="6.0.0" />
         <dependency id="YamlDotNet" version="16.3.0" />
       </group>
     </dependencies>
   </metadata>
   <files>
     <file src="LagoVistaIcon.png" target="LagoVistaIcon.png" />
-    <file src="bin\release\net9.0\LagoVista.IoT.StarterKit.dll" target="lib\net9.0\LagoVista.IoT.StarterKit.dll" />
-    <file src="bin\release\net9.0\LagoVista.IoT.StarterKit.pdb" target="lib\net9.0\LagoVista.IoT.StarterKit.pdb" />
+    <file src="bin/Release/net9.0/LagoVista.IoT.StarterKit.dll" target="lib/net9.0/LagoVista.IoT.StarterKit.dll" />
+    <file src="bin/Release/net9.0/LagoVista.IoT.StarterKit.pdb" target="lib/net9.0/LagoVista.IoT.StarterKit.pdb" />
   </files>
 </package>

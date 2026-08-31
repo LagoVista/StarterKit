@@ -4,18 +4,18 @@
     <OutputType>Library</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="LagoVista.CloudStorage" Version="3.0.3369.1318" />
-    <PackageReference Include="LagoVista.IoT.Billing.Managers" Version="3.0.3369.1318" />
-    <PackageReference Include="LagoVista.IoT.DeviceAdmin" Version="3.0.3369.1318" />
-    <PackageReference Include="LagoVista.IoT.DeviceManagement.Core" Version="3.0.3369.1318" />
-    <PackageReference Include="LagoVista.IoT.DeviceMessaging.Admin" Version="3.0.3369.1318" />
-    <PackageReference Include="LagoVista.IoT.Verifiers" Version="3.0.3369.1318" />
-    <PackageReference Include="LagoVista.Manufacturing" Version="3.0.3369.1318" />
-    <PackageReference Include="LagoVista.IoT.Runtime.Core" Version="3.0.3369.1318" />
-    <PackageReference Include="LagoVista.IoT.Pipeline.Admin" Version="3.0.3369.1318" />
-    <PackageReference Include="LagoVista.IoT.Deployment.Admin" Version="3.0.3369.1318" />
-    <PackageReference Include="LagoVista.IoT.Simulator.Admin" Version="3.0.3369.1318" />
-    <PackageReference Include="YamlDotNet" Version="16.3.0" />
+    <PackageReference Include="LagoVista.CloudStorage" />
+    <PackageReference Include="LagoVista.IoT.Billing.Managers" />
+    <PackageReference Include="LagoVista.IoT.DeviceAdmin" />
+    <PackageReference Include="LagoVista.IoT.DeviceManagement.Core" />
+    <PackageReference Include="LagoVista.IoT.DeviceMessaging.Admin" />
+    <PackageReference Include="LagoVista.IoT.Verifiers" />
+    <PackageReference Include="LagoVista.Manufacturing" />
+    <PackageReference Include="LagoVista.IoT.Runtime.Core" />
+    <PackageReference Include="LagoVista.IoT.Pipeline.Admin" />
+    <PackageReference Include="LagoVista.IoT.Deployment.Admin" />
+    <PackageReference Include="LagoVista.IoT.Simulator.Admin" />
+    <PackageReference Include="YamlDotNet" />
   </ItemGroup>
   <ItemGroup>
     <None Update="T4ResourceGenerator.tt">
@@ -28,8 +28,6 @@
       <Generator></Generator>
     </EmbeddedResource>
   </ItemGroup>
-
-
   <ItemGroup>
     <Compile Update="T4ResourceGenerator.cs">
       <DesignTime>True</DesignTime>
@@ -37,11 +35,7 @@
       <DependentUpon>T4ResourceGenerator.tt</DependentUpon>
     </Compile>
   </ItemGroup>
-
-
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
-
-
 </Project>

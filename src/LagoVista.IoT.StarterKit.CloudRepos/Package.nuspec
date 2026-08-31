@@ -1,8 +1,8 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <package>
   <metadata>
     <id>LagoVista.IoT.StarterKits.CloudRepos</id>
-    <version>3.0.3369.1318</version>
+    <version>6.0.0</version>
     <authors>Software Logistics, LLC</authors>
     <owners>Software Logistics, LLC</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -16,15 +16,15 @@
     <repository url="https://www.github.com/lagovista" type="git" branch="master"></repository>
     <dependencies>
       <group targetFramework="net9.0">
-        <dependency id="LagoVista.CloudStorage" version="3.0.3369.1318" />
-        <dependency id="LagoVista.Core.Configuration" version="3.0.3369.1318" />
-        <dependency id="LagoVista.IoT.StarterKit" version="3.0.3369.1318" />
+        <dependency id="LagoVista.CloudStorage" version="6.0.2" />
+        <dependency id="LagoVista.Core.Configuration" version="6.0.10" />
+        <dependency id="LagoVista.IoT.StarterKit" version="6.0.0" />
       </group>
     </dependencies>
   </metadata>
   <files>
     <file src="LagoVistaIcon.png" target="LagoVistaIcon.png" />
-    <file src="bin\release\net9.0\LagoVista.IoT.StarterKits.CloudRepos.dll" target="lib\net9.0\LagoVista.IoT.StarterKits.CloudRepos.dll" />
-    <file src="bin\release\net9.0\LagoVista.IoT.StarterKits.CloudRepos.pdb" target="lib\net9.0\LagoVista.IoT.StarterKits.CloudRepos.pdb" />
+    <file src="bin/Release/net9.0/LagoVista.IoT.StarterKits.CloudRepos.dll" target="lib/net9.0/LagoVista.IoT.StarterKits.CloudRepos.dll" />
+    <file src="bin/Release/net9.0/LagoVista.IoT.StarterKits.CloudRepos.pdb" target="lib/net9.0/LagoVista.IoT.StarterKits.CloudRepos.pdb" />
   </files>
 </package>
