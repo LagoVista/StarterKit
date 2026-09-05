@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>LagoVista.IoT.StarterKit</id>
-    <version>7.0.1</version>
+    <version>7.0.2</version>
     <authors>Software Logistics, LLC</authors>
     <owners>Software Logistics, LLC</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -16,17 +16,17 @@
     <repository url="https://www.github.com/lagovista" type="git" branch="master"></repository>
     <dependencies>
       <group targetFramework="net9.0">
-        <dependency id="LagoVista.CloudStorage" version="7.0.3" />
-        <dependency id="LagoVista.IoT.Billing.Managers" version="7.0.1" />
-        <dependency id="LagoVista.IoT.Deployment.Admin" version="7.0.2" />
-        <dependency id="LagoVista.IoT.DeviceAdmin" version="7.0.2" />
-        <dependency id="LagoVista.IoT.DeviceManagement.Core" version="7.0.2" />
-        <dependency id="LagoVista.IoT.DeviceMessaging.Admin" version="7.0.2" />
-        <dependency id="LagoVista.IoT.Pipeline.Admin" version="7.0.2" />
-        <dependency id="LagoVista.IoT.Runtime.Core" version="7.0.2" />
-        <dependency id="LagoVista.IoT.Simulator.Admin" version="7.0.2" />
-        <dependency id="LagoVista.IoT.Verifiers" version="7.0.2" />
-        <dependency id="LagoVista.Manufacturing" version="7.0.2" />
+        <dependency id="LagoVista.CloudStorage" version="7.0.5" />
+        <dependency id="LagoVista.IoT.Billing.Managers" version="7.0.2" />
+        <dependency id="LagoVista.IoT.Deployment.Admin" version="7.0.3" />
+        <dependency id="LagoVista.IoT.DeviceAdmin" version="7.0.3" />
+        <dependency id="LagoVista.IoT.DeviceManagement.Core" version="7.0.3" />
+        <dependency id="LagoVista.IoT.DeviceMessaging.Admin" version="7.0.3" />
+        <dependency id="LagoVista.IoT.Pipeline.Admin" version="7.0.3" />
+        <dependency id="LagoVista.IoT.Runtime.Core" version="7.0.3" />
+        <dependency id="LagoVista.IoT.Simulator.Admin" version="7.0.3" />
+        <dependency id="LagoVista.IoT.Verifiers" version="7.0.3" />
+        <dependency id="LagoVista.Manufacturing" version="7.0.3" />
         <dependency id="YamlDotNet" version="16.3.0" />
       </group>
     </dependencies>
