@@ -1,25 +1,25 @@
-<Project>
+﻿<?xml version="1.0" encoding="utf-8"?><Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="LagoVista.CloudStorage" Version="7.0.5" />
-    <PackageVersion Include="LagoVista.Core" Version="7.0.4" />
-    <PackageVersion Include="LagoVista.Core.Configuration" Version="7.0.4" />
-    <PackageVersion Include="LagoVista.Core.TestBase" Version="7.0.4" />
-    <PackageVersion Include="LagoVista.IoT.Billing.Managers" Version="7.0.2" />
-    <PackageVersion Include="LagoVista.IoT.Deployment.Admin" Version="7.0.3" />
-    <PackageVersion Include="LagoVista.IoT.DeviceAdmin" Version="7.0.3" />
-    <PackageVersion Include="LagoVista.IoT.DeviceManagement.Core" Version="7.0.3" />
-    <PackageVersion Include="LagoVista.IoT.DeviceMessaging.Admin" Version="7.0.3" />
-    <PackageVersion Include="LagoVista.IoT.Logging" Version="7.0.4" />
-    <PackageVersion Include="LagoVista.IoT.Pipeline.Admin" Version="7.0.3" />
-    <PackageVersion Include="LagoVista.IoT.Runtime.Core" Version="7.0.3" />
-    <PackageVersion Include="LagoVista.IoT.Simulator.Admin" Version="7.0.3" />
-    <PackageVersion Include="LagoVista.IoT.Verifiers" Version="7.0.3" />
-    <PackageVersion Include="LagoVista.IoT.Web.Common" Version="7.0.3" />
-    <PackageVersion Include="LagoVista.Manufacturing" Version="7.0.3" />
-    <PackageVersion Include="LagoVista.UserAdmin" Version="7.0.4" />
+    <PackageVersion Include="LagoVista.CloudStorage" Version="7.0.107" />
+    <PackageVersion Include="LagoVista.Core" Version="7.0.61" />
+    <PackageVersion Include="LagoVista.Core.Configuration" Version="7.0.61" />
+    <PackageVersion Include="LagoVista.Core.TestBase" Version="7.0.61" />
+    <PackageVersion Include="LagoVista.IoT.Billing.Managers" Version="7.0.10" />
+    <PackageVersion Include="LagoVista.IoT.Deployment.Admin" Version="7.0.31" />
+    <PackageVersion Include="LagoVista.IoT.DeviceAdmin" Version="7.0.9" />
+    <PackageVersion Include="LagoVista.IoT.DeviceManagement.Core" Version="7.0.12" />
+    <PackageVersion Include="LagoVista.IoT.DeviceMessaging.Admin" Version="7.0.6" />
+    <PackageVersion Include="LagoVista.IoT.Logging" Version="7.0.13" />
+    <PackageVersion Include="LagoVista.IoT.Pipeline.Admin" Version="7.0.6" />
+    <PackageVersion Include="LagoVista.IoT.Runtime.Core" Version="7.0.13" />
+    <PackageVersion Include="LagoVista.IoT.Simulator.Admin" Version="7.0.7" />
+    <PackageVersion Include="LagoVista.IoT.Verifiers" Version="7.0.6" />
+    <PackageVersion Include="LagoVista.IoT.Web.Common" Version="7.0.64" />
+    <PackageVersion Include="LagoVista.Manufacturing" Version="7.0.11" />
+    <PackageVersion Include="LagoVista.UserAdmin" Version="7.0.35" />
     <PackageVersion Include="YamlDotNet" Version="16.3.0" />
   </ItemGroup>
 </Project>
